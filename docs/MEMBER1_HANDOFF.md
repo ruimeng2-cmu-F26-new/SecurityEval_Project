@@ -7,22 +7,25 @@ records. The framework, three sample contracts, source verification, and batch-g
 command are complete. Live generation remains pending until a local OpenAI API key is
 available. No live output or security result is claimed before that run finishes.
 
-## Fixed first-run configuration
+## Fixed detection-experiment configuration
 
 | Setting | Value |
 |---|---|
 | Provider | OpenAI Responses API |
-| Model | `gpt-5.4-mini-2026-03-17` |
-| Reasoning effort | `none` |
-| Maximum output tokens | `4096` |
+| Models | `gpt-6-luna`, `gpt-6.1-sol` |
+| Reasoning effort | `medium` |
+| Maximum output tokens | `25000` |
 | Temperature | Omitted |
 | Storage | `false` |
 | Retry policy | No automatic retries |
-| Attempts | One initial attempt per sample |
+| Attempts | Ten independent requests per task-model combination |
+| Total candidates | 60 |
 
-The snapshot model keeps the first comparison reproducible. All three samples must use
-the same settings. Preserve failed, refused, incomplete, or syntactically invalid outputs
-as recorded errors; do not silently regenerate or select a more favorable candidate.
+Use a dated snapshot when one is available. Otherwise retain the requested model,
+returned model, response ID, UTC timestamp, and complete response metadata. All task-model
+combinations use the same settings. Preserve failed, refused, incomplete, or syntactically
+invalid outputs as recorded errors; do not silently regenerate or select a more favorable
+candidate. The complete design is in `docs/EXPERIMENT_PLAN.md`.
 
 ## Selected sample contracts
 
@@ -38,26 +41,43 @@ Member 2 or Member 3 writes analysis logic or candidate tests.
 
 ## Live generation
 
-From the repository root, activate the Python 3.11 environment, enter the key locally,
-and run one batch. The key must never be pasted into chat, written to a file, or committed.
+Before any paid call, prepare and review all 60 requests:
+
+```bash
+security-eval generate-experiment \
+  --models gpt-6-luna gpt-6.1-sol \
+  --runs 10 \
+  --reasoning-effort medium \
+  --max-output-tokens 25000 \
+  --dry-run \
+  --out artifacts/member1-experiment-dry-run-001
+```
+
+From the repository root, activate the Python 3.11 environment and enter the key locally.
+The key must never be pasted into chat, written to a file, or committed. First make six
+pilot calls by using `--runs 1` and a new output directory. If the final prompt,
+parameters, and parser remain unchanged, those six records may become run 1 of the final
+dataset. Otherwise mark them as excluded pilots and create a fresh experiment directory.
 
 ```bash
 source .venv/bin/activate
 read -s "OPENAI_API_KEY?OpenAI API key: "
 export OPENAI_API_KEY
 printf '\n'
-security-eval generate-batch \
-  --model gpt-5.4-mini-2026-03-17 \
-  --reasoning-effort none \
-  --max-output-tokens 4096 \
-  --out artifacts/member1-live-001
+security-eval generate-experiment \
+  --models gpt-6-luna gpt-6.1-sol \
+  --runs 1 \
+  --reasoning-effort medium \
+  --max-output-tokens 25000 \
+  --out artifacts/member1-pilot-001
 unset OPENAI_API_KEY
 ```
 
-Success requires `manifest.json` to report `complete` and all three records to report
-`generated`. A `generated` record proves only that the response completed, parsed as
-Python, and contained the expected top-level function. It does not prove functional
-correctness or security.
+The full experiment uses the same command with `--runs 10` in a new output directory.
+Success requires `manifest.json` to report `complete`, 60 unique candidate IDs, and all
+60 records to report `generated`. A `generated` record proves only that the response
+completed, parsed as Python, and contained the expected top-level function. It does not
+prove functional correctness or security.
 
 ## Review and teammate delivery
 
@@ -69,7 +89,8 @@ Before sharing any artifact:
 3. Read the candidates without importing or executing them on the host.
 4. Copy the reviewed batch into a tracked experiment directory or share it through the
    agreed team channel. The default `artifacts/` directory is intentionally Git-ignored.
-5. Tell Members 2 and 3 to use the exact same `code.py` files and verify their hashes.
+5. Confirm that the manifest contains 30 candidates per model and ten per task-model pair.
+6. Tell Members 2 and 3 to use the exact same `code.py` files and verify their hashes.
 
 Start the integrated demo with `sql_delete_user`. Member 2 should run Bandit and the
 custom AST rules. Member 3 should run functional and security tests only in the restricted

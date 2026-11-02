@@ -81,3 +81,20 @@ reported **48 passed in 1.80s** and `python -m pip check` found no broken requir
 The pipeline tests exercise real Bandit/AST execution with synthetic Docker responses
 and verify shared run/code identities and evidence paths. They do not claim a live
 LLM run or a new real-Docker experiment.
+
+## Member 1 repeated-experiment preparation — 2026-11-01
+
+- `python -m pytest -q`: **52 passed in 1.85s** after installing the repository-pinned
+  Bandit 1.9.4 dependency in the local virtual environment.
+- `python -m pip check`: no broken requirements.
+- The new `generate-experiment` dry run completed with **60 prepared records**, 60 unique
+  candidate IDs, no errors, no API calls, and no `code.py` files.
+- Distribution: 30 records for `gpt-6-luna`, 30 for `gpt-6.1-sol`, and exactly ten
+  records for every task-model pair.
+- All 60 generation records passed the generation JSON schema. Every request used
+  `reasoning.effort = medium`, `max_output_tokens = 25000`, `store = false`, and omitted
+  `temperature`.
+- `git diff --check` and JSON parsing of the updated generation schema completed cleanly.
+
+This is harness and request-preparation evidence only. No live API call, generated
+candidate, detector result, vulnerability result, or repair result is claimed.

@@ -9,7 +9,15 @@ from openai import OpenAI
 
 from security_eval.cli import main
 from security_eval.contracts import load_samples, validate
-from security_eval.generation import extract_code, generate, prepare, run_batch
+from security_eval.generation import (
+    candidate_id,
+    estimate_cost_usd,
+    extract_code,
+    generate,
+    prepare,
+    run_batch,
+    run_experiment,
+)
 
 
 @pytest.fixture
@@ -18,13 +26,15 @@ def sample():
 
 
 class FixtureResponse:
-    def __init__(self, text, status="completed"):
+    def __init__(self, text, status="completed", model="fixture-only", usage=None):
         self.output_text = text
         self.status = status
+        self.model = model
+        self.usage = usage
 
     def model_dump(self, **kwargs):
-        return {"id": "unit-test-fixture", "model": "fixture-only", "status": self.status,
-                "usage": None, "output": []}
+        return {"id": "unit-test-fixture", "model": self.model, "status": self.status,
+                "usage": self.usage, "output": []}
 
 
 def fixture_client(text, status="completed"):
@@ -37,6 +47,9 @@ def test_dry_run_does_not_create_code_or_claim_generation(tmp_path, sample):
     assert record["status"] == "prepared"
     assert not (out / "code.py").exists()
     assert "temperature" not in json.loads((out / "request.json").read_text())
+    assert record["candidate_id"] == "sql_delete_user__fixture-only__run_01"
+    assert record["run_index"] == 1
+    assert record["prompt_sha256"]
     with pytest.raises(FileExistsError):
         prepare(sample, out, "fixture-only")
 
@@ -158,9 +171,75 @@ def test_batch_missing_key_fails_before_creating_output(tmp_path, monkeypatch):
     assert not out.exists()
 
 
+def test_candidate_ids_and_cost_estimates_are_reproducible():
+    assert candidate_id("sql_delete_user", "gpt-6.1-sol", 3) == (
+        "sql_delete_user__gpt-6-1-sol__run_03"
+    )
+    usage = {
+        "input_tokens": 2000,
+        "input_tokens_details": {"cached_tokens": 500},
+        "output_tokens": 4000,
+    }
+    assert estimate_cost_usd(usage, "gpt-6.1-sol") == 0.04305
+    assert estimate_cost_usd(usage, "unknown-model") is None
+
+
+def test_experiment_dry_run_prepares_every_model_sample_and_run(tmp_path):
+    samples = load_samples(Path(__file__).resolve().parents[2] / "data/samples.jsonl")
+    out = tmp_path / "experiment"
+    manifest = run_experiment(
+        samples, out, ["gpt-6-luna", "gpt-6.1-sol"], runs=2,
+        dry_run=True, reasoning_effort="medium", max_output_tokens=25000,
+    )
+    assert manifest["status"] == "complete"
+    assert manifest["expected_candidates"] == 12
+    assert manifest["status_counts"] == {"prepared": 12, "generated": 0, "error": 0}
+    assert len({item["candidate_id"] for item in manifest["results"]}) == 12
+    assert all(item["status"] == "prepared" for item in manifest["results"])
+    assert all(item["code"] is None for item in manifest["results"])
+    assert not list(out.rglob("code.py"))
+
+
+def test_experiment_generation_records_cost_and_hashes(tmp_path):
+    sample = load_samples(Path(__file__).resolve().parents[2] / "data/samples.jsonl")[:1]
+    usage = {
+        "input_tokens": 1000,
+        "input_tokens_details": {"cached_tokens": 0},
+        "output_tokens": 2000,
+    }
+    code = "def remove_user(conn, username):\n    return 0\n"
+    client = SimpleNamespace(responses=SimpleNamespace(
+        create=lambda **kwargs: FixtureResponse(code, model=kwargs["model"], usage=usage)
+    ))
+    manifest = run_experiment(
+        sample, tmp_path / "experiment", ["gpt-6-luna", "gpt-6.1-sol"],
+        runs=1, client=client, reasoning_effort="medium", max_output_tokens=25000,
+    )
+    assert manifest["status"] == "complete"
+    assert manifest["status_counts"] == {"prepared": 0, "generated": 2, "error": 0}
+    assert manifest["estimated_cost_usd"] == 0.0231
+    assert all(item["response_sha256"] and item["code_sha256"] for item in manifest["results"])
+
+
 def test_cli_batch_dry_run(tmp_path):
     samples = Path(__file__).resolve().parents[2] / "data/samples.jsonl"
     out = tmp_path / "batch"
     assert main(["generate-batch", "--samples", str(samples), "--model", "fixture-only",
                  "--out", str(out), "--reasoning-effort", "none", "--dry-run"]) == 0
     assert json.loads((out / "manifest.json").read_text())["status"] == "complete"
+
+
+def test_cli_experiment_dry_run(tmp_path):
+    samples = Path(__file__).resolve().parents[2] / "data/samples.jsonl"
+    out = tmp_path / "experiment"
+    assert main([
+        "generate-experiment", "--samples", str(samples),
+        "--models", "gpt-6-luna", "gpt-6.1-sol", "--runs", "2",
+        "--out", str(out), "--dry-run",
+    ]) == 0
+    manifest = json.loads((out / "manifest.json").read_text())
+    assert manifest["expected_candidates"] == 12
+    assert manifest["parameters"] == {
+        "max_output_tokens": 25000,
+        "reasoning_effort": "medium",
+    }

@@ -7,7 +7,7 @@ from pathlib import Path
 from jsonschema.exceptions import ValidationError
 
 from .contracts import load_samples, validate
-from .generation import generate, prepare, run_batch
+from .generation import generate, prepare, run_batch, run_experiment
 from .pipeline import evaluate
 from .static_runner import all_completed, format_summary, run_static
 
@@ -35,7 +35,7 @@ def main(argv=None) -> int:
     generation.add_argument("--dry-run", action="store_true")
     generation.add_argument("--temperature", type=float)
     generation.add_argument("--max-output-tokens", type=int, default=4096)
-    generation.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh"])
+    generation.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"])
     batch = commands.add_parser("generate-batch", help="Generate one recorded attempt for every selected sample")
     batch.add_argument("--samples", type=Path, default=Path("data/samples.jsonl"))
     batch.add_argument("--model", default=os.environ.get("OPENAI_MODEL"))
@@ -43,7 +43,21 @@ def main(argv=None) -> int:
     batch.add_argument("--dry-run", action="store_true")
     batch.add_argument("--temperature", type=float)
     batch.add_argument("--max-output-tokens", type=int, default=4096)
-    batch.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh"])
+    batch.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"])
+    experiment = commands.add_parser(
+        "generate-experiment",
+        help="Generate or dry-run repeated independent candidates across multiple models",
+    )
+    experiment.add_argument("--samples", type=Path, default=Path("data/samples.jsonl"))
+    experiment.add_argument("--models", nargs="+", required=True)
+    experiment.add_argument("--runs", type=int, default=10)
+    experiment.add_argument("--out", required=True, type=Path,
+                            help="New experiment directory; existing results are never overwritten")
+    experiment.add_argument("--dry-run", action="store_true")
+    experiment.add_argument("--max-output-tokens", type=int, default=25000)
+    experiment.add_argument("--reasoning-effort",
+                            choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"],
+                            default="medium")
     args = parser.parse_args(argv)
     try:
         if args.command == "validate":
@@ -61,6 +75,20 @@ def main(argv=None) -> int:
             print(format_summary(summary))
             print(f"Results: {args.out / 'static_summary.json'}")
             return 0 if all_completed(summary) else 1
+        elif args.command == "generate-experiment":
+            manifest = run_experiment(
+                load_samples(args.samples), args.out, args.models,
+                runs=args.runs, dry_run=args.dry_run,
+                max_output_tokens=args.max_output_tokens,
+                reasoning_effort=args.reasoning_effort,
+            )
+            print(json.dumps({
+                "status": manifest["status"],
+                "expected_candidates": manifest["expected_candidates"],
+                "status_counts": manifest["status_counts"],
+                "manifest": str(args.out / "manifest.json"),
+            }))
+            return 0 if manifest["status"] == "complete" else 1
         elif args.command == "generate-batch":
             if not args.model:
                 raise ValueError("Set --model or OPENAI_MODEL explicitly")
