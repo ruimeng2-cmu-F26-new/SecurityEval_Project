@@ -30,20 +30,18 @@ def main(argv=None) -> int:
     generation = commands.add_parser("generate", help="Generate one candidate or prepare a dry run")
     generation.add_argument("sample_id")
     generation.add_argument("--samples", type=Path, default=Path("data/samples.jsonl"))
-    generation.add_argument("--model", default=os.environ.get("OPENAI_MODEL"))
+    generation.add_argument("--model", default=os.environ.get("ANTHROPIC_MODEL"))
     generation.add_argument("--out", required=True, type=Path, help="New directory; existing results are never overwritten")
     generation.add_argument("--dry-run", action="store_true")
-    generation.add_argument("--temperature", type=float)
-    generation.add_argument("--max-output-tokens", type=int, default=4096)
-    generation.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"])
+    generation.add_argument("--max-tokens", type=int, default=16000)
+    generation.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default="medium")
     batch = commands.add_parser("generate-batch", help="Generate one recorded attempt for every selected sample")
     batch.add_argument("--samples", type=Path, default=Path("data/samples.jsonl"))
-    batch.add_argument("--model", default=os.environ.get("OPENAI_MODEL"))
+    batch.add_argument("--model", default=os.environ.get("ANTHROPIC_MODEL"))
     batch.add_argument("--out", required=True, type=Path, help="New batch directory; existing results are never overwritten")
     batch.add_argument("--dry-run", action="store_true")
-    batch.add_argument("--temperature", type=float)
-    batch.add_argument("--max-output-tokens", type=int, default=4096)
-    batch.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"])
+    batch.add_argument("--max-tokens", type=int, default=16000)
+    batch.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default="medium")
     experiment = commands.add_parser(
         "generate-experiment",
         help="Generate or dry-run repeated independent candidates across multiple models",
@@ -54,9 +52,8 @@ def main(argv=None) -> int:
     experiment.add_argument("--out", required=True, type=Path,
                             help="New experiment directory; existing results are never overwritten")
     experiment.add_argument("--dry-run", action="store_true")
-    experiment.add_argument("--max-output-tokens", type=int, default=25000)
-    experiment.add_argument("--reasoning-effort",
-                            choices=["none", "minimal", "low", "medium", "high", "xhigh", "max"],
+    experiment.add_argument("--max-tokens", type=int, default=16000)
+    experiment.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
                             default="medium")
     args = parser.parse_args(argv)
     try:
@@ -79,8 +76,8 @@ def main(argv=None) -> int:
             manifest = run_experiment(
                 load_samples(args.samples), args.out, args.models,
                 runs=args.runs, dry_run=args.dry_run,
-                max_output_tokens=args.max_output_tokens,
-                reasoning_effort=args.reasoning_effort,
+                max_tokens=args.max_tokens,
+                effort=args.effort,
             )
             print(json.dumps({
                 "status": manifest["status"],
@@ -91,25 +88,22 @@ def main(argv=None) -> int:
             return 0 if manifest["status"] == "complete" else 1
         elif args.command == "generate-batch":
             if not args.model:
-                raise ValueError("Set --model or OPENAI_MODEL explicitly")
+                raise ValueError("Set --model or ANTHROPIC_MODEL explicitly")
             manifest = run_batch(
                 load_samples(args.samples), args.out, args.model,
-                dry_run=args.dry_run, temperature=args.temperature,
-                max_output_tokens=args.max_output_tokens,
-                reasoning_effort=args.reasoning_effort,
+                dry_run=args.dry_run, max_tokens=args.max_tokens, effort=args.effort,
             )
             print(json.dumps({"status": manifest["status"], "manifest": str(args.out / "manifest.json")}))
             return 0 if manifest["status"] == "complete" else 1
         else:
             if not args.model:
-                raise ValueError("Set --model or OPENAI_MODEL explicitly")
+                raise ValueError("Set --model or ANTHROPIC_MODEL explicitly")
             samples = {s["sample_id"]: s for s in load_samples(args.samples)}
             if args.sample_id not in samples:
                 raise ValueError("Unknown sample_id")
             operation = prepare if args.dry_run else generate
             record = operation(samples[args.sample_id], args.out, args.model,
-                               temperature=args.temperature, max_output_tokens=args.max_output_tokens,
-                               reasoning_effort=args.reasoning_effort)
+                               max_tokens=args.max_tokens, effort=args.effort)
             print(json.dumps({"status": record["status"], "record": str(args.out / "generation.json")}))
             return 1 if record["status"] == "error" else 0
         return 0

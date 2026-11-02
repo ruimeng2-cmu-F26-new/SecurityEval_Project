@@ -16,8 +16,8 @@ They are not candidate functionality/security results and are not GitHub CI resu
 The tests exercise contract rejection, duplicate sample handling, batch preparation,
 credential checks before batch output creation, pending analyzer
 states, code extraction, missing credentials, API failure, empty/invalid/incomplete
-outputs, preservation of raw output, prevention of candidate execution, the real
-OpenAI SDK with an explicitly mocked HTTP transport, and pipeline hash checks.
+outputs, preservation of raw output, prevention of candidate execution, provider
+request serialization, and pipeline hash checks.
 Synthetic fixture responses exist only in temporary test directories.
 
 ## Not run / not implemented
@@ -82,18 +82,18 @@ The pipeline tests exercise real Bandit/AST execution with synthetic Docker resp
 and verify shared run/code identities and evidence paths. They do not claim a live
 LLM run or a new real-Docker experiment.
 
-## Member 1 repeated-experiment preparation — 2026-11-01
+## Member 1 Claude experiment preparation — 2026-11-01
 
-- `python -m pytest -q`: **52 passed in 1.85s** after installing the repository-pinned
-  Bandit 1.9.4 dependency in the local virtual environment.
+- `python -m pytest -q`: **52 passed** with synthetic Claude fixtures and no
+  live provider request.
 - `python -m pip check`: no broken requirements.
 - The new `generate-experiment` dry run completed with **60 prepared records**, 60 unique
   candidate IDs, no errors, no API calls, and no `code.py` files.
-- Distribution: 30 records for `gpt-6-luna`, 30 for `gpt-6.1-sol`, and exactly ten
+- Distribution: 30 records for `claude-haiku-5-5`, 30 for `claude-sonnet-5-5`, and exactly ten
   records for every task-model pair.
 - All 60 generation records passed the generation JSON schema. Every request used
-  `reasoning.effort = medium`, `max_output_tokens = 25000`, `store = false`, and omitted
-  `temperature`.
+  `thinking.type = adaptive`, `output_config.effort = medium`, `max_tokens = 16000`,
+  and omitted temperature, top-p, and top-k.
 - `git diff --check` and JSON parsing of the updated generation schema completed cleanly.
 
 This is harness and request-preparation evidence only. No live API call, generated

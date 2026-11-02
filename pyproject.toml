@@ -7,7 +7,7 @@ name = "securityeval-project"
 version = "0.1.0"
 description = "Traceable SecurityEval code generation and evaluation contracts"
 requires-python = ">=3.11,<3.12"
-dependencies = ["jsonschema>=4.23,<5", "openai>=2,<3"]
+dependencies = ["jsonschema>=4.23,<5", "anthropic>=2,<3"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10"]

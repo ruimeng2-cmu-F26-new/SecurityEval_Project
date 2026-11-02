@@ -4,19 +4,19 @@
 
 Member 1 owns sample selection, prompt adaptation, code generation, and generation
 records. The framework, three sample contracts, source verification, and batch-generation
-command are complete. Live generation remains pending until a local OpenAI API key is
+command are complete. Live generation remains pending until a local Anthropic API key is
 available. No live output or security result is claimed before that run finishes.
 
 ## Fixed detection-experiment configuration
 
 | Setting | Value |
 |---|---|
-| Provider | OpenAI Responses API |
-| Models | `gpt-6-luna`, `gpt-6.1-sol` |
-| Reasoning effort | `medium` |
-| Maximum output tokens | `25000` |
-| Temperature | Omitted |
-| Storage | `false` |
+| Provider | Anthropic Messages API |
+| Models | `claude-haiku-5-5`, `claude-sonnet-5-5` |
+| Effort | `medium` |
+| Thinking | `adaptive` |
+| Maximum output tokens | `16000` |
+| Temperature / top-p / top-k | Omitted |
 | Retry policy | No automatic retries |
 | Attempts | Ten independent requests per task-model combination |
 | Total candidates | 60 |
@@ -45,10 +45,10 @@ Before any paid call, prepare and review all 60 requests:
 
 ```bash
 security-eval generate-experiment \
-  --models gpt-6-luna gpt-6.1-sol \
+  --models claude-haiku-5-5 claude-sonnet-5-5 \
   --runs 10 \
-  --reasoning-effort medium \
-  --max-output-tokens 25000 \
+  --effort medium \
+  --max-tokens 16000 \
   --dry-run \
   --out artifacts/member1-experiment-dry-run-001
 ```
@@ -56,21 +56,21 @@ security-eval generate-experiment \
 From the repository root, activate the Python 3.11 environment and enter the key locally.
 The key must never be pasted into chat, written to a file, or committed. First make six
 pilot calls by using `--runs 1` and a new output directory. If the final prompt,
-parameters, and parser remain unchanged, those six records may become run 1 of the final
-dataset. Otherwise mark them as excluded pilots and create a fresh experiment directory.
+parameters, and parser remain unchanged, the six records still remain excluded pilots.
+The formal dataset is always generated in a fresh experiment directory.
 
 ```bash
 source .venv/bin/activate
-read -s "OPENAI_API_KEY?OpenAI API key: "
-export OPENAI_API_KEY
+read -s "ANTHROPIC_API_KEY?Anthropic API key: "
+export ANTHROPIC_API_KEY
 printf '\n'
 security-eval generate-experiment \
-  --models gpt-6-luna gpt-6.1-sol \
+  --models claude-haiku-5-5 claude-sonnet-5-5 \
   --runs 1 \
-  --reasoning-effort medium \
-  --max-output-tokens 25000 \
+  --effort medium \
+  --max-tokens 16000 \
   --out artifacts/member1-pilot-001
-unset OPENAI_API_KEY
+unset ANTHROPIC_API_KEY
 ```
 
 The full experiment uses the same command with `--runs 10` in a new output directory.

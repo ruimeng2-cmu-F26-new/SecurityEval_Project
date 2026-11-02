@@ -9,15 +9,16 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 ## Current Status
 
 - Implemented: a Python 3.11 project scaffold, three traceable samples adapted from
-  SecurityEval, shared JSON schemas, Member 1's OpenAI Responses API generation and
+  SecurityEval, shared JSON schemas, Member 1's Anthropic Messages API generation and
   artifact recording, offline harness tests, and integration points for all three members.
 - Not yet run: live LLM generation. API credentials are pending.
 - Implemented (Member 2): Bandit integration, two custom AST rules validated on hand-written
   fixtures, and `security-eval static`. See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Implemented (Member 3): a bounded Docker runner and functional/security tests
   for the three adapted samples. See [Docker execution](docker/README.md).
-- Selected for the first experiment: `gpt-6-luna` and `gpt-6.1-sol`, ten independent
-  requests per task-model pair at medium reasoning effort (60 candidates total).
+- Selected for the first experiment: `claude-haiku-5-5` and `claude-sonnet-5-5`, ten
+  independent requests per task-model pair with adaptive thinking and medium effort
+  (60 candidates total).
   The 60-record dry run is complete; live generation and evaluation remain pending.
 - By default, `pytest` tests the harness only. **Passing harness tests does not establish
   the functionality or security of generated code.** The `generated` status indicates
@@ -94,9 +95,9 @@ Prepare the complete 60-candidate experiment without making an API call or produ
 
 ```bash
 security-eval generate-experiment \
-  --models gpt-6-luna gpt-6.1-sol \
-  --runs 10 --reasoning-effort medium --max-output-tokens 25000 \
-  --dry-run --out artifacts/member1-experiment-dry-run-001
+  --models claude-haiku-5-5 claude-sonnet-5-5 \
+  --runs 10 --effort medium --max-tokens 16000 \
+  --dry-run --out artifacts/member1-claude-dry-run-001
 ```
 
 The first experiment makes ten independent requests for each of three tasks and two
@@ -104,27 +105,27 @@ models: 60 candidates total. Use a dated model snapshot when available; otherwis
 the requested and returned model IDs, response ID, timestamp, metadata, and hashes.
 Preserve every initial output rather than selecting only favorable candidates.
 
-Live generation requires `OPENAI_API_KEY` in the local environment. The following zsh
+Live generation requires `ANTHROPIC_API_KEY` in the local environment. The following zsh
 commands read the key without displaying it or placing its value in shell history:
 
 ```bash
-read -s "OPENAI_API_KEY?OpenAI API key: "
-export OPENAI_API_KEY
+read -s "ANTHROPIC_API_KEY?Anthropic API key: "
+export ANTHROPIC_API_KEY
 printf '\n'
 security-eval generate-experiment \
-  --models gpt-6-luna gpt-6.1-sol \
-  --runs 1 --reasoning-effort medium --max-output-tokens 25000 \
+  --models claude-haiku-5-5 claude-sonnet-5-5 \
+  --runs 1 --effort medium --max-tokens 16000 \
   --out artifacts/member1-pilot-001
-unset OPENAI_API_KEY
+unset ANTHROPIC_API_KEY
 ```
 
 For bash, replace the `read` command with
-`read -s -p 'OpenAI API key: ' OPENAI_API_KEY`.
+`read -s -p 'Anthropic API key: ' ANTHROPIC_API_KEY`.
 `.env.example` documents the variables; the application does not automatically load `.env`.
-`OPENAI_MODEL` can be used instead of `--model`.
+`ANTHROPIC_MODEL` can be used instead of `--model`.
 
-The `--temperature` parameter is omitted by default. Set it only when the selected
-model supports it. Requests have a 90-second timeout and no automatic retries.
+Temperature, top-p, and top-k are intentionally omitted. Requests use adaptive thinking,
+medium effort, a 90-second timeout, and no automatic retries.
 
 The experiment writes `manifest.json` and one subdirectory per candidate. Each attempt saves
 `sample.json`, `request.json`, and `generation.json`. After receiving
@@ -137,7 +138,7 @@ not marked successful.
 Candidate code is parsed but **never imported or executed** during generation.
 Experiment artifacts are ignored by Git by default; review them before archiving or sharing.
 
-API reference: [Responses API](https://developers.openai.com/api/reference/python/resources/responses/methods/create).
+API reference: [Claude API primer](https://platform.claude.com/docs/en/claude_api_primer).
 The frozen experimental design is in [Experiment Plan](docs/EXPERIMENT_PLAN.md).
 The complete Member 1 run and review checklist is in
 [Member 1 Handoff](docs/MEMBER1_HANDOFF.md).

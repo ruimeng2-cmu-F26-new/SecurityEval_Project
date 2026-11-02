@@ -25,7 +25,7 @@
       ]
     },
     "provider": {
-      "const": "openai"
+      "const": "anthropic"
     },
     "requested_model": {
       "type": "string",
@@ -41,6 +41,22 @@
           "type": "null"
         }
       ]
+    },
+    "effort": {
+      "enum": ["low", "medium", "high", "xhigh", "max"]
+    },
+    "thinking_type": {
+      "const": "adaptive"
+    },
+    "max_tokens": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stop_reason": {
+      "type": ["string", "null"]
+    },
+    "failure_kind": {
+      "type": ["string", "null"]
     },
     "created_at": {
       "type": "string",
@@ -197,6 +213,11 @@
     "provider",
     "requested_model",
     "returned_model",
+    "effort",
+    "thinking_type",
+    "max_tokens",
+    "stop_reason",
+    "failure_kind",
     "created_at",
     "completed_at",
     "request_file",
@@ -252,6 +273,12 @@
           "returned_model": {
             "type": "null"
           },
+          "stop_reason": {
+            "type": "null"
+          },
+          "failure_kind": {
+            "type": "null"
+          },
           "usage": {
             "type": "null"
           },
@@ -303,6 +330,12 @@
           },
           "error": {
             "type": "null"
+          },
+          "stop_reason": {
+            "const": "end_turn"
+          },
+          "failure_kind": {
+            "type": "null"
           }
         }
       }
@@ -323,6 +356,10 @@
           "completed_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "failure_kind": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }
