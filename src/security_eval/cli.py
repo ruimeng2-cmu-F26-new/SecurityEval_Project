@@ -7,6 +7,7 @@ from pathlib import Path
 from jsonschema.exceptions import ValidationError
 
 from .contracts import load_samples, validate
+from .evaluation import merge_labels, run_metrics, write_label_sheet
 from .generation import generate, prepare, run_batch
 from .pipeline import evaluate
 from .static_runner import all_completed, format_summary, run_static
@@ -44,6 +45,20 @@ def main(argv=None) -> int:
     batch.add_argument("--temperature", type=float)
     batch.add_argument("--max-output-tokens", type=int, default=4096)
     batch.add_argument("--reasoning-effort", choices=["none", "minimal", "low", "medium", "high", "xhigh"])
+    sheet = commands.add_parser("label-sheet", help="Write a blank review sheet with no detector output")
+    sheet.add_argument("paths", nargs="+", type=Path, help="Experiment or generation run directories")
+    sheet.add_argument("--out", type=Path, required=True, help="New CSV file")
+    merging = commands.add_parser("merge-labels", help="Combine two reviewer sheets and list disagreements")
+    merging.add_argument("first", type=Path)
+    merging.add_argument("second", type=Path)
+    merging.add_argument("--out", type=Path, required=True, help="New CSV file; adjudicate blank labels in it")
+    metrics = commands.add_parser("metrics", help="Compute detection metrics from results and manual labels")
+    metrics.add_argument("--candidates", nargs="+", type=Path, required=True,
+                         help="Experiment or generation run directories")
+    metrics.add_argument("--results", nargs="+", type=Path, required=True,
+                         help="Directories searched for bandit.json, ast.json and pytest-docker.json")
+    metrics.add_argument("--labels", type=Path, help="Adjudicated labels CSV")
+    metrics.add_argument("--out", type=Path, required=True, help="New directory; existing results are never overwritten")
     args = parser.parse_args(argv)
     try:
         if args.command == "validate":
@@ -56,6 +71,14 @@ def main(argv=None) -> int:
             results = evaluate(args.run_dir, args.out)
             print(json.dumps({r["tool"]: r["status"] for r in results}))
             return 0 if all(r["status"] == "completed" for r in results) else 1
+        elif args.command == "label-sheet":
+            print(f"Wrote {write_label_sheet(args.paths, args.out)} candidates to {args.out}")
+        elif args.command == "merge-labels":
+            print(json.dumps(merge_labels(args.first, args.second, args.out)))
+        elif args.command == "metrics":
+            result = run_metrics(args.candidates, args.results, args.out, args.labels)
+            print(json.dumps({"pairs": result["pairs"], "labels": result["labels"],
+                              "skipped": len(result["skipped"]), "report": str(args.out / "report.md")}))
         elif args.command == "static":
             summary = run_static(args.paths, args.out, args.sample_id)
             print(format_summary(summary))

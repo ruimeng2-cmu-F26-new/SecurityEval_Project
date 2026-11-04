@@ -12,8 +12,9 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
   SecurityEval, shared JSON schemas, Member 1's OpenAI Responses API generation and
   artifact recording, offline harness tests, and integration points for all three members.
 - Not yet run: live LLM generation. API credentials are pending.
-- Implemented (Member 2): Bandit integration, two custom AST rules validated on hand-written
-  fixtures, and `security-eval static`. See [Static Analysis](docs/STATIC_ANALYSIS.md).
+- Implemented (Member 2): Bandit integration, three custom AST rules validated on hand-written
+  fixtures, `security-eval static`, and labeling and metrics tooling (`label-sheet`,
+  `merge-labels`, `metrics`). See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Implemented (Member 3): a bounded Docker runner and functional/security tests
   for the three adapted samples. See [Docker execution](docker/README.md).
 - Selected for the first run: `gpt-5.4-mini-2026-03-17` with fixed parameters.
@@ -169,7 +170,8 @@ no findings.
 | Member 2 / Jiayi Li| `analyzers/static.py`, new rule modules, and rule unit tests | Bandit integration, one or two AST rules, and actual JSON findings |
 | Member 3 | `analyzers/dynamic.py`, `tests/candidates/`, `docker/` | Isolated execution, functional and security tests, and supporting evidence |
 
-See [Shared Contracts](docs/INTERFACES.md) for the complete handoff. Start with
+See [Shared Contracts](docs/INTERFACES.md) for the complete handoff. The draft
+[Evaluation Protocol](docs/EVALUATION_PROTOCOL.md) defines how detectors are compared. Start with
 `sql_delete_user`, then extend the pipeline to the other two samples. Coordinate changes
 to shared schemas and function signatures before implementation.
 

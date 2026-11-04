@@ -81,3 +81,18 @@ reported **48 passed in 1.80s** and `python -m pip check` found no broken requir
 The pipeline tests exercise real Bandit/AST execution with synthetic Docker responses
 and verify shared run/code identities and evidence paths. They do not claim a live
 LLM run or a new real-Docker experiment.
+
+## Static rules and evaluation tooling (Member 2) — 2026-11-04
+
+Python 3.11.17, Bandit 1.9.4, AST rule set 0.2.0. Everything below uses hand-written
+fixtures or synthetic data. **No model candidate was generated or analyzed, Docker was not
+run for this check, and no detection metric from a real experiment exists yet.**
+
+| Check | Observed result |
+|---|---|
+| `python -m pytest -q` | **87 passed** on `main` plus these changes |
+| Rule fixtures, exact (rule, line) pairs | Unsafe: `AST-SQL-001` 5, `AST-CMD-001` 8, `AST-PATH-001` 5; safe: 0; allowlisted command: 2 at low |
+| Member 3 handwritten controls (AST only) | `sql_safe`, `path_safe`: no findings; `command_safe`: low; `sql_unsafe`: high |
+| Metric code | Scores, overlap, paired changes and inconclusive handling match hand-calculated values on a synthetic table |
+| 16 deliberate breakages of the rules and metric code | All make a test fail, after adding the cases exposed by 2 initial survivors |
+| Copy of `origin/member1-experiment-60` with these changes | **91 passed**; a fake-client run of `generate-experiment` went through `static`, `label-sheet`, `merge-labels` and `metrics` |
