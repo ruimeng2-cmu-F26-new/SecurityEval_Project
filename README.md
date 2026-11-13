@@ -11,6 +11,10 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 - Implemented: a Python 3.11 project scaffold, three traceable samples adapted from
   SecurityEval, shared JSON schemas, Member 1's Anthropic Messages API generation and
   artifact recording, offline harness tests, and integration points for all three members.
+- Not yet run: live LLM generation. API credentials are pending.
+- Implemented (Member 2): Bandit integration, three custom AST rules validated on hand-written
+  fixtures, `security-eval static`, and labeling and metrics tooling (`label-sheet`,
+  `merge-labels`, `metrics`). See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Completed: the frozen 60-candidate Claude generation run is archived under
   `experiments/member1-formal-60-001/` with requests, responses, source, hashes,
   usage, and estimated cost records.
@@ -181,7 +185,8 @@ no findings.
 | Member 2 / Jiayi Li| `analyzers/static.py`, new rule modules, and rule unit tests | Bandit integration, one or two AST rules, and actual JSON findings |
 | Member 3 | `analyzers/dynamic.py`, `tests/candidates/`, `docker/` | Isolated execution, functional and security tests, and supporting evidence |
 
-See [Shared Contracts](docs/INTERFACES.md) for the complete handoff. Start with
+See [Shared Contracts](docs/INTERFACES.md) for the complete handoff. The draft
+[Evaluation Protocol](docs/EVALUATION_PROTOCOL.md) defines how detectors are compared. Start with
 `sql_delete_user`, then extend the pipeline to the other two samples. Coordinate changes
 to shared schemas and function signatures before implementation.
 

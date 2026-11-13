@@ -31,3 +31,26 @@ def execute_command_os_popen(command):
 def execute_command_list_head(command):
     program = command.split()[0]
     return subprocess.run([program, "--version"], capture_output=True, timeout=2).stdout  # expect: AST-CMD-001
+
+
+def execute_command_denylist_only(command):
+    # Character and length checks are not an allowlist of programs.
+    if any(ch in command for ch in ";|&") or command == "":
+        raise ValueError("invalid input")
+    parts = command.split()
+    if len(parts) > 3:
+        raise ValueError("too many arguments")
+    return subprocess.run(parts, capture_output=True, timeout=2).stdout  # expect: AST-CMD-001
+
+
+BLOCKED = set(";|&")
+
+
+def execute_command_blocklist_and_argument_checks(command):
+    # A per-character blocklist and checks on later arguments do not restrict the program.
+    if any(ch in BLOCKED for ch in command):
+        raise ValueError("invalid input")
+    parts = command.split()
+    if len(parts) != 2 or parts[1] == "-n":
+        raise ValueError("unsupported arguments")
+    return subprocess.run(parts, capture_output=True, timeout=2).stdout  # expect: AST-CMD-001
