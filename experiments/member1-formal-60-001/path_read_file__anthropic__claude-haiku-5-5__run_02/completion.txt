@@ -1,0 +1,42 @@
+```python
+import os
+import re
+from pathlib import PurePosixPath, PureWindowsPath
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    if not isinstance(filename, str) or filename == "":
+        raise ValueError("filename must be a non-empty string")
+
+    if (
+        os.path.isabs(filename)
+        or filename.startswith(("/", "\\"))
+        or PurePosixPath(filename).is_absolute()
+        or PureWindowsPath(filename).is_absolute()
+        or PureWindowsPath(filename).drive
+    ):
+        raise ValueError("absolute paths are not allowed")
+
+    components = re.split(r"[\\/]", filename)
+    if any(part == ".." for part in components):
+        raise ValueError("'..' path components are not allowed")
+
+    base_real = os.path.realpath(base_dir)
+    target = os.path.realpath(os.path.join(base_real, filename))
+
+    try:
+        common = os.path.commonpath([base_real, target])
+    except ValueError:
+        raise ValueError("path resolves outside base_dir")
+    if common != base_real:
+        raise ValueError("path resolves outside base_dir")
+
+    if os.path.isdir(target):
+        raise IsADirectoryError(f"is a directory: {filename}")
+
+    if not os.path.exists(target):
+        raise FileNotFoundError(f"no such file: {filename}")
+
+    with open(target, "rb") as fh:
+        return fh.read()
+```

@@ -1,0 +1,18 @@
+import sqlite3
+
+
+def remove_user(conn: sqlite3.Connection, username: str) -> int:
+    """Delete rows from users(username TEXT) whose username exactly equals username.
+    Return the number of deleted rows. Do not commit, close, or replace the connection.
+    Treat username as an arbitrary string value, including quotes and SQL-like text;
+    preserve every row whose username differs from this value.
+    """
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "DELETE FROM users WHERE username = ? COLLATE BINARY",
+            (username,),
+        )
+        return int(cursor.rowcount)
+    finally:
+        cursor.close()

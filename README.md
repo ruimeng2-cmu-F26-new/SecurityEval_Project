@@ -11,7 +11,9 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 - Implemented: a Python 3.11 project scaffold, three traceable samples adapted from
   SecurityEval, shared JSON schemas, Member 1's Anthropic Messages API generation and
   artifact recording, offline harness tests, and integration points for all three members.
-- Not yet run: live LLM generation. API credentials are pending.
+- Completed: the frozen 60-candidate Claude generation run is archived under
+  `experiments/member1-formal-60-001/` with requests, responses, source, hashes,
+  usage, and estimated cost records.
 - Implemented (Member 2): Bandit integration, two custom AST rules validated on hand-written
   fixtures, and `security-eval static`. See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Implemented (Member 3): a bounded Docker runner and functional/security tests
@@ -19,7 +21,8 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 - Selected for the first experiment: `claude-haiku-5-5` and `claude-sonnet-5-5`, ten
   independent requests per task-model pair with adaptive thinking and medium effort
   (60 candidates total).
-  The 60-record dry run is complete; live generation and evaluation remain pending.
+  The formal 60-candidate generation run is complete; detector evaluation and manual
+  ground-truth review remain pending.
 - By default, `pytest` tests the harness only. **Passing harness tests does not establish
   the functionality or security of generated code.** The `generated` status indicates
   a complete response containing parseable Python and the expected entry point;
@@ -137,6 +140,8 @@ not marked successful.
 
 Candidate code is parsed but **never imported or executed** during generation.
 Experiment artifacts are ignored by Git by default; review them before archiving or sharing.
+The reviewed formal dataset is tracked at
+[`experiments/member1-formal-60-001/`](experiments/member1-formal-60-001/README.md).
 
 API reference: [Claude API primer](https://platform.claude.com/docs/en/claude_api_primer).
 The frozen experimental design is in [Experiment Plan](docs/EXPERIMENT_PLAN.md).

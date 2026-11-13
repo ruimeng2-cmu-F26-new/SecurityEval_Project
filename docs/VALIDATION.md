@@ -98,3 +98,24 @@ LLM run or a new real-Docker experiment.
 
 This is harness and request-preparation evidence only. No live API call, generated
 candidate, detector result, vulnerability result, or repair result is claimed.
+
+## Member 1 formal Claude generation — 2026-11-12
+
+- The six pilot calls completed successfully and remain excluded from the formal dataset.
+- The formal run created 60 unique candidate IDs: 30 per model and exactly ten per
+  task-model combination.
+- All 60 records have status `generated`, all responses ended with `end_turn`, and no
+  generation error was recorded.
+- All request, response, and code SHA-256 hashes were independently verified before
+  archiving the dataset.
+- Recorded usage was 15,020 input tokens and 46,953 output tokens. The manifest's
+  pricing estimate is USD 0.1569905.
+- No API credential pattern was found in the archived request, response, source, or
+  metadata files.
+- Bandit and custom AST analysis completed on the six excluded pilots. Docker evaluation
+  could not start in the Codex execution environment because the `docker` executable was
+  unavailable; this is recorded as an infrastructure error rather than a candidate result.
+
+The frozen formal artifacts are in `experiments/member1-formal-60-001/`. A `generated`
+status establishes response completion, Python parsing, and entry-point presence only.
+No functional correctness, security, detection, benchmark, or repair claim is made here.

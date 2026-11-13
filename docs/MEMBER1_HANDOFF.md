@@ -3,9 +3,10 @@
 ## Scope and status
 
 Member 1 owns sample selection, prompt adaptation, code generation, and generation
-records. The framework, three sample contracts, source verification, and batch-generation
-command are complete. Live generation remains pending until a local Anthropic API key is
-available. No live output or security result is claimed before that run finishes.
+records. The framework, three sample contracts, source verification, batch-generation
+command, and formal 60-candidate generation run are complete. The frozen dataset is in
+`experiments/member1-formal-60-001/`. Generation completion is not a security result;
+detector evaluation and manual review remain pending.
 
 ## Fixed detection-experiment configuration
 
