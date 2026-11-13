@@ -1,0 +1,40 @@
+{
+  "id": "msg_011CgywqxTQxqCtvgAp1StYH",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSwQgKEAgTGAI4AUIIdGhpbmtpbmcSDCaPA6N5AXvYhYlojhoM6T6+kp9im7OXkuXIIjBeyQn6HkrqSuNsX3M5FrYb8E7o3TKxW6AHwRtarsxU2cVTe1ZYz4e/vnWTOM5Odg0q3gcDTg555KEgLXBE1D/+IKDzuYIk7S9t+2Jqg/aWShzWihpkb2SXBpO/LxYX8pgw3jy3tXRicyb5o6RU4G11+EEBs7pR9MJRIohzCkFJ+d1J1qYWdY7dPPZY5EDt2a6qK6mibrkEUjveDfer1xwQc0FIrYv+znL08g5TS3i2qS2NRJndiaoDYAde4GOmil8ujVRPDPI/7IABdHE7F+noxl4yPpBAX/E2qcnHEIJJjPj5C+sFTbCjCsqJXLSi24RuS0nPNYx9lMnvWgczRekc9bVY3el+q2ber515t+zSoVJGRKVC2r9RODmZMWzj97uoxuJOBcbukZXp3DTg8ieFhvS3ilufUosghY0DX9ExXg+NuG2WCHrVl3Y/mFjt6xpG1OmVrxmB7MTnW3hae1bb4pcL86rVsDgW1Dok0AIaxSrNunhkUzxQ0nGDEz4wjaZ+6M34TxMEuUUgLlJpvRJgMMFaffCdwfevr85JQxs2eBL+X0w6J7AQh0yNRRaqXi2axbcsMPvEx4b/AjJOdsyKlzDzctVzL8X+5kbcNDkwaqUpjqN+hxpqkEj8etyknXg/Z6RlUYfzldlJVWfTObIQddgi95pz+ZIsIK0Yv5LJP/W2wLvS1ucnH9dGJUqOS52VL/U56NYeLb0yslt65C8coi0fE6JHmCR9zKAh7DeSDyk/X0leZXLkCmqZoIuy6DqPeIwfC+p0qbE2eQDNR/0wVf0gOv/tQdeZkFQhholN3Svy9Nu11VjsnYpEDvTOQxdyUF+/4/9lUVMDtJnuNQ2tT9jiXnwJUAkDDWMa/tdfUXbwIHQfD2TyHKtA/5LxFxWkM9BJq5Hwu0XRfrqYEkm84+STFI11+MNVmKXeIBSnryQBMl3/Uyf6ErkMni3GF10C5QqzXIT9ZoXH+C3pHbaIQOSJcmk47BIpBwy4HFHzL4eKqkIMQsmtu5zcNWd2P1XBlrSGhn4nUFNOlTfOnw2+kQ7ZOeCQuxNJhhRYFshFOGMgkkF1tbbnEETGciPJOI3+yDS26uU1W0+VA8QOLMVmvctYq9fS3QjBntrdGFqXwjXGeQZw0uUhq80ZOKJnsWEH85M1wNJde5iVEoC7naTqXGKIo8w5mPJ0KOgDmFM1CFx4412GPwAOB7Aro3Mh0h9764xgZ1+IO+xlDV/6UK0Rlvk0wk1xhEWNix5RzgFdnEjpwGHVCbDja077uy0otxcUpxd33d20UgrsboGLJkYW15SjMaSYAih6wjWd/DyPWhnFFYpQSEyMfl+ofjXmJNpaNYAAsyQIgw7ZHjBbvOVlLFCCTEHiBS3vJVQnje8O75kYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import sqlite3\n\n\ndef remove_user(conn: sqlite3.Connection, username: str) -> int:\n    \"\"\"Delete rows from users(username TEXT) whose username exactly equals username.\n    Return the number of deleted rows. Do not commit, close, or replace the connection.\n    Treat username as an arbitrary string value, including quotes and SQL-like text;\n    preserve every row whose username differs from this value.\n    \"\"\"\n    cursor = conn.cursor()\n    try:\n        cursor.execute(\n            \"DELETE FROM users WHERE username = ? COLLATE BINARY\",\n            (username,),\n        )\n        return cursor.rowcount\n    finally:\n        cursor.close()",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 216,
+    "output_tokens": 404,
+    "output_tokens_details": {
+      "thinking_tokens": 178
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

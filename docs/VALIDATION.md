@@ -16,8 +16,8 @@ They are not candidate functionality/security results and are not GitHub CI resu
 The tests exercise contract rejection, duplicate sample handling, batch preparation,
 credential checks before batch output creation, pending analyzer
 states, code extraction, missing credentials, API failure, empty/invalid/incomplete
-outputs, preservation of raw output, prevention of candidate execution, the real
-OpenAI SDK with an explicitly mocked HTTP transport, and pipeline hash checks.
+outputs, preservation of raw output, prevention of candidate execution, provider
+request serialization, and pipeline hash checks.
 Synthetic fixture responses exist only in temporary test directories.
 
 ## Not run / not implemented
@@ -96,3 +96,40 @@ run for this check, and no detection metric from a real experiment exists yet.**
 | Metric code | Scores, overlap, paired changes and inconclusive handling match hand-calculated values on a synthetic table |
 | 16 deliberate breakages of the rules and metric code | All make a test fail, after adding the cases exposed by 2 initial survivors |
 | Copy of `origin/member1-experiment-60` with these changes | **91 passed**; a fake-client run of `generate-experiment` went through `static`, `label-sheet`, `merge-labels` and `metrics` |
+## Member 1 Claude experiment preparation — 2026-11-01
+
+- `python -m pytest -q`: **52 passed** with synthetic Claude fixtures and no
+  live provider request.
+- `python -m pip check`: no broken requirements.
+- The new `generate-experiment` dry run completed with **60 prepared records**, 60 unique
+  candidate IDs, no errors, no API calls, and no `code.py` files.
+- Distribution: 30 records for `claude-haiku-5-5`, 30 for `claude-sonnet-5-5`, and exactly ten
+  records for every task-model pair.
+- All 60 generation records passed the generation JSON schema. Every request used
+  `thinking.type = adaptive`, `output_config.effort = medium`, `max_tokens = 16000`,
+  and omitted temperature, top-p, and top-k.
+- `git diff --check` and JSON parsing of the updated generation schema completed cleanly.
+
+This is harness and request-preparation evidence only. No live API call, generated
+candidate, detector result, vulnerability result, or repair result is claimed.
+
+## Member 1 formal Claude generation — 2026-11-12
+
+- The six pilot calls completed successfully and remain excluded from the formal dataset.
+- The formal run created 60 unique candidate IDs: 30 per model and exactly ten per
+  task-model combination.
+- All 60 records have status `generated`, all responses ended with `end_turn`, and no
+  generation error was recorded.
+- All request, response, and code SHA-256 hashes were independently verified before
+  archiving the dataset.
+- Recorded usage was 15,020 input tokens and 46,953 output tokens. The manifest's
+  pricing estimate is USD 0.1569905.
+- No API credential pattern was found in the archived request, response, source, or
+  metadata files.
+- Bandit and custom AST analysis completed on the six excluded pilots. Docker evaluation
+  could not start in the Codex execution environment because the `docker` executable was
+  unavailable; this is recorded as an infrastructure error rather than a candidate result.
+
+The frozen formal artifacts are in `experiments/member1-formal-60-001/`. A `generated`
+status establishes response completion, Python parsing, and entry-point presence only.
+No functional correctness, security, detection, benchmark, or repair claim is made here.

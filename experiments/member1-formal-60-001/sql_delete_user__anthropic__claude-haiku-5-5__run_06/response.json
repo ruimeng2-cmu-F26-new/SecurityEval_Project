@@ -1,0 +1,40 @@
+{
+  "id": "msg_011CgywrY8TdJocrb8XNqwii",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS0wkKEAgTGAI4AUIIdGhpbmtpbmcSDAiJm7jk4hNZxE/RCBoMBFZhjI+Vc6+shxEiIjBuMgeyvkSVYufoWLXebu5Asr7Wci6gG8MjyBbqr5VOTAjj2QZolcueSKovJLayTAYq8AjZYOog3IahqO8kK57lpVwKTWidz051m7CuJDjABbA7KlGsnZVddrlEOBghnPRv0LXdvecVHtASgwsDph6jV0pPIfXPsDJ90Hvu2fTLiIp5YhR55Wm0uC4cKfosup4EVyfc7K4vvfetOsmaeu7GLjpbO6TOtOPaPWfv6Idduq6SgioiFK24Q9zyvJX4aqNLHuLE8DP1GJ6vHTfl6SMQ34HIjOGPEjKy7Cn1rjruPSwku+hDra4zZUaupmSeyP/jMtm/uEIIn50sBO+B3XfFWpz3sQpKaCi4XqcRetbheW/LRN9lC+EsFXAKREZkvfAkPFIjf4N0AaP+JrZ9guYgRhZrEnNCJxN1kZxvSXYjCAJ9R4IFaG5vefSk3le00Wk48KkKepzQEodp6Mc+4GYTya02FTuIZRK2lyuwxiS4pMMGtmjTXwETukWReDg3d0dZcxamPb3c5x6JQ3GaQTxpN6tLDeKTrD7h2FodN4JnpRCwT3XJzAclar1lsxOw69cEhcISLLlzwkHV66zc2W/+7vTYXF4XSZbqLLoYW4TBcTrnQ2n6WraaD45bnnWS6GTRnnEXiHxuqPOv24vwZyt+DCb6rNaJGYXy6BxrcLQTJgRawrnSOODtMaKDvPupHRxsh3N47qLJ3hMTRZJvLLp74FUEV1a8Tatj6PKLsrbmGpz0nZdL3cHGsahU9dgKeHLGf3kbaBh6efWW3GGHzXb7vpJiGYH4eK9s4JxpIKPTGy+I8/wnsUz7r4YCoBqcJPdtRmXq8VVZMiKXyyOeGoke87BInWH8V0gsmZAqoBoHXLsFkHVPJWSEpVCCKPJ6cvC++2Dvpg0/BenUsuD+RIezMtMRJrDv3W3+sRQd9L4WgkFg1nTyyBwMghcGJT/o7KosyhFEiUbV1l8BTP6EXdJRz3NpqrQXa5bBqqXxflxrS0vI8++ehpfYQvHJkpNwEmQf+iHerQUtrP7bilG+2qTxUD1pHD1pYbj2EO0TerIzwvFATt2Undux8d9uzYYf4X3SkFHOOheDASboBupfY+sRRt73zCfnZp68G8rHYBaBupjwKLuwOmC5BR976WzFqb1s6ixPQpsEiuyU7WwLHxLRKKeBoQCTIeFR9u+eIHrnTw2ZKXfqL+FU9IoisTYnRKybqpm2GNbYBhtHPzmJ/+Sm9ffV0vp+KaIl/Yq7ikE4BIzCDX/6CwGdA1jls9UzYl2svlLgJv+8PhK3NFK4mDQbSSM8Z0ulcbFoobzc7Un6T2WNSUwgcVuwV9iWLd822iL77wdL7Sl/uBm8wKuJSlfFFSQD8yPOH142AvW1jTO4eKKNGhO5WSXyjp6A43bm3ZWSvksaI+zPjORVlta+MwPJ5QUQbojYrbeJwe/RUIxkAJEIL4JhlNXdwcqOpSJGpYu7y32B/3RLnQjgFLQ8JPxTKt/Nh9jAweV04fxIwjuzYlbn4bRoachXgYH1yTZUgojGwLPepX/Jj3rcALejMHNM7mcrED8uJqlIN0x/lnWjIbJW4xgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n\ndef remove_user(conn: sqlite3.Connection, username: str) -> int:\n    \"\"\"Delete rows from users(username TEXT) whose username exactly equals username.\n    Return the number of deleted rows. Do not commit, close, or replace the connection.\n    Treat username as an arbitrary string value, including quotes and SQL-like text;\n    preserve every row whose username differs from this value.\n    \"\"\"\n    cursor = conn.cursor()\n    try:\n        cursor.execute(\n            \"DELETE FROM users WHERE username = ? COLLATE BINARY\",\n            (username,),\n        )\n        return cursor.rowcount\n    finally:\n        cursor.close()\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 216,
+    "output_tokens": 468,
+    "output_tokens_details": {
+      "thinking_tokens": 237
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

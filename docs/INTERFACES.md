@@ -13,11 +13,17 @@ IDs are stable; do not rename sample IDs or entry points independently.
 - `generation.json`: `prepared` means no API call; `generated` means a complete response
   with parseable source and the named top-level function; `error` records failure.
   Syntax validation does not prove signature compliance, functionality or security.
+- Repeated experiments add a stable `candidate_id` and positive `run_index`. Records
+  retain SHA-256 hashes for the adapted prompt, request JSON, response JSON, and exact
+  candidate bytes. Token usage and the standard-processing cost estimate are recorded
+  when the requested model has a documented price in the harness.
 - `request.json` is the actual payload; `response.json` is the unmodified SDK response
   serialized as JSON, and `completion.txt` is the complete output text. Only a single
   enclosing Markdown fence is removed from candidate source. No repair is attempted.
 - All generation paths are relative to the generation directory. Code hash uses the
   exact UTF-8 bytes of `code.py`. Preserve the initial candidate for every detector.
+- `generate-experiment` creates one independent request per task-model-run combination.
+  It does not pass a conversation ID or previous response ID between candidates.
 
 ## Analyzer API (Member 2 and Member 3)
 

@@ -9,16 +9,24 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 ## Current Status
 
 - Implemented: a Python 3.11 project scaffold, three traceable samples adapted from
-  SecurityEval, shared JSON schemas, Member 1's OpenAI Responses API generation and
+  SecurityEval, shared JSON schemas, Member 1's Anthropic Messages API generation and
   artifact recording, offline harness tests, and integration points for all three members.
 - Not yet run: live LLM generation. API credentials are pending.
 - Implemented (Member 2): Bandit integration, three custom AST rules validated on hand-written
   fixtures, `security-eval static`, and labeling and metrics tooling (`label-sheet`,
   `merge-labels`, `metrics`). See [Static Analysis](docs/STATIC_ANALYSIS.md).
+- Completed: the frozen 60-candidate Claude generation run is archived under
+  `experiments/member1-formal-60-001/` with requests, responses, source, hashes,
+  usage, and estimated cost records.
+- Implemented (Member 2): Bandit integration, two custom AST rules validated on hand-written
+  fixtures, and `security-eval static`. See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Implemented (Member 3): a bounded Docker runner and functional/security tests
   for the three adapted samples. See [Docker execution](docker/README.md).
-- Selected for the first run: `gpt-5.4-mini-2026-03-17` with fixed parameters.
-  Live generation and evaluation of actual model candidates remain pending.
+- Selected for the first experiment: `claude-haiku-5-5` and `claude-sonnet-5-5`, ten
+  independent requests per task-model pair with adaptive thinking and medium effort
+  (60 candidates total).
+  The formal 60-candidate generation run is complete; detector evaluation and manual
+  ground-truth review remain pending.
 - By default, `pytest` tests the harness only. **Passing harness tests does not establish
   the functionality or security of generated code.** The `generated` status indicates
   a complete response containing parseable Python and the expected entry point;
@@ -89,40 +97,44 @@ MSR4P&S 2022. [DOI](https://doi.org/10.1145/3549035.3561184).
 
 ## Member 1: Code Generation and Artifact Recording
 
-Prepare all three requests without making an API call or producing `code.py`:
+Prepare the complete 60-candidate experiment without making an API call or producing
+`code.py`:
 
 ```bash
-security-eval generate-batch \
-  --model gpt-5.4-mini-2026-03-17 --reasoning-effort none \
-  --dry-run --out artifacts/member1-prepared-001
+security-eval generate-experiment \
+  --models claude-haiku-5-5 claude-sonnet-5-5 \
+  --runs 10 --effort medium --max-tokens 16000 \
+  --dry-run --out artifacts/member1-claude-dry-run-001
 ```
 
-The first experiment uses the dated model snapshot shown above so all three candidates
-are generated with the same reproducible configuration. Preserve each initial output
-before evaluation rather than selecting only favorable outputs.
+The first experiment makes ten independent requests for each of three tasks and two
+models: 60 candidates total. Use a dated model snapshot when available; otherwise retain
+the requested and returned model IDs, response ID, timestamp, metadata, and hashes.
+Preserve every initial output rather than selecting only favorable candidates.
 
-Live generation requires `OPENAI_API_KEY` in the local environment. The following zsh
+Live generation requires `ANTHROPIC_API_KEY` in the local environment. The following zsh
 commands read the key without displaying it or placing its value in shell history:
 
 ```bash
-read -s "OPENAI_API_KEY?OpenAI API key: "
-export OPENAI_API_KEY
+read -s "ANTHROPIC_API_KEY?Anthropic API key: "
+export ANTHROPIC_API_KEY
 printf '\n'
-security-eval generate-batch \
-  --model gpt-5.4-mini-2026-03-17 --reasoning-effort none \
-  --max-output-tokens 4096 --out artifacts/member1-live-001
-unset OPENAI_API_KEY
+security-eval generate-experiment \
+  --models claude-haiku-5-5 claude-sonnet-5-5 \
+  --runs 1 --effort medium --max-tokens 16000 \
+  --out artifacts/member1-pilot-001
+unset ANTHROPIC_API_KEY
 ```
 
 For bash, replace the `read` command with
-`read -s -p 'OpenAI API key: ' OPENAI_API_KEY`.
+`read -s -p 'Anthropic API key: ' ANTHROPIC_API_KEY`.
 `.env.example` documents the variables; the application does not automatically load `.env`.
-`OPENAI_MODEL` can be used instead of `--model`.
+`ANTHROPIC_MODEL` can be used instead of `--model`.
 
-The `--temperature` parameter is omitted by default. Set it only when the selected
-model supports it. Requests have a 90-second timeout and no automatic retries.
+Temperature, top-p, and top-k are intentionally omitted. Requests use adaptive thinking,
+medium effort, a 90-second timeout, and no automatic retries.
 
-The batch writes `manifest.json` and one subdirectory per sample. Each attempt saves
+The experiment writes `manifest.json` and one subdirectory per candidate. Each attempt saves
 `sample.json`, `request.json`, and `generation.json`. After receiving
 a response, it also saves `response.json` and `completion.txt`, plus `code.py` when source
 can be extracted. Records include request and code hashes, requested and returned model
@@ -132,8 +144,11 @@ not marked successful.
 
 Candidate code is parsed but **never imported or executed** during generation.
 Experiment artifacts are ignored by Git by default; review them before archiving or sharing.
+The reviewed formal dataset is tracked at
+[`experiments/member1-formal-60-001/`](experiments/member1-formal-60-001/README.md).
 
-API reference: [Responses API](https://developers.openai.com/api/reference/python/resources/responses/methods/create).
+API reference: [Claude API primer](https://platform.claude.com/docs/en/claude_api_primer).
+The frozen experimental design is in [Experiment Plan](docs/EXPERIMENT_PLAN.md).
 The complete Member 1 run and review checklist is in
 [Member 1 Handoff](docs/MEMBER1_HANDOFF.md).
 
@@ -166,7 +181,7 @@ no findings.
 
 | Member | Primary files and directories | Expected deliverables |
 |---|---|---|
-| Member 1 / Susie Zhong | `data/`, `generation.py`, `scripts/verify_source.py` | Three live-generated candidates with request and response records |
+| Member 1 / Susie Zhong | `data/`, `generation.py`, `scripts/verify_source.py` | 60 live-generated candidates with request, response, hash, usage, and cost records |
 | Member 2 / Jiayi Li| `analyzers/static.py`, new rule modules, and rule unit tests | Bandit integration, one or two AST rules, and actual JSON findings |
 | Member 3 | `analyzers/dynamic.py`, `tests/candidates/`, `docker/` | Isolated execution, functional and security tests, and supporting evidence |
 

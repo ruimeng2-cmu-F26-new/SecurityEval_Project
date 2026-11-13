@@ -1,0 +1,35 @@
+{
+  "id": "msg_011Cgyx8baXjxYHjEV8UXY5D",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\n\n\ndef read_file(base_dir: str, filename: str) -> bytes:\n    \"\"\"Read and return the bytes of a regular file inside an existing base_dir.\n\n    Allows relative nested paths. Raises ValueError for empty paths, absolute\n    paths, any '..' path component, or a path resolving outside base_dir\n    through symlinks. Raises FileNotFoundError for a missing in-base file and\n    IsADirectoryError for a directory.\n    \"\"\"\n    if not isinstance(filename, str) or filename == \"\":\n        raise ValueError(\"empty path\")\n    if \"\\x00\" in filename:\n        raise ValueError(\"invalid path\")\n\n    # Absolute path checks (POSIX and Windows-style)\n    if os.path.isabs(filename) or filename.startswith((\"/\", \"\\\\\")):\n        raise ValueError(\"absolute path not allowed\")\n    drive, _ = os.path.splitdrive(filename)\n    if drive:\n        raise ValueError(\"absolute path not allowed\")\n\n    parts = filename.replace(\"\\\\\", \"/\").split(\"/\")\n    if any(p == \"..\" for p in parts):\n        raise ValueError(\"'..' component not allowed\")\n    if all(p in (\"\", \".\") for p in parts):\n        raise ValueError(\"empty path\")\n\n    base_real = os.path.realpath(base_dir)\n    candidate = os.path.join(base_real, *[p for p in parts if p not in (\"\", \".\")])\n    resolved = os.path.realpath(candidate)\n\n    try:\n        common = os.path.commonpath([base_real, resolved])\n    except ValueError:\n        raise ValueError(\"path escapes base directory\")\n    if common != base_real:\n        raise ValueError(\"path escapes base directory\")\n\n    if not os.path.lexists(resolved):\n        raise FileNotFoundError(filename)\n    if os.path.isdir(resolved):\n        raise IsADirectoryError(filename)\n    if not os.path.isfile(resolved):\n        raise FileNotFoundError(filename)\n\n    with open(resolved, \"rb\") as f:\n        return f.read()",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 277,
+    "output_tokens": 679,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

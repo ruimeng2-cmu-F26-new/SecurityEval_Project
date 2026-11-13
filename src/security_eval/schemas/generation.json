@@ -5,9 +5,17 @@
     "schema_version": {
       "const": "1.0"
     },
+    "candidate_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_.-]*(?:__[a-z0-9][a-z0-9_.-]*)*$"
+    },
     "sample_id": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "run_index": {
+      "type": "integer",
+      "minimum": 1
     },
     "status": {
       "enum": [
@@ -17,7 +25,7 @@
       ]
     },
     "provider": {
-      "const": "openai"
+      "const": "anthropic"
     },
     "requested_model": {
       "type": "string",
@@ -33,6 +41,22 @@
           "type": "null"
         }
       ]
+    },
+    "effort": {
+      "enum": ["low", "medium", "high", "xhigh", "max"]
+    },
+    "thinking_type": {
+      "const": "adaptive"
+    },
+    "max_tokens": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "stop_reason": {
+      "type": ["string", "null"]
+    },
+    "failure_kind": {
+      "type": ["string", "null"]
     },
     "created_at": {
       "type": "string",
@@ -57,6 +81,10 @@
       "type": "string",
       "minLength": 1
     },
+    "prompt_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
     "request_sha256": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
@@ -66,6 +94,17 @@
         {
           "type": "string",
           "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "response_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         },
         {
           "type": "null"
@@ -128,6 +167,17 @@
         "null"
       ]
     },
+    "estimated_cost_usd": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "error": {
       "anyOf": [
         {
@@ -156,23 +206,33 @@
   },
   "required": [
     "schema_version",
+    "candidate_id",
     "sample_id",
+    "run_index",
     "status",
     "provider",
     "requested_model",
     "returned_model",
+    "effort",
+    "thinking_type",
+    "max_tokens",
+    "stop_reason",
+    "failure_kind",
     "created_at",
     "completed_at",
     "request_file",
     "sample_file",
+    "prompt_sha256",
     "request_sha256",
     "response_file",
+    "response_sha256",
     "raw_output_file",
     "code_file",
     "code_sha256",
     "syntax_valid",
     "response_id",
     "usage",
+    "estimated_cost_usd",
     "error"
   ],
   "allOf": [
@@ -198,6 +258,9 @@
           "response_file": {
             "type": "null"
           },
+          "response_sha256": {
+            "type": "null"
+          },
           "raw_output_file": {
             "type": "null"
           },
@@ -210,7 +273,16 @@
           "returned_model": {
             "type": "null"
           },
+          "stop_reason": {
+            "type": "null"
+          },
+          "failure_kind": {
+            "type": "null"
+          },
           "usage": {
+            "type": "null"
+          },
+          "estimated_cost_usd": {
             "type": "null"
           },
           "error": {
@@ -244,6 +316,10 @@
             "type": "string",
             "minLength": 1
           },
+          "response_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
           "raw_output_file": {
             "type": "string",
             "minLength": 1
@@ -253,6 +329,12 @@
             "format": "date-time"
           },
           "error": {
+            "type": "null"
+          },
+          "stop_reason": {
+            "const": "end_turn"
+          },
+          "failure_kind": {
             "type": "null"
           }
         }
@@ -274,6 +356,10 @@
           "completed_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "failure_kind": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }
