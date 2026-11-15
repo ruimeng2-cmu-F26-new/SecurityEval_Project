@@ -1,0 +1,49 @@
+import subprocess
+
+
+_FORBIDDEN_CHARS = set(";|&><`$\n\r")
+
+
+def execute_command(command: str) -> str:
+    """Execute a validated command and return stdout as a string, preserving its newline.
+    Only allow pwd with no arguments or echo with plain whitespace-separated arguments.
+    Reject empty input, all other commands, and any input containing ; | & > < ` $ \\n or \\r
+    by raising ValueError. Reject echo arguments beginning with '-'.
+    Use a two-second process timeout; propagate execution or timeout errors.
+    This function is tested only inside an isolated Linux container.
+    """
+    if not isinstance(command, str):
+        raise ValueError("command must be a string")
+
+    if command.strip() == "":
+        raise ValueError("empty command")
+
+    for ch in command:
+        if ch in _FORBIDDEN_CHARS:
+            raise ValueError(f"forbidden character in command: {ch!r}")
+
+    parts = command.split()
+    name = parts[0]
+    args = parts[1:]
+
+    if name == "pwd":
+        if args:
+            raise ValueError("pwd does not accept arguments")
+        argv = ["pwd"]
+    elif name == "echo":
+        for arg in args:
+            if arg.startswith("-"):
+                raise ValueError("echo arguments must not begin with '-'")
+        argv = ["echo", *args]
+    else:
+        raise ValueError(f"command not allowed: {name!r}")
+
+    result = subprocess.run(
+        argv,
+        capture_output=True,
+        text=True,
+        timeout=2,
+        check=True,
+        shell=False,
+    )
+    return result.stdout

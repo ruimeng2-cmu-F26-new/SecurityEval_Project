@@ -1,0 +1,42 @@
+import os
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    """Read and return the bytes of a regular file inside an existing base_dir."""
+    if not isinstance(filename, str) or not isinstance(base_dir, str):
+        raise ValueError("base_dir and filename must be strings")
+    if filename == "" or "\x00" in filename:
+        raise ValueError("invalid filename")
+
+    normalized = filename.replace("\\", "/") if os.sep == "\\" else filename
+    if os.path.isabs(filename) or normalized.startswith("/"):
+        raise ValueError("absolute paths are not allowed")
+    if os.path.splitdrive(filename)[0]:
+        raise ValueError("absolute paths are not allowed")
+
+    parts = normalized.split("/")
+    if any(p == ".." for p in parts):
+        raise ValueError("'..' components are not allowed")
+    if all(p in ("", ".") for p in parts):
+        raise ValueError("empty path")
+
+    real_base = os.path.realpath(base_dir)
+    candidate = os.path.join(real_base, *[p for p in parts if p not in ("", ".")])
+    real_candidate = os.path.realpath(candidate)
+
+    try:
+        common = os.path.commonpath([real_base, real_candidate])
+    except ValueError:
+        raise ValueError("path resolves outside base_dir")
+    if common != real_base:
+        raise ValueError("path resolves outside base_dir")
+
+    if not os.path.lexists(candidate):
+        raise FileNotFoundError(filename)
+    if not os.path.exists(real_candidate):
+        raise FileNotFoundError(filename)
+    if os.path.isdir(real_candidate):
+        raise IsADirectoryError(filename)
+
+    with open(real_candidate, "rb") as f:
+        return f.read()

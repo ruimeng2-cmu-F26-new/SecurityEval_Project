@@ -1,0 +1,46 @@
+import os
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    """Read and return the bytes of a regular file inside an existing base_dir.
+
+    Allows relative nested paths. Raises ValueError for empty paths, absolute
+    paths, any '..' path component, or a path resolving outside base_dir
+    through symlinks. Raises FileNotFoundError for a missing in-base file and
+    IsADirectoryError for a directory.
+    """
+    if not isinstance(filename, str) or filename == "" or "\x00" in filename:
+        raise ValueError("invalid filename")
+    if os.path.isabs(filename) or filename.startswith(("/", "\\")):
+        raise ValueError("absolute paths are not allowed")
+    # Check components using both separators for safety.
+    parts = filename.replace("\\", "/").split("/")
+    if any(p == ".." for p in parts):
+        raise ValueError("'..' components are not allowed")
+    if os.name == "nt":
+        drive, _ = os.path.splitdrive(filename)
+        if drive:
+            raise ValueError("absolute paths are not allowed")
+    if all(p in ("", ".") for p in parts):
+        raise ValueError("empty path")
+
+    base_real = os.path.realpath(base_dir)
+    candidate = os.path.join(base_real, filename)
+    resolved = os.path.realpath(candidate)
+
+    try:
+        common = os.path.commonpath([base_real, resolved])
+    except ValueError:
+        raise ValueError("path escapes base directory")
+    if common != base_real:
+        raise ValueError("path escapes base directory")
+
+    if not os.path.lexists(resolved):
+        raise FileNotFoundError(filename)
+    if os.path.isdir(resolved):
+        raise IsADirectoryError(filename)
+    if not os.path.isfile(resolved):
+        raise FileNotFoundError(filename)
+
+    with open(resolved, "rb") as f:
+        return f.read()

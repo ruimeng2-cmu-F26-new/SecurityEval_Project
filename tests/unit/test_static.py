@@ -12,7 +12,9 @@ from security_eval.static_runner import run_static
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures/static"
 SAMPLE = {"sample_id": "rule_fixture"}
-RULE_FIXTURES = ["sql_unsafe.py", "sql_safe.py", "command_unsafe.py", "command_safe.py", "no_findings.py"]
+RULE_FIXTURES = ["sql_unsafe.py", "sql_safe.py", "command_unsafe.py", "command_safe.py", "command_allowlisted.py",
+                 "path_unsafe.py", "path_safe.py", "no_findings.py"]
+DYNAMIC_CONTROLS = Path(__file__).resolve().parents[1] / "fixtures/dynamic"
 
 
 def expected(path: Path) -> set[tuple[str, int]]:
@@ -32,13 +34,32 @@ def test_ast_rules_report_exactly_the_marked_lines(name):
 def test_every_rule_has_unsafe_and_safe_fixture():
     marked = {rule for name in RULE_FIXTURES for rule, _ in expected(FIXTURES / name)}
     assert marked == {r.rule_id for r in ast_rules.RULES}
-    for prefix in ("sql", "command"):
+    for prefix in ("sql", "command", "path"):
         assert (FIXTURES / f"{prefix}_safe.py").exists() and (FIXTURES / f"{prefix}_unsafe.py").exists()
 
 
 def test_command_rule_severity_distinguishes_shell_from_program_choice():
-    severities = {f["line"]: f["severity"] for f in ast_rules.scan((FIXTURES / "command_unsafe.py").read_bytes())}
-    assert sorted(severities.values()) == ["high", "high", "high", "medium", "medium", "medium"]
+    severities = [f["severity"] for f in ast_rules.scan((FIXTURES / "command_unsafe.py").read_bytes())]
+    assert sorted(severities) == ["high"] * 3 + ["medium"] * 5
+
+
+def test_command_rule_lowers_severity_after_allowlist_comparison():
+    findings = ast_rules.scan((FIXTURES / "command_allowlisted.py").read_bytes())
+    assert [f["severity"] for f in findings] == ["low", "low"]
+
+
+def test_path_rule_severity_distinguishes_missing_and_weak_checks():
+    findings = ast_rules.scan((FIXTURES / "path_unsafe.py").read_bytes())
+    assert [f["severity"] for f in findings] == ["high", "high", "high", "medium", "medium"]
+    assert "symlinks" in findings[3]["message"] and "sibling" in findings[4]["message"]
+    assert all(f["cwe"] == "CWE-022" for f in findings)
+
+
+@pytest.mark.parametrize("name,expected", [
+    ("sql_safe.py", []), ("path_safe.py", []), ("command_safe.py", ["low"]), ("sql_unsafe.py", ["high"])])
+def test_rules_on_member3_handwritten_controls(name, expected):
+    findings = ast_rules.scan((DYNAMIC_CONTROLS / name).read_bytes())
+    assert [f["severity"] for f in findings] == expected
 
 
 def test_ast_analyzer_contract_and_evidence(tmp_path):

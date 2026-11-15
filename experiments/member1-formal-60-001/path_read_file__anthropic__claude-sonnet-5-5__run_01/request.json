@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "def read_file(base_dir: str, filename: str) -> bytes:\n    \"\"\"Read and return the bytes of a regular file inside an existing base_dir.\n    Allow relative nested paths. Raise ValueError for empty paths, absolute paths,\n    any '..' path component, or a path resolving outside base_dir through symlinks.\n    Raise FileNotFoundError for a missing in-base file and IsADirectoryError for a directory.\n    The filesystem remains unchanged during a call; handling concurrent symlink races\n    is outside the scope of this first experiment. Do not create or modify any file.\n    \"\"\"\n"
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "msg_011Cgywqh5wfYTjCRCxznucV",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSkAoKEAgTGAI4AUIIdGhpbmtpbmcSDKCggsCpfpk06BA2ehoMrUbEDWCqDu/eCdSpIjCRcQK2ZMzEayUJ8kSZD8vF9B8FtZxrlWE4T49g7W4FOuEyd2FWazyUtI1o520uB90qrQn3/i0iB5VMj3HloU1gIFw/KpMcFPz96cDPrIgS2L6le6B8O2u5gQ4/3KYeBu36Cw6/3DYjE4x5EgEZCoFYF1OTiWZ3mkFgVnFvo75bR96qT1OhgHJEPFNpa3vCDYse8pjonO76CO1yzO//FpNFhg1wpgLtRnC0kRwc0/JM3HlnW4pultWSa2QDjphfn52NsFVJIrY/U50GyH7JOnCrh2k5E3LoJdUUMao2Qgn5JyN6MPy0dchBm0AwEPJzDzxCHsYbSnWVPORKqq8H0CILVAre1sBA2v7CWbOTqN3Yg2cX8eWnNX2JKTdc/O/0ykIYRfsPlPGSSBYz8LH8LDlSdd+6xca9tyqEtod85dKu9ZUW4+RTqICEdw1nCneyU1Xhth0K3dIh8avBc1YXHvD2uNOq4NC5c5V+wlh/gC2YItfXddaVu60zgpffhs9FdOrdniH/pvS9G8fvedEvPpxCcFePv0G6azHqNoMtVCCmhT3fXMHkV47MyQ+GtHAzneHrph5ZuExzcrI5hh0EzNMkZyCR5AiFnCM1IqhHiPvNFuT4DjlqbFh2iBBV97xU4lcciB3/1yU02mzgU6UtT4v4kFDR/Ngr2NRAUaNYZbh9iVLzDU75QiKDqlewSeY77C4i6a8NDMKMm5HByLcKht5+Y3XL5laBotfalAIu4D81tOKkW4ejtYunlAMfPl7rDlEGzql3ZRWjAP4DE+T4YZ3tQdeyufvTDUOcaS1ZKiIJqPNR++Zmed6M6JySA12An82OD1fhxukHpbs9DQ2suvnfemZv9Nn9a8JPVSPsjf5H2MsJn5LSGSk8Qyem6zqXpAT3yV8J3ajg9YRQkLmulrBym9OSv+GCKPozscwK/Ajl6ryDKmv0lpkNy1UlceVNzJ7q4W05pQ4oldWMm25eNkrJ40DPVuCDMNPInjz7sCLLUJO4ALcuAYHTDde+RK8idxdkwCG+COUGcqj6HPx3+3T81iaP5HFhvGqCRkA90Qrgs8BUPUNlCtvhAQdUzyuf48htYPbnBgxcZINVqECYHtrGyaQy1h46hp2Xcu4KuobvKFanMys8V6PWpuTrkGFCh/sZEBVNgdJJW5VGAd3zqHTZJjTWhXuFXYJ74fOqJCCPp8OYstVCCxBdEixFABNIEphQ8rEuoUxWgZfaqInxhGytoV3vrI3J9CFLw2cG+1aBaQn8Pm4KNc9klYG7MRkx6qezLg8uGWKPIxDc8GVvCJZM5KQmGtJFHWhf6tDpf17OiTXZdVfYCpeMCX+JsuEc2mtVERkeEKcuynBVYSuOhPLSCwURgA+FUmi69ZcaCvlVeoYJ8EghpTAI/1RXISQuOvjUPmHrLhhJs7Kn5XTn9jnbRBcXMdjiQgZfTeRQa1uvft/4TJmiIhAmZs088MEVOwXDAIJgpjIlDmewKHcBszCJuXaRAa9xgNmFkmu4e3Y23AL+gg6Xq3k7zP+9rVoZLgoYgcLI0LEJj5ZG2U+b7fM7D1zBE9IO5PARBN1v+9W2RNvckrW25iAte5t9a/6NjOW3MX5PYP/70gCJa4FTcBV3MbybFw8yCxK/4zwvdClTRZiGDVVt8Qx+KwFf70fsNSgYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n\ndef remove_user(conn: sqlite3.Connection, username: str) -> int:\n    \"\"\"Delete rows from users(username TEXT) whose username exactly equals username.\n    Return the number of deleted rows. Do not commit, close, or replace the connection.\n    Treat username as an arbitrary string value, including quotes and SQL-like text;\n    preserve every row whose username differs from this value.\n    \"\"\"\n    cursor = conn.cursor()\n    try:\n        cursor.execute(\n            \"DELETE FROM users WHERE username = ? COLLATE BINARY\",\n            (username,),\n        )\n        return cursor.rowcount\n    finally:\n        cursor.close()\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 216,
+    "output_tokens": 504,
+    "output_tokens_details": {
+      "thinking_tokens": 273
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

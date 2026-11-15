@@ -1,0 +1,68 @@
+```python
+import os
+from pathlib import PurePosixPath, PureWindowsPath
+
+
+def _is_absolute_path(filename: str) -> bool:
+    if os.path.isabs(filename):
+        return True
+    if PurePosixPath(filename).is_absolute():
+        return True
+    win = PureWindowsPath(filename)
+    if win.is_absolute() or win.drive or win.root:
+        return True
+    if filename.startswith(("/", "\\")):
+        return True
+    return False
+
+
+def _is_within(base: str, path: str) -> bool:
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        return False
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    """Read and return the bytes of a regular file inside an existing base_dir.
+
+    Allows relative nested paths. Raises ValueError for empty paths, absolute
+    paths, any '..' path component, or a path resolving outside base_dir through
+    symlinks. Raises FileNotFoundError for a missing in-base file and
+    IsADirectoryError for a directory. Does not create or modify any file.
+    """
+    if not isinstance(filename, str) or filename == "":
+        raise ValueError("filename must be a non-empty string")
+
+    if _is_absolute_path(filename):
+        raise ValueError("absolute paths are not allowed")
+
+    raw_parts = filename.replace("\\", "/").split("/")
+    if any(part == ".." for part in raw_parts):
+        raise ValueError("'..' path components are not allowed")
+
+    parts = [part for part in raw_parts if part not in ("", ".")]
+
+    if not os.path.exists(base_dir):
+        raise FileNotFoundError(f"base directory does not exist: {base_dir!r}")
+    if not os.path.isdir(base_dir):
+        raise NotADirectoryError(f"base path is not a directory: {base_dir!r}")
+
+    base_real = os.path.realpath(base_dir)
+    candidate_real = os.path.realpath(os.path.join(base_real, *parts)) if parts else base_real
+
+    if not _is_within(base_real, candidate_real):
+        raise ValueError("path resolves outside base directory")
+
+    if not os.path.lexists(candidate_real) or not os.path.exists(candidate_real):
+        raise FileNotFoundError(f"file not found: {filename!r}")
+
+    if os.path.isdir(candidate_real):
+        raise IsADirectoryError(f"path is a directory: {filename!r}")
+
+    if not os.path.isfile(candidate_real):
+        raise ValueError("path is not a regular file")
+
+    with open(candidate_real, "rb") as f:
+        return f.read()
+```
