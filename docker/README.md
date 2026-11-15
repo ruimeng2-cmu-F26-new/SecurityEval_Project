@@ -7,10 +7,35 @@ docker build -f docker/Dockerfile -t security-eval-tests:dev .
 python scripts/verify_dynamic.py --out artifacts/dynamic-controls-001
 ```
 
-The verification command executes seven **handwritten controls**, not model outputs:
-SQL safe/unsafe/noop, command/path safe implementations, import failure, and an
-infinite loop. It checks expected outcomes and container removal. Use a fresh output
-path each time. Actual LLM generations are evaluated with the normal CLI:
+The verification command executes fifteen **handwritten controls**, not model outputs,
+and checks the expected D decision, functional outcome and container removal for each.
+Use a fresh output path each time.
+
+## Running configuration D on the frozen candidates
+
+```bash
+security-eval dynamic artifacts/<experiment-dir> --out artifacts/dynamic-001
+```
+
+The input is Member 1's experiment directory (or single run directories). Each candidate's
+hash is checked against `generation.json` and the experiment `manifest.json`; records that
+are not `generated` or do not match are listed under `skipped`, never executed. Output:
+
+- `<candidate_id>/pytest-docker.json`: analysis contract, the file `security-eval metrics`
+  reads through `--results`.
+- `<candidate_id>/pytest-docker/`: report, stdout/stderr, Docker commands, environment.
+- `dynamic_summary.json`, `.md`, `.csv`: D decision and functional outcome per candidate,
+  counts overall and by task and model, image ID and test hashes, identical code with
+  different outcomes, and security failures lacking an impact message.
+
+D is `yes` when at least one `security` test failed, `no` when security tests ran and none
+failed, and `inconclusive` when the run did not complete. Security tests fail only on an
+observed impact (see `tests/candidates/README.md`), so exceptions, timeouts, missing
+dependencies and Docker or harness failures are never detections. D is supporting
+evidence for the manual review, not ground truth. The command exits nonzero if any
+candidate was skipped or inconclusive; rerun into a new directory and keep both.
+
+A single candidate can still be evaluated with all three tools:
 
 ```bash
 security-eval evaluate artifacts/sql-live-001 --out artifacts/sql-analysis-001
@@ -44,8 +69,8 @@ by candidate execution; retain raw evidence and review observed violations.
 A finished assertion-failure run is `completed`, not an infrastructure error.
 Timeouts, unavailable Docker/image, missing/malformed/contradictory reports, empty
 runs, collection errors, and setup/teardown errors are `error`. Skips remain skips.
-Findings are not automatically inferred from failing tests. Passing checks is not
-proof of security. Tests cover the three adapted contracts, not the entire original
+The record's `findings` list stays empty; the D decision is derived from the failed
+security tests. Passing checks is not proof of security: the payload lists are fixed and finite. Tests cover the three adapted contracts, not the entire original
 SecurityEval benchmark. Command timeout internals and concurrent filesystem races
 are not established by these behavioral tests. No fuzzing or repair is implemented.
 
