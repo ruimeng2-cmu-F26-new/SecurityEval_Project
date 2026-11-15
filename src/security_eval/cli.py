@@ -8,9 +8,9 @@ from jsonschema.exceptions import ValidationError
 
 from .contracts import load_samples, validate
 from .evaluation import merge_labels, run_metrics, write_label_sheet
-from .generation import generate, prepare, run_batch
 from .generation import generate, prepare, run_batch, run_experiment
 from .pipeline import evaluate
+from . import dynamic_runner
 from .static_runner import all_completed, format_summary, run_static
 
 
@@ -25,6 +25,11 @@ def main(argv=None) -> int:
     evaluation = commands.add_parser("evaluate", help="Run available adapters; unfinished adapters report not_run")
     evaluation.add_argument("run_dir", type=Path)
     evaluation.add_argument("--out", type=Path, required=True)
+    dynamic = commands.add_parser("dynamic", help="Run Docker functional/security tests on generation run directories")
+    dynamic.add_argument("paths", nargs="+", type=Path, help="Experiment directories or generation run directories")
+    dynamic.add_argument("--out", type=Path, required=True, help="New directory; existing results are never overwritten")
+    dynamic.add_argument("--image", default="security-eval-tests:dev")
+    dynamic.add_argument("--timeout", type=int, default=60, help="Seconds allowed for one candidate's container")
     static = commands.add_parser("static", help="Run Bandit and custom AST rules on files or run directories")
     static.add_argument("paths", nargs="+", type=Path, help=".py files, generation run directories, or folders of them")
     static.add_argument("--out", type=Path, required=True, help="New directory; existing results are never overwritten")
@@ -76,7 +81,13 @@ def main(argv=None) -> int:
                             default="medium")
     args = parser.parse_args(argv)
     try:
-        if args.command == "validate":
+        if args.command == "dynamic":
+            summary = dynamic_runner.run_dynamic(args.paths, args.out, args.image, args.timeout,
+                                                 progress=lambda line: print(line, flush=True))
+            print(json.dumps({"overall": summary["overall"], "skipped": len(summary["skipped"]),
+                              "summary": str(args.out / "dynamic_summary.md")}))
+            return 0 if dynamic_runner.all_completed(summary) else 1
+        elif args.command == "validate":
             validate(args.kind, json.loads(args.file.read_text(encoding="utf-8")))
             print("Valid " + args.kind + " contract")
         elif args.command == "samples":

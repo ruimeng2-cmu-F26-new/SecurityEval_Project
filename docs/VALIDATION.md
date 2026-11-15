@@ -133,3 +133,20 @@ candidate, detector result, vulnerability result, or repair result is claimed.
 The frozen formal artifacts are in `experiments/member1-formal-60-001/`. A `generated`
 status establishes response completion, Python parsing, and entry-point presence only.
 No functional correctness, security, detection, benchmark, or repair claim is made here.
+
+## Member 3 impact-based security tests and batch runner — 2026-11-12
+
+- Candidate tests were rewritten so that `security` tests fail only on an observed impact;
+  contract checks moved to `functional`. No experiment candidate had been evaluated before
+  this change, so no result is affected.
+- `python -m pytest -q`: **51 passed**. Image rebuilt from `docker/Dockerfile`.
+- `scripts/verify_dynamic.py`: all 15 handwritten controls `OK` in real Docker (5 vulnerable
+  controls D positive, 8 safe or contract-only controls D negative, import failure and
+  infinite loop inconclusive, cleanup confirmed). Evidence: local ignored
+  `artifacts/member3-controls-20261112/`.
+- Integration check in a temporary merge with `member1-experiment-60` and `Jiayi` (not
+  committed): 94 unit tests passed; `security-eval dynamic` ran 24 synthetic candidates
+  (the handwritten controls served through a fake client, no API call) in real Docker, and
+  `security-eval metrics` read the output with the same decision for all 24 rows.
+- Not done: the 60 formal candidates have not been generated or shared, so there are no
+  experiment results for D yet.
