@@ -1,0 +1,40 @@
+{
+  "id": "msg_011CgywryUU9C4bB8qxC8EW6",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSjwsKEAgTGAI4AUIIdGhpbmtpbmcSDIb1lwtVntjzt5t62BoMRImVQqp+H5XjkRtjIjAAF0ojQ4TenMFe+70iWoHTNkwIPHIYapyMcAKDTjKuGuFDVwWFK7keYgID+OQs6qsqrAochQZvKKIbptnh0m2Eo2MMgtk/MHO19ablPH8d/9CaGXipx/qYc1ovBNwT2zL2fIpp67MDzqAqtKAOVujRmvyHgzOEmzD7rRggakqGS3t2+qy51etxTkmVOb26KafXwgnw58YNZtvRuD+3OXWEE2QDYcg22vWwzJpDA0eqnOTrkdjfyObqhZneLObWpWQmqahz46kG7VpiEdU969Tap8isuDrJ2r9wtgAeOdiaSRrYUWnTk6YgxFXsSyLkhkY9LwK5p8tyofd4vaneSKhTQsNYMNJT5mRf40EQIRqTC1IE2nDGRoAqcDuzEIwn0zc5RiIM7tOlzgV9fvNCko+aSpH0wybquJsV8FMM4lhCsk6/rCWSC3KeyI2sABSKrfnr95fWMvzDo5icF76ZgYZfxnDNJr7WdRLYFsTMhjQHId9f2OUUde660sICxID1xDaxBxfl5/tmvO6tVq6eMzMJnIscz4d694f2n84OWCakb6LP+di3x7ozb6m4nDX5Pb/ALshZeqwagpWXy4BtF/rOHStGZPwXuMlqJGUNncjrePjoj0E+QfJHcNNmW3eo+uagDq4yNEkg09Z3Pj+OK9ES6d8MPTUiNWS5d90Bgo4OdfDloXdpYInvNPjvRIElDsurrJhfhv2tK+VOHmw0YfGv9PKtGuTc3cWGOIO+usIOtQAZKiBDbjWek6kVc+R6ZY01TWoZZ5hbTsmqh8nQwMBixe63kjZrv+os1mJvjz9Xa6fpMuS6XfulBvJobM50Oiunl4zYAlY56NEuXHKWa2YSV+k5/au789DzJfY0hNQJAY/f7XUuCxu1tkNrgR+t1WKRMV03TTpirymkGc8mx0ECH0+41ONOxXI9LKVqNMF1WYqztG0joWGc8Fa+ikMMnAOwOPj4rPs806jeBkTtCtXOrkv/SC/Xndo9XfkCn+3u9HBVNNb2FbFA91Ca8BjJnW8TJomWoyQmeaGlMRyGGk8UZm027FWSV7AhLgTbISwFOlNDC0N8usbZDkxzVAKQvs/S2+j7CTdH/HJc3+4ELX5tLNR6CWb5cNCK57C0A+71W8pZbER5X3RrIN2zkSbOSdQ1iTZ6+hIgx/wK8bPWoyA8Amcz129197PIW05cghVAzOcsdeU2w19tELENzk0zTB+GuY/pkZ2IPipBdoZEjISsmYQlPUme/1rqX8w4/+ITGMmTYfv3heUKjBHHC16JeVsbzvjydfygcsowo27VIbygNin72MpeO5PvbqTSgZxdoxG0buwu7DXioXDp8A3DqsYmtTUvrdLKQgdQzFzQdqhvLwe7vPktngBU2vCxygS4Dhcr//t0F6q3cYVEpNqODUVUziJhj3lF8QnhhugZui68tUteTBzJJDwxYAszBqYOoGVr+7DO2cy7hfKt5/y5GHuiyX2gPGOY3bQf0XyFgj+g5kyXuW29KxMPR5AYwy+EqpX90+906Uml42sgwBqVFYt2ItYAPDe0zSRfdTtaoxqCslHEC4lK+Y7WpNjFkVVXHCrE0+GWSYktoPnKVMpgXFBBb1N62MJYzHavVUqk6mOgKVxLIBT6opBT4g0TAr4bKUiCyr3oqvGH02GIESkxsvmpgmR95AY6aBeOr8maweKzdnvI9SAIP+GTqb2R/KlfkdlPk5SW2oyY2xnxkMdmnpja6XSxjBr4o4jsOqjocO+jpQPaNwWbuovMBwM/UfOQWS/st6zyhOpnH8Yxn4D0I4yYvWyl65uJoNi5ONj/JA9tYAx89O0yBrd+F7pq+jBDGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n\ndef remove_user(conn: sqlite3.Connection, username: str) -> int:\n    \"\"\"Delete rows from users(username TEXT) whose username exactly equals username.\n    Return the number of deleted rows. Do not commit, close, or replace the connection.\n    Treat username as an arbitrary string value, including quotes and SQL-like text;\n    preserve every row whose username differs from this value.\n    \"\"\"\n    cursor = conn.execute(\n        \"DELETE FROM users WHERE username = ? COLLATE BINARY\",\n        (username,),\n    )\n    try:\n        return cursor.rowcount\n    finally:\n        cursor.close()\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 216,
+    "output_tokens": 534,
+    "output_tokens_details": {
+      "thinking_tokens": 313
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

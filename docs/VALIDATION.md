@@ -16,8 +16,8 @@ They are not candidate functionality/security results and are not GitHub CI resu
 The tests exercise contract rejection, duplicate sample handling, batch preparation,
 credential checks before batch output creation, pending analyzer
 states, code extraction, missing credentials, API failure, empty/invalid/incomplete
-outputs, preservation of raw output, prevention of candidate execution, the real
-OpenAI SDK with an explicitly mocked HTTP transport, and pipeline hash checks.
+outputs, preservation of raw output, prevention of candidate execution, provider
+request serialization, and pipeline hash checks.
 Synthetic fixture responses exist only in temporary test directories.
 
 ## Not run / not implemented
@@ -81,6 +81,58 @@ reported **48 passed in 1.80s** and `python -m pip check` found no broken requir
 The pipeline tests exercise real Bandit/AST execution with synthetic Docker responses
 and verify shared run/code identities and evidence paths. They do not claim a live
 LLM run or a new real-Docker experiment.
+
+## Static rules and evaluation tooling (Member 2) — 2026-11-04
+
+Python 3.11.17, Bandit 1.9.4, AST rule set 0.2.0. Everything below uses hand-written
+fixtures or synthetic data. **No model candidate was generated or analyzed, Docker was not
+run for this check, and no detection metric from a real experiment exists yet.**
+
+| Check | Observed result |
+|---|---|
+| `python -m pytest -q` | **87 passed** on `main` plus these changes |
+| Rule fixtures, exact (rule, line) pairs | Unsafe: `AST-SQL-001` 5, `AST-CMD-001` 8, `AST-PATH-001` 5; safe: 0; allowlisted command: 2 at low |
+| Member 3 handwritten controls (AST only) | `sql_safe`, `path_safe`: no findings; `command_safe`: low; `sql_unsafe`: high |
+| Metric code | Scores, overlap, paired changes and inconclusive handling match hand-calculated values on a synthetic table |
+| 16 deliberate breakages of the rules and metric code | All make a test fail, after adding the cases exposed by 2 initial survivors |
+| Copy of `origin/member1-experiment-60` with these changes | **91 passed**; a fake-client run of `generate-experiment` went through `static`, `label-sheet`, `merge-labels` and `metrics` |
+## Member 1 Claude experiment preparation — 2026-11-01
+
+- `python -m pytest -q`: **52 passed** with synthetic Claude fixtures and no
+  live provider request.
+- `python -m pip check`: no broken requirements.
+- The new `generate-experiment` dry run completed with **60 prepared records**, 60 unique
+  candidate IDs, no errors, no API calls, and no `code.py` files.
+- Distribution: 30 records for `claude-haiku-5-5`, 30 for `claude-sonnet-5-5`, and exactly ten
+  records for every task-model pair.
+- All 60 generation records passed the generation JSON schema. Every request used
+  `thinking.type = adaptive`, `output_config.effort = medium`, `max_tokens = 16000`,
+  and omitted temperature, top-p, and top-k.
+- `git diff --check` and JSON parsing of the updated generation schema completed cleanly.
+
+This is harness and request-preparation evidence only. No live API call, generated
+candidate, detector result, vulnerability result, or repair result is claimed.
+
+## Member 1 formal Claude generation — 2026-11-12
+
+- The six pilot calls completed successfully and remain excluded from the formal dataset.
+- The formal run created 60 unique candidate IDs: 30 per model and exactly ten per
+  task-model combination.
+- All 60 records have status `generated`, all responses ended with `end_turn`, and no
+  generation error was recorded.
+- All request, response, and code SHA-256 hashes were independently verified before
+  archiving the dataset.
+- Recorded usage was 15,020 input tokens and 46,953 output tokens. The manifest's
+  pricing estimate is USD 0.1569905.
+- No API credential pattern was found in the archived request, response, source, or
+  metadata files.
+- Bandit and custom AST analysis completed on the six excluded pilots. Docker evaluation
+  could not start in the Codex execution environment because the `docker` executable was
+  unavailable; this is recorded as an infrastructure error rather than a candidate result.
+
+The frozen formal artifacts are in `experiments/member1-formal-60-001/`. A `generated`
+status establishes response completion, Python parsing, and entry-point presence only.
+No functional correctness, security, detection, benchmark, or repair claim is made here.
 
 ## Member 3 impact-based security tests and batch runner — 2026-11-12
 

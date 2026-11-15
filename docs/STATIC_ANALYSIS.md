@@ -1,6 +1,6 @@
 # Static analysis (Member 2)
 
-Bandit is the baseline scanner; two custom AST rules add input-to-sink checks for the
+Bandit is the baseline scanner; three custom AST rules add input-to-sink checks for the
 selected samples. Both produce the shared `analysis.json` contract, plus a combined
 `static_summary.json`. **Every finding is an unverified potential issue**, not a confirmed
 vulnerability; "no findings" does not mean the code is secure.
@@ -49,7 +49,7 @@ plugins. `--ignore-nosec` stops generated code from suppressing the baseline wit
 `errors`, so a non-empty `errors` list is reported as `status: error`. Exit 1 must match
 non-empty results; anything else is a tool failure.
 
-## Custom AST rules (`analyzers/ast_rules.py`, rule set 0.1.0)
+## Custom AST rules (`analyzers/ast_rules.py`, rule set 0.2.0)
 
 A value is *input-derived* if it is a parameter of the enclosing function, a call to
 `input()`, or a local variable assigned (transitively) from one. Code is parsed with
@@ -58,15 +58,20 @@ A value is *input-derived* if it is a parameter of the enclosing function, a cal
 | Rule | Sample | Reports | Cannot determine |
 |---|---|---|---|
 | `AST-SQL-001` (CWE-089, high) | `sql_delete_user` | `.execute/.executemany/.executescript` whose SQL text (first argument) is input-derived | Sanitization or trusted input; flows through other functions, attributes, containers, globals; any method named `execute` counts as SQL |
-| `AST-CMD-001` (CWE-078) | `command_allowlist` | `subprocess.*`/`os.system`/`os.popen` with an input-derived command, either through a shell (high) or selecting the program to run (medium) | Allowlist checks before the call (validated code is still reported); argument injection when the program name is constant; `os.exec*`/`spawn*`; `shell=<variable>` is treated as `shell=True` |
+| `AST-CMD-001` (CWE-078) | `command_allowlist` | `subprocess.*`/`os.system`/`os.popen` with an input-derived command: through a shell (high), selecting the program without an allowlist-style comparison (medium), or after one (low) | Whether the comparison is correct or guards every path to the call; argument injection when the program name is constant; `os.exec*`/`spawn*`; `shell=<variable>` is treated as `shell=True` |
+| `AST-PATH-001` (CWE-022) | `path_read_file` | File access through an input-derived path: no recognized containment check (high), or a check that leaves symlinks unresolved or uses a plain string prefix (medium) | Whether a recognized check really guards this access or is enforced; a trusted directory parameter counts as input; concurrent symlink races |
 
-Both rules are intraprocedural and flow-insensitive: they ignore statement order and
+Taint tracking is intraprocedural and flow-insensitive: it ignores statement order and
 branches, and any expression that mentions an input-derived name counts as input-derived
 (e.g. `len(username)`), which can produce false positives. Imports and aliases such as
 `import subprocess as sp` and `from subprocess import run` are resolved; `getattr` and
-dynamic imports are not. No rule for `path_read_file` yet: the relevant mistakes (missing
-`resolve()`/containment checks) are hard to judge syntactically and are better left to
-dynamic tests.
+dynamic imports are not. `AST-PATH-001` also looks for guards in same-module functions
+connected by calls, so a validation helper is recognized.
+
+Bandit has no general path-traversal check, so `AST-PATH-001` keeps B1 from having zero
+recall on `path_read_file` by construction. The allowlist handling in `AST-CMD-001` was
+added after Member 3's safe handwritten control was reported at medium severity. Both
+changes were made before any model candidate was analyzed.
 
 To add a rule, write `check(tree, ctx) -> list[finding]` and append a `Rule` to `RULES`.
 
@@ -77,21 +82,46 @@ samples or LLM output. Lines marked `# expect: <RULE>` must be reported, and not
 may be. `tests/unit/test_static.py` checks:
 
 - the exact (rule, line) pairs for the unsafe and safe fixtures of each rule;
-- the command rule's severity split (shell: high; program choice: medium);
+- the severity split of the command and path rules;
+- the expected AST results on Member 3's handwritten controls;
 - contract validity and evidence files;
 - syntax errors in both tools, Bandit's no-findings case and batch input errors;
 - that results are never overwritten.
 
-As a sanity check, the suite was run against deliberately broken copies of the rules (input
-source, propagation, `shell=` handling, list-head check, alias resolution); each one made
-at least one test fail. Passing fixtures show the rules behave as designed on these
+As a sanity check, the suite was run against deliberately broken copies of the rules and
+the metric code. Two survivors exposed missing allowlist cases, which were added; every
+one of these broken copies now makes at least one test fail. Passing fixtures show the rules behave as designed on these
 patterns; they do not measure false-positive or false-negative rates on real code.
+
+## Experiment workflow
+
+The full comparison is defined in [Evaluation Protocol](EVALUATION_PROTOCOL.md).
+
+```bash
+# 1. Label from code only, before looking at any detector output.
+security-eval label-sheet artifacts/experiment-001 --out reviewer_a.csv   # repeat for reviewer_b.csv
+security-eval merge-labels reviewer_a.csv reviewer_b.csv --out labels.csv # fill blank labels by adjudication
+
+# 2. Run the detectors (Bandit, AST and Docker tests) on every generated candidate.
+for run in artifacts/experiment-001/*/; do
+  security-eval evaluate "$run" --out "artifacts/experiment-001-results/$(basename "$run")"
+done
+
+# 3. Join everything and compute metrics.
+security-eval metrics --candidates artifacts/experiment-001 \
+  --results artifacts/experiment-001-results --labels labels.csv --out artifacts/experiment-001-metrics
+```
+
+`evaluate` exits nonzero when a candidate cannot be evaluated, and the loop continues; failed
+generations are listed as skipped. `metrics` writes `evaluation_table.csv`, `metrics.json`,
+`report.md` and `error_analysis.csv` (B1 false positives and negatives with an empty
+`category` column for manual error analysis). Omit `--labels` only to check that results
+join correctly; do not read detector results before first-pass labeling is complete.
 
 ## Assumptions to confirm
 
-- Member 1: candidates live in `artifacts/<run>/` with `generation.json`, `sample.json` and
-  `code.py`, as the scaffold writes them.
-- Member 3: `static_summary.json` findings can be joined with dynamic results by
-  `sample_id` + `code_sha256`; `validation_status` is the field to update after testing.
-- Shared harness: `BanditAnalyzer(out_dir)` / `ASTAnalyzer(out_dir)` now take the output
+- Member 1: candidates live in `<experiment>/<candidate_id>/` with `generation.json`,
+  `sample.json` and `code.py`, as `generate-experiment` writes them.
+- Member 3: `pytest-docker.json` stays an `analysis.json` record, with one category per test.
+- Shared harness: `BanditAnalyzer(out_dir)` / `ASTAnalyzer(out_dir)` take the output
   directory for evidence files; `pipeline.evaluate` passes it.

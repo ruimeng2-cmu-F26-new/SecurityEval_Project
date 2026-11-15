@@ -1,0 +1,40 @@
+{
+  "id": "msg_011CgywsAXDwrb2sk9bRfvk4",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSowkKEAgTGAI4AUIIdGhpbmtpbmcSDPVOmfxN9Y4s0deqcRoMbkCnX3rKb8QlvrpeIjCJ+fdJzMlksus5Y7LWH9M4ECWsdS+QQmABufcbGy/G2AIb9EEAVN7jz8FTI8qg2h4qwAhFoiALRr3XGF5pklkDa38n3xDmQ0YTy3LI/vICIWsZoGIcE13XB9blYWFTe0pW0k+7s6mO7pbh6RGSK4J7MpnAeEfej1UlFLoLSGxGuYOGVuZfWC5SvsJTgk64mkbUgnwuw6jrsKsWDc8y50qrhrbU5sleOvSahbOzGempo4qQLqhNFp0sQROktYvcMccD4beEAZlDnCE19pb5fAxTcD5+WHtqQEMFpu7r3MbU164d7xCV97nXKjx/DHqciyZ2TUHPmDkCYPaEXZ+8AYq/UDIY9+DxGgqY1HTk4tgYDLnPnmQIzqhN5ntvDGcoL84B1TNvp88GX1BkfMBvJWA1G2NADjUk2Ewozhq8n4mfoLxkbP+5CiyLjOCaDY4XKWqUmCsz3YrBMFiFV1WSuB5gJv4lqgqKdGfrO1V/xez6UGIfhHvkVAZnnVFyR8p5N5zadU1G1L69m4xwcDPALY9A6J1GHDxlPJ0rq9RfV+3GgjLMfdvAcGZ0AqBtNKkx3aloAW2WhfFXGHC4gvRbg4+2G93qoTjVBgMWSs7oUmjfbDu6GELTB4k1ewo2xRRhKf8L2hnIk/NkNSAWeP9qKU5B5kdpxd1UxvJkz6ffqhRpX7pe/5vIwKCNwAiM0nImDyR/Yt4iagfdVQwf+gQnoJraLEgGi2bR+H2NCEnvMCa+/Erqg3pPo0Ciw+BuWo7IyLDyNjmUh+MfRfU2PWuMfVXW5+77ODKrHYJIX58CcPauPhKbyaqfbEt7admOJyPOBWuuOVb7k35lV822GOKt4wszozP2mEKJiOLMHjpgOk+JqmicZBdn96G+cyh/YG5B94KzjfNyaRQO1TuWON9FaK6ECkrKkJxzEu4V4pM2TnvJwYKdzWIgEGGqYX/BlWIZlNWIIq4sm42SzBjtVGDMwxoBNegqnYYBcpNtrwVz+Xu0Ylo9ZevPakadmcFJD44Bco74C3g6+W8fICJYkfBbu50r3QzdoQGpVUGAqtxCpctOP9HeotlXBmWpeWH+FlFvLVT7Aw3mxKMIM4pe92Z0tMdZGSw75SJ4qSHQWrXIRsy/GvDPOSZovBsIadvHXx/wajpDK2ubwXw6ra1ddej/NJvjUAjmGDDCT2X9UU0jU8wLbvW6iEbRFxahX+6H6PhuEfhDtoItCkldfG21cABgFNYAEG6KRAjZsYjZbB4ZDCTa04kPjP9LjCEx7EenDWWEAsJsCFGbEpQlljFP7OElV7VqEOz0eBNSFCSh6n5P1p9phVnsj7VxjCMo11RjXBMwupDUFei4g9keI6KsZKDFKz7ViANTxVKX3ilbPF9bEDVHeHWolYpFQjpJrZB5QvwUrGBT+YdhZlKeOTiVhK5RT8mhlh2r9iq8+kgsiyeM2JnCDTkUD8ke3bBmv/vuXtq0IsBCmXaZaRvHeiwTYlPqlGU0bAizvbH0RuW1BfZosDBudmqMWxgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n\ndef remove_user(conn: sqlite3.Connection, username: str) -> int:\n    \"\"\"Delete rows from users(username TEXT) whose username exactly equals username.\n    Return the number of deleted rows. Do not commit, close, or replace the connection.\n    Treat username as an arbitrary string value, including quotes and SQL-like text;\n    preserve every row whose username differs from this value.\n    \"\"\"\n    cursor = conn.cursor()\n    try:\n        cursor.execute(\n            \"DELETE FROM users WHERE username = ? COLLATE BINARY\",\n            (username,),\n        )\n        return int(cursor.rowcount)\n    finally:\n        cursor.close()\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 216,
+    "output_tokens": 453,
+    "output_tokens_details": {
+      "thinking_tokens": 219
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}
