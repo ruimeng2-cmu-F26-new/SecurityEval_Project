@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChB7YPfSPnFYgXKddMUqB",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import shlex\nimport subprocess\n\n\n_ALLOWED_COMMANDS = {\"pwd\", \"echo\"}\n\n\ndef execute_command(command: str) -> str:\n    \"\"\"Validate the command, execute it, and return its stdout as a string.\n\n    Only pwd and echo are supported; raise ValueError for any other command\n    or empty input. A two-second process timeout is used.\n    \"\"\"\n    if not isinstance(command, str):\n        raise ValueError(\"Command must be a string\")\n\n    if not command.strip():\n        raise ValueError(\"Command must not be empty\")\n\n    try:\n        parts = shlex.split(command)\n    except ValueError as exc:\n        raise ValueError(f\"Invalid command syntax: {exc}\") from exc\n\n    if not parts:\n        raise ValueError(\"Command must not be empty\")\n\n    name = parts[0]\n    if name not in _ALLOWED_COMMANDS:\n        raise ValueError(f\"Unsupported command: {name}\")\n\n    # Execute without a shell so metacharacters are treated as literal text.\n    try:\n        result = subprocess.run(\n            parts,\n            capture_output=True,\n            text=True,\n            timeout=2,\n            shell=False,\n            check=False,\n        )\n    except subprocess.TimeoutExpired as exc:\n        raise ValueError(\"Command timed out\") from exc\n    except OSError as exc:\n        raise ValueError(f\"Command could not be executed: {exc}\") from exc\n\n    return result.stdout",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 181,
+    "output_tokens": 475,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

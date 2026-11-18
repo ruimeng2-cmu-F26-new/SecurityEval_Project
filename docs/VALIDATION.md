@@ -113,8 +113,11 @@ run for this check, and no detection metric from a real experiment exists yet.**
 This is harness and request-preparation evidence only. No live API call, generated
 candidate, detector result, vulnerability result, or repair result is claimed.
 
-## Member 1 formal Claude generation — 2026-11-12
+## Member 1 function-only formal Claude generation — 2026-11-18
 
+- `python -m pytest -q`: **95 passed in 2.25s** after freezing the function-only
+  prompt hashes and rebasing onto the latest Member 2 and Member 3 changes.
+- `python -m pip check`: no broken requirements.
 - The six pilot calls completed successfully and remain excluded from the formal dataset.
 - The formal run created 60 unique candidate IDs: 30 per model and exactly ten per
   task-model combination.
@@ -122,15 +125,18 @@ candidate, detector result, vulnerability result, or repair result is claimed.
   generation error was recorded.
 - All request, response, and code SHA-256 hashes were independently verified before
   archiving the dataset.
-- Recorded usage was 15,020 input tokens and 46,953 output tokens. The manifest's
-  pricing estimate is USD 0.1569905.
+- The three model-facing prompt hashes match the frozen function-only prompt hashes in
+  the unit tests. Security requirements and attack cases were not included in requests.
+- Recorded usage was 10,640 input tokens and 40,740 output tokens. The manifest's
+  pricing estimate is USD 0.1491615.
+- The 60 candidates contain 41 distinct code hashes: 3 for SQL, 20 for command execution,
+  and 18 for path reading. This is a reproducibility count, not an evaluation result.
 - No API credential pattern was found in the archived request, response, source, or
   metadata files.
-- Bandit and custom AST analysis completed on the six excluded pilots. Docker evaluation
-  could not start in the Codex execution environment because the `docker` executable was
-  unavailable; this is recorded as an infrastructure error rather than a candidate result.
+- The superseded security-explicit candidate batch was removed from the current repository
+  tree before this function-only batch was archived.
 
-The frozen formal artifacts are in `experiments/member1-formal-60-001/`. A `generated`
+The frozen formal artifacts are in `experiments/member1-formal-60-002/`. A `generated`
 status establishes response completion, Python parsing, and entry-point presence only.
 No functional correctness, security, detection, benchmark, or repair claim is made here.
 
@@ -148,5 +154,5 @@ No functional correctness, security, detection, benchmark, or repair claim is ma
   committed): 94 unit tests passed; `security-eval dynamic` ran 24 synthetic candidates
   (the handwritten controls served through a fake client, no API call) in real Docker, and
   `security-eval metrics` read the output with the same decision for all 24 rows.
-- Not done: the 60 formal candidates have not been generated or shared, so there are no
-  experiment results for D yet.
+- At the time of this Member 3 validation, the replacement function-only formal candidates
+  had not yet been generated, so this section contains no experiment result for D.

@@ -11,20 +11,17 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 - Implemented: a Python 3.11 project scaffold, three traceable samples adapted from
   SecurityEval, shared JSON schemas, Member 1's Anthropic Messages API generation and
   artifact recording, offline harness tests, and integration points for all three members.
-- Not yet run: live LLM generation. API credentials are pending.
 - Implemented (Member 2): Bandit integration, three custom AST rules validated on hand-written
   fixtures, `security-eval static`, and labeling and metrics tooling (`label-sheet`,
   `merge-labels`, `metrics`). See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Completed: the frozen 60-candidate Claude generation run is archived under
-  `experiments/member1-formal-60-001/` with requests, responses, source, hashes,
+  `experiments/member1-formal-60-002/` with requests, responses, source, hashes,
   usage, and estimated cost records.
-- Implemented (Member 2): Bandit integration, two custom AST rules validated on hand-written
-  fixtures, and `security-eval static`. See [Static Analysis](docs/STATIC_ANALYSIS.md).
 - Implemented (Member 3): a bounded Docker runner and functional/security tests
   for the three adapted samples. See [Docker execution](docker/README.md).
 - Selected for the first experiment: `claude-haiku-5-5` and `claude-sonnet-5-5`, ten
   independent requests per task-model pair with adaptive thinking and medium effort
-  (60 candidates total).
+  (60 candidates total) using the frozen function-only prompts.
   The formal 60-candidate generation run is complete; detector evaluation and manual
   ground-truth review remain pending.
 - By default, `pytest` tests the harness only. **Passing harness tests does not establish
@@ -74,8 +71,10 @@ selection rationale, functional requirement, security requirement, upstream comm
 and SHA-256 hash. Original prompts were extracted from the upstream dataset; locally
 written code is not represented as upstream data.
 
-**These prompts add explicit security requirements and constitute an adapted experiment.
-Results must not be reported as scores on the original SecurityEval benchmark.**
+**The model-facing prompts state only the functional contract and do not disclose the
+separate security requirements or attack cases. They still constitute an adapted
+experiment, so results must not be reported as scores on the original SecurityEval
+benchmark.**
 The CWE label identifies the upstream sample category; it does not establish that
 any particular generated candidate contains that vulnerability.
 
@@ -110,7 +109,9 @@ security-eval generate-experiment \
 The first experiment makes ten independent requests for each of three tasks and two
 models: 60 candidates total. Use a dated model snapshot when available; otherwise retain
 the requested and returned model IDs, response ID, timestamp, metadata, and hashes.
-Preserve every initial output rather than selecting only favorable candidates.
+Preserve every initial output rather than selecting only favorable candidates. The
+model receives only `adapted_prompt`; `security_requirements` remain hidden evaluation
+criteria for testing and manual ground-truth review.
 
 Live generation requires `ANTHROPIC_API_KEY` in the local environment. The following zsh
 commands read the key without displaying it or placing its value in shell history:
@@ -145,7 +146,7 @@ not marked successful.
 Candidate code is parsed but **never imported or executed** during generation.
 Experiment artifacts are ignored by Git by default; review them before archiving or sharing.
 The reviewed formal dataset is tracked at
-[`experiments/member1-formal-60-001/`](experiments/member1-formal-60-001/README.md).
+[`experiments/member1-formal-60-002/`](experiments/member1-formal-60-002/README.md).
 
 API reference: [Claude API primer](https://platform.claude.com/docs/en/claude_api_primer).
 The frozen experimental design is in [Experiment Plan](docs/EXPERIMENT_PLAN.md).
