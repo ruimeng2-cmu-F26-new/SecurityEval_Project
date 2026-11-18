@@ -1,0 +1,12 @@
+import sqlite3
+
+
+def remove_user(conn: sqlite3.Connection, username: str) -> int:
+    """Remove the user with the given username from the users(username TEXT) table.
+    Return the number of deleted rows. Do not commit or close the connection.
+    """
+    cursor = conn.execute("DELETE FROM users WHERE username = ?", (username,))
+    try:
+        return cursor.rowcount if cursor.rowcount is not None else 0
+    finally:
+        cursor.close()

@@ -1,0 +1,48 @@
+import shlex
+import subprocess
+
+
+_ALLOWED_COMMANDS = {"pwd", "echo"}
+
+
+def execute_command(command: str) -> str:
+    """Validate the command, execute it, and return its stdout as a string.
+
+    Only pwd and echo are supported; raises ValueError for any other command
+    or empty input. Uses a two-second process timeout.
+    """
+    if not isinstance(command, str):
+        raise ValueError("Command must be a string")
+
+    if not command.strip():
+        raise ValueError("Command must not be empty")
+
+    try:
+        parts = shlex.split(command, posix=True)
+    except ValueError as exc:
+        raise ValueError(f"Invalid command syntax: {exc}") from exc
+
+    if not parts:
+        raise ValueError("Command must not be empty")
+
+    name = parts[0]
+    if name not in _ALLOWED_COMMANDS:
+        raise ValueError(f"Unsupported command: {name}")
+
+    # Execute without a shell so no metacharacter interpretation occurs.
+    # Use absolute-path-independent lookup via env PATH, but fixed argument list.
+    try:
+        result = subprocess.run(
+            parts,
+            shell=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise ValueError("Command timed out") from exc
+    except FileNotFoundError as exc:
+        raise ValueError(f"Command not found: {name}") from exc
+
+    return result.stdout

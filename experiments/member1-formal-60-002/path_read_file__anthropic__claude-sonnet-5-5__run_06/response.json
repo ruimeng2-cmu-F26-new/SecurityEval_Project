@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChB7c2rA3a8SpoSxApUiA",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\n\n\ndef read_file(base_dir: str, filename: str) -> bytes:\n    \"\"\"Validate filename and return the bytes of that file inside base_dir.\n    filename may be a relative nested path such as reports/note.txt.\n    Raise FileNotFoundError if the file does not exist and IsADirectoryError for a directory.\n    \"\"\"\n    if not isinstance(base_dir, str) or not isinstance(filename, str):\n        raise TypeError(\"base_dir and filename must be strings\")\n    if not filename or \"\\x00\" in filename or \"\\x00\" in base_dir:\n        raise ValueError(\"invalid filename\")\n    if os.path.isabs(filename) or os.path.splitdrive(filename)[0]:\n        raise ValueError(\"filename must be a relative path\")\n    normalized = filename.replace(\"\\\\\", \"/\")\n    parts = normalized.split(\"/\")\n    if any(p == \"..\" for p in parts):\n        raise ValueError(\"path traversal is not allowed\")\n\n    base_real = os.path.realpath(base_dir)\n    target = os.path.realpath(os.path.join(base_real, *[p for p in parts if p not in (\"\", \".\")]))\n\n    try:\n        common = os.path.commonpath([base_real, target])\n    except ValueError:\n        raise ValueError(\"filename escapes base directory\")\n    if common != base_real:\n        raise ValueError(\"filename escapes base directory\")\n\n    if not os.path.exists(target):\n        raise FileNotFoundError(filename)\n    if os.path.isdir(target):\n        raise IsADirectoryError(filename)\n\n    with open(target, \"rb\") as f:\n        return f.read()",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 186,
+    "output_tokens": 534,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

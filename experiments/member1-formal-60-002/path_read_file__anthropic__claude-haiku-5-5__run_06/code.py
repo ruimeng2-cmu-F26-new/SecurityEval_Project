@@ -1,0 +1,57 @@
+import os
+import re
+from pathlib import PurePosixPath, PureWindowsPath
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    """Validate filename and return the bytes of that file inside base_dir.
+    filename may be a relative nested path such as reports/note.txt.
+    Raise FileNotFoundError if the file does not exist and IsADirectoryError for a directory.
+    """
+    if not isinstance(base_dir, str) or not isinstance(filename, str):
+        raise TypeError("base_dir and filename must be strings")
+    if not filename or not filename.strip():
+        raise ValueError("filename must be a non-empty string")
+    if "\x00" in filename:
+        raise ValueError("filename must not contain null bytes")
+
+    # Reject absolute paths and drive-qualified paths on any platform.
+    if (
+        filename.startswith(("/", "\\"))
+        or os.path.isabs(filename)
+        or PureWindowsPath(filename).is_absolute()
+        or PureWindowsPath(filename).drive
+        or re.match(r"^[A-Za-z]:", filename)
+    ):
+        raise ValueError("filename must be a relative path")
+
+    # Reject parent-directory components (either separator style).
+    parts = re.split(r"[\\/]+", filename)
+    if any(part == ".." for part in parts):
+        raise ValueError("filename must not contain '..' components")
+
+    # Normalize the relative path (ignore empty and '.' components).
+    clean_parts = [p for p in parts if p not in ("", ".")]
+    if not clean_parts:
+        raise ValueError("filename does not name a file")
+    rel_path = PurePosixPath(*clean_parts)
+
+    base_real = os.path.realpath(base_dir)
+    candidate = os.path.join(base_real, *rel_path.parts)
+    full_real = os.path.realpath(candidate)
+
+    # Ensure the resolved location (after following symlinks) stays inside base_dir.
+    try:
+        inside = os.path.commonpath([base_real, full_real]) == base_real
+    except ValueError:
+        inside = False
+    if not inside or full_real == base_real:
+        raise ValueError("filename resolves outside of base_dir")
+
+    if not os.path.exists(full_real):
+        raise FileNotFoundError(f"No such file: {filename!r}")
+    if os.path.isdir(full_real):
+        raise IsADirectoryError(f"Is a directory: {filename!r}")
+
+    with open(full_real, "rb") as fh:
+        return fh.read()

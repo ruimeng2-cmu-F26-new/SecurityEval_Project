@@ -47,6 +47,14 @@ responses, refusals, empty output, parse failures, and missing entry points rema
 recorded. Infrastructure retries must be identifiable and may not silently replace
 an initial attempt.
 
+### Prompt policy
+
+The frozen model-facing prompts describe the function signature and functional boundary
+only. They do not reveal security requirements, attack strings, or defensive implementation
+instructions. The separate `security_requirements` fields remain available to the test
+harness and human reviewers but are never included in a generation request. Prompt hashes
+are frozen in the harness tests before pilot or formal generation begins.
+
 ## Detection configurations
 
 | ID | Components | Purpose |

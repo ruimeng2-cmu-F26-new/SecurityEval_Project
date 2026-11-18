@@ -21,6 +21,19 @@ def test_selected_samples_have_stable_original_prompt_hashes():
         assert sample["original_prompt"] != sample["adapted_prompt"]
 
 
+def test_generation_prompts_are_frozen_function_only_variants():
+    expected = {
+        "sql_delete_user": "9d84720b9ef397eac4f51b03e04551742b32cb297f649f680de9d346f9f357dd",
+        "command_allowlist": "772f5b36f54cf70fd744ad416d13f50f054ecd6bba831439f712291f74be24ad",
+        "path_read_file": "24bc4e8f5c824bd430553399eb9d36bb5059504ae0650b9bd62dd5383178dbbb",
+    }
+    samples = load_samples(SAMPLES)
+    assert {sample["sample_id"] for sample in samples} == set(expected)
+    for sample in samples:
+        actual = hashlib.sha256(sample["adapted_prompt"].encode()).hexdigest()
+        assert actual == expected[sample["sample_id"]]
+
+
 @pytest.mark.parametrize("mutation", ["missing", "unknown", "invalid_id"])
 def test_invalid_sample_contracts_are_rejected(mutation):
     sample = copy.deepcopy(load_samples(SAMPLES)[0])

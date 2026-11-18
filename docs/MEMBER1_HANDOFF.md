@@ -5,7 +5,7 @@
 Member 1 owns sample selection, prompt adaptation, code generation, and generation
 records. The framework, three sample contracts, source verification, batch-generation
 command, and formal 60-candidate generation run are complete. The frozen dataset is in
-`experiments/member1-formal-60-001/`. Generation completion is not a security result;
+`experiments/member1-formal-60-002/`. Generation completion is not a security result;
 detector evaluation and manual review remain pending.
 
 ## Fixed detection-experiment configuration
@@ -39,6 +39,9 @@ candidate. The complete design is in `docs/EXPERIMENT_PLAN.md`.
 The complete requirements and the original/adapted prompt distinction are in
 `data/samples.jsonl`. Changes to signatures or expected behavior must be agreed on before
 Member 2 or Member 3 writes analysis logic or candidate tests.
+
+The model receives only `adapted_prompt`. Security requirements and attack cases remain
+hidden evaluation criteria and must not be appended to the provider request.
 
 ## Live generation
 

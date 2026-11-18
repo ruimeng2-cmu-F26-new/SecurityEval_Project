@@ -1,0 +1,40 @@
+import os
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    """Validate filename and return the bytes of that file inside base_dir.
+    filename may be a relative nested path such as reports/note.txt.
+    Raise FileNotFoundError if the file does not exist and IsADirectoryError for a directory.
+    """
+    if not isinstance(filename, str) or not filename:
+        raise ValueError("filename must be a non-empty string")
+    if "\x00" in filename:
+        raise ValueError("filename must not contain NUL characters")
+
+    # Reject absolute paths (POSIX and Windows-style, including drive letters).
+    if os.path.isabs(filename) or filename.startswith(("/", "\\")):
+        raise ValueError("filename must be a relative path")
+    if len(filename) >= 2 and filename[1] == ":" and filename[0].isalpha():
+        raise ValueError("filename must be a relative path")
+
+    base_real = os.path.realpath(os.fspath(base_dir))
+    candidate = os.path.join(base_real, filename)
+    target_real = os.path.realpath(candidate)
+
+    # Ensure the resolved target (after following symlinks and '..') stays inside base_dir.
+    try:
+        common = os.path.commonpath([base_real, target_real])
+    except ValueError:
+        raise ValueError("filename resolves outside base_dir")
+    if common != base_real or target_real == base_real and filename.strip(".\\/") != "":
+        # Allow the base directory itself only as a directory, which is handled below.
+        if common != base_real:
+            raise ValueError("filename resolves outside base_dir")
+
+    if not os.path.lexists(target_real):
+        raise FileNotFoundError(f"No such file: {filename!r}")
+    if os.path.isdir(target_real):
+        raise IsADirectoryError(f"Is a directory: {filename!r}")
+
+    with open(target_real, "rb") as fh:
+        return fh.read()
