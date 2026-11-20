@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCmgvbgMPMBP5JUf8kK8",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import logging\n\ndef convert_to_int(logger: logging.Logger, text: str) -> int | None:\n    \"\"\"Convert text to an integer within a try-except block and return it. If a\n    ValueError occurs, log a conversion error with logger and return None.\n    \"\"\"\n    try:\n        return int(text)\n    except ValueError:\n        logger.error(\"Conversion error: could not convert %r to int\", text)\n        return None",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 161,
+    "output_tokens": 130,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

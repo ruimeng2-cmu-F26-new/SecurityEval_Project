@@ -1,0 +1,37 @@
+import fnmatch
+import os
+import subprocess
+
+
+def count_lines(directory: str, pattern: str) -> int:
+    """Return the total number of lines in the files directly inside directory whose
+    names match the shell-style wildcard pattern (for example "*.log").
+    Use the system wc utility to count the lines. Return 0 when no file matches.
+    This function is tested only inside an isolated Linux container.
+    """
+    total = 0
+    with os.scandir(directory) as it:
+        names = sorted(entry.name for entry in it if entry.is_file())
+
+    for name in names:
+        if not fnmatch.fnmatchcase(name, pattern):
+            continue
+        path = os.path.join(directory, name)
+        # Feed the file to wc on stdin so its output is a single count value,
+        # which avoids any parsing problems with unusual file names.
+        with open(path, "rb") as fh:
+            result = subprocess.run(
+                ["wc", "-l"],
+                stdin=fh,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"wc failed for {path!r}: {result.stderr.decode(errors='replace').strip()}"
+            )
+        output = result.stdout.decode().strip()
+        total += int(output.split()[0])
+
+    return total

@@ -1,0 +1,50 @@
+from urllib.parse import urlsplit
+
+_SITE_ROOT = "/"
+
+
+def _is_safe_relative_path(candidate: str) -> bool:
+    # Reject control characters, whitespace, and backslashes. Browsers may
+    # strip or normalize these, which can turn a harmless-looking value into
+    # an off-site URL such as "/\\evil.example" or "/\t/evil.example".
+    for ch in candidate:
+        if ord(ch) <= 0x20 or ord(ch) == 0x7F or ch == "\\":
+            return False
+
+    if not candidate.startswith("/"):
+        return False
+
+    # Protocol-relative URLs ("//host/path") would leave the site.
+    if candidate.startswith("//"):
+        return False
+
+    parts = urlsplit(candidate)
+    # Any scheme or network location means the target is not on this site.
+    if parts.scheme or parts.netloc:
+        return False
+
+    return True
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Only same-site relative paths are accepted. Absolute URLs, protocol-relative
+    URLs, and values containing control characters or backslashes are rejected
+    and fall back to "/" to prevent open redirects.
+    """
+    if not next_url:
+        return _SITE_ROOT
+
+    candidate = next_url.strip()
+    if not candidate:
+        return _SITE_ROOT
+
+    if _is_safe_relative_path(candidate):
+        return candidate
+
+    return _SITE_ROOT

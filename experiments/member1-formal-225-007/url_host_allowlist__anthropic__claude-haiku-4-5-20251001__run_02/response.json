@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqTAEYXCgDtLQ9WbG8R",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nfrom urllib.parse import urlparse\n\n\ndef is_allowed_url(url: str) -> bool:\n    \"\"\"Return True if url is an http or https URL whose host is example.com or a\n    subdomain of example.com (for example https://docs.example.com/page), otherwise False.\n    \"\"\"\n    try:\n        parsed = urlparse(url)\n        \n        # Check if scheme is http or https\n        if parsed.scheme not in ('http', 'https'):\n            return False\n        \n        # Check if netloc (host) is not empty\n        host = parsed.netloc.lower()\n        if not host:\n            return False\n        \n        # Check if host is example.com or a subdomain of example.com\n        if host == 'example.com':\n            return True\n        \n        if host.endswith('.example.com'):\n            return True\n        \n        return False\n    except Exception:\n        return False\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 120,
+    "output_tokens": 226,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

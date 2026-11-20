@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqPJBBHbzJGPAV57Sj4",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport re\nfrom typing import List, Tuple\n\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression such as \"2 * (3 + 4) - 1.5\" and return the\n    result as a float. Numbers, parentheses, unary minus and the operators + - * / **\n    are supported. Raise ValueError for malformed input such as \"2 +\" or an empty string.\n    \"\"\"\n    if not expression or not expression.strip():\n        raise ValueError(\"Empty expression\")\n    \n    tokens = _tokenize(expression)\n    if not tokens:\n        raise ValueError(\"Empty expression\")\n    \n    result, pos = _parse_expression(tokens, 0)\n    if pos != len(tokens):\n        raise ValueError(f\"Unexpected token at position {pos}\")\n    return result\n\n\ndef _tokenize(expression: str) -> List[str]:\n    \"\"\"Tokenize the expression into numbers, operators, and parentheses.\"\"\"\n    pattern = r'(\\d+\\.?\\d*|\\.\\d+|[+\\-*/()\\*])'\n    tokens = re.findall(pattern, expression.replace(\" \", \"\"))\n    \n    # Validate that the expression has valid structure\n    if not tokens:\n        raise ValueError(\"Invalid expression\")\n    \n    return tokens\n\n\ndef _parse_expression(tokens: List[str], pos: int) -> Tuple[float, int]:\n    \"\"\"Parse an expression (handles + and -).\"\"\"\n    left, pos = _parse_term(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos] in ('+', '-'):\n        op = tokens[pos]\n        pos += 1\n        right, pos = _parse_term(tokens, pos)\n        if op == '+':\n            left = left + right\n        else:\n            left = left - right\n    \n    return left, pos\n\n\ndef _parse_term(tokens: List[str], pos: int) -> Tuple[float, int]:\n    \"\"\"Parse a term (handles * and /).\"\"\"\n    left, pos = _parse_power(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos] in ('*', '/'):\n        op = tokens[pos]\n        pos += 1\n        right, pos = _parse_power(tokens, pos)\n        if op == '*':\n            left = left * right\n        else:\n            if right == 0:\n                raise ValueError(\"Division by zero\")\n            left = left / right\n    \n    return left, pos\n\n\ndef _parse_power(tokens: List[str], pos: int) -> Tuple[float, int]:\n    \"\"\"Parse a power expression (handles **).\"\"\"\n    left, pos = _parse_unary(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos] == '**':\n        pos += 1\n        right, pos = _parse_unary(tokens, pos)\n        left = left ** right\n    \n    return left, pos\n\n\ndef _parse_unary(tokens: List[str], pos: int) -> Tuple[float, int]:\n    \"\"\"Parse unary expressions (handles unary minus and plus).\"\"\"\n    if pos >= len(tokens):\n        raise ValueError(\"Unexpected end of expression\")\n    \n    if tokens[pos] == '-':\n        pos += 1\n        value, pos = _parse_unary(tokens, pos)\n        return -value, pos\n    elif tokens[pos] == '+':\n        pos += 1\n        return _parse_unary(tokens, pos)\n    else:\n        return _parse_primary(tokens, pos)\n\n\ndef _parse_primary(tokens: List[str], pos: int) -> Tuple[float, int]:\n    \"\"\"Parse primary expressions (numbers and parenthesized expressions).\"\"\"\n    if pos >= len(tokens):\n        raise ValueError(\"Unexpected end of expression\")\n    \n    token = tokens[pos]\n    \n    if token == '(':\n        pos += 1\n        value, pos = _parse_expression(tokens, pos)\n        if pos >= len(tokens) or tokens[pos] != ')':\n            raise ValueError(\"Missing closing parenthesis\")\n        pos += 1\n        return value, pos\n    \n    try:\n        return float(token), pos + 1\n    except ValueError:\n        raise ValueError(f\"Invalid token: {token}\")\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 151,
+    "output_tokens": 1040,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

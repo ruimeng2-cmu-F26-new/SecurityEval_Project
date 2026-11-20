@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpLYBqT7uFcnQ7DUKxF",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression such as \"2 * (3 + 4) - 1.5\" and return the\n    result as a float. Numbers, parentheses, unary minus and the operators + - * / **\n    are supported. Raise ValueError for malformed input such as \"2 +\" or an empty string.\n    \"\"\"\n    if not expression or not expression.strip():\n        raise ValueError(\"Empty expression\")\n    \n    expression = expression.strip()\n    tokens = _tokenize(expression)\n    \n    if not tokens:\n        raise ValueError(\"Empty expression\")\n    \n    result, pos = _parse_expression(tokens, 0)\n    \n    if pos != len(tokens):\n        raise ValueError(\"Unexpected tokens after expression\")\n    \n    return result\n\n\ndef _tokenize(expression: str) -> list:\n    \"\"\"Tokenize the expression into numbers, operators, and parentheses.\"\"\"\n    tokens = []\n    i = 0\n    \n    while i < len(expression):\n        char = expression[i]\n        \n        if char.isspace():\n            i += 1\n            continue\n        \n        if char.isdigit() or (char == '.' and i + 1 < len(expression) and expression[i + 1].isdigit()):\n            j = i\n            while j < len(expression) and (expression[j].isdigit() or expression[j] == '.'):\n                j += 1\n            tokens.append(('NUMBER', float(expression[i:j])))\n            i = j\n        elif char in '+-*/()**':\n            if char == '*' and i + 1 < len(expression) and expression[i + 1] == '*':\n                tokens.append(('OPERATOR', '**'))\n                i += 2\n            else:\n                tokens.append(('OPERATOR', char))\n                i += 1\n        elif char == '(':\n            tokens.append(('LPAREN', '('))\n            i += 1\n        elif char == ')':\n            tokens.append(('RPAREN', ')'))\n            i += 1\n        else:\n            raise ValueError(f\"Invalid character: {char}\")\n    \n    return tokens\n\n\ndef _parse_expression(tokens: list, pos: int) -> tuple:\n    \"\"\"Parse addition and subtraction (lowest precedence).\"\"\"\n    left, pos = _parse_term(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos][0] == 'OPERATOR' and tokens[pos][1] in '+-':\n        op = tokens[pos][1]\n        pos += 1\n        right, pos = _parse_term(tokens, pos)\n        \n        if op == '+':\n            left = left + right\n        else:\n            left = left - right\n    \n    return left, pos\n\n\ndef _parse_term(tokens: list, pos: int) -> tuple:\n    \"\"\"Parse multiplication and division.\"\"\"\n    left, pos = _parse_power(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos][0] == 'OPERATOR' and tokens[pos][1] in '*/':\n        op = tokens[pos][1]\n        pos += 1\n        right, pos = _parse_power(tokens, pos)\n        \n        if op == '*':\n            left = left * right\n        else:\n            if right == 0:\n                raise ValueError(\"Division by zero\")\n            left = left / right\n    \n    return left, pos\n\n\ndef _parse_power(tokens: list, pos: int) -> tuple:\n    \"\"\"Parse exponentiation (right associative).\"\"\"\n    left, pos = _parse_unary(tokens, pos)\n    \n    if pos < len(tokens) and tokens[pos][0] == 'OPERATOR' and tokens[pos][1] == '**':\n        pos += 1\n        right, pos = _parse_power(tokens, pos)\n        left = left ** right\n    \n    return left, pos\n\n\ndef _parse_unary(tokens: list, pos: int) -> tuple:\n    \"\"\"Parse unary minus and primary expressions.\"\"\"\n    if pos < len(tokens) and tokens[pos][0] == 'OPERATOR' and tokens[pos][1] in '+-':\n        op = tokens[pos][1]\n        pos += 1\n        value, pos = _parse_unary(tokens, pos)\n        \n        if op == '-':\n            value = -value\n        \n        return value, pos\n    \n    return _parse_primary(tokens, pos)\n\n\ndef _parse_primary(tokens: list, pos: int) -> tuple:\n    \"\"\"Parse numbers and parenthesized expressions.\"\"\"\n    if pos >= len(tokens):\n        raise ValueError(\"Unexpected end of expression\")\n    \n    token_type, token_value = tokens[pos]\n    \n    if token_type == 'NUMBER':\n        return token_value, pos + 1\n    \n    if token_type == 'LPAREN':\n        pos += 1\n        result, pos = _parse_expression(tokens, pos)\n        \n        if pos >= len(tokens) or tokens[pos][0] != 'RPAREN':\n            raise ValueError(\"Missing closing parenthesis\")\n        \n        return result, pos + 1\n    \n    raise ValueError(f\"Unexpected token: {token_value}\")\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 151,
+    "output_tokens": 1289,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

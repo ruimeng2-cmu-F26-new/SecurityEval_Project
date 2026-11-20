@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "def build_response_head(content_type: str) -> str:\n    \"\"\"Return the head of an HTTP/1.1 200 OK response as text: the status line\n    \"HTTP/1.1 200 OK\", a Content-Type header whose value is content_type, a\n    \"Content-Length: 0\" header, and the terminating blank line. Lines end with CRLF.\n    \"\"\"\n"
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

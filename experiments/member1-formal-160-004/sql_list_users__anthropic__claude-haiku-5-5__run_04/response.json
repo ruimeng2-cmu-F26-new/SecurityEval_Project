@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCoBb4cWEEeusWvzDSmp",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSsAkKEAgUGAI4AUIIdGhpbmtpbmcSDF4MY58wvXLzzCAnAxoMjceipSjx2JT39jkcIjDLeBdYef2sxP9KnwhaphisBd4IVmFcTbjuzq/aOOaswo1T5Y2c5nGBCRximDR6nhsqzQixf4ZCRVc3D3xU+om+y35z57X7OY1lDiV/XjaoTiXT8IDtwpU8vgNKOuj3FpvJuKlcuBWfoZqdw7TMwUZvIx7eguQPCI1M6hgiio0UT/rSdACjFFhI1dfyYSHKxcll30pzA6zUtnhTl27s3gjxOZbiP5Wu1D6mOqmFNu0rtXQCjxI4v9AtMNeQOmZTmOhM7L7PNpshmuMQUQfrQz1duQIm10efr4zr6AsxvwpGmBUqTS2ZM2ECcTWXkzJ6M/lwnY/RebFzxMlTSAhwv6BCmUnhtRcXp3hSX+QIlDum3m7t0iABIDJ4biXCkhrjNmWiaQ+r3nLUQ8cNNjpiWFYdrouKMhuXTNYOJMm4m8wwigdH4yjf1eqkSaZO/LOT76SWEyGyUsm+15iIsB6iHDrmran99cZLovCzCiJIcFAH8AG+IxQaoLYyYFIYkun6CslK1xqZ43SvXwikfZTB7AgV25NaDSbFXe3BeO/SQfbhj2YYbT5gk8EVauthV25nzjp4C1rSQvUfAv3HiJ2RYC06CPnooDJiEjDtiKCZnMobB6ZraqsoJlpcJh728dbH8a5MsNjEf8tH1Bi4gbKg1FQgNunQsn3/eoBTfhbZWZqGdMCIJZwGyWpEDkB3lfCMLoqwv2hG8K1PV8oOrfugauOfHeN7edX0JD1B+RL3E1bHigSHpSLsxRWoKXxv7L3K36w73q87tQCKCiamQ6o3e26VgPSjhR2NKBKapO9M3gEeQU4C9I7umlYSYvFOnI5wUy3KEOq8TQtI5vzwQfpZscJcazwnNwpGLeEjQ5mpFLQuXmF648Us3PfPXYbbB1c9x8B2H7NgpXoC+Ei1RyqiWig+QkICnIOYKiuVfqqUbavnQlGvPB1ex751/+tlDpq2UoYyjqMkbDXfDQeET7stbXgGCrfZP4mfLEmOuG89CuOQ57vwRYsbfBAUBAkEsZhOzzrUWFDl7GOnDKpLizZi8oAfUFW2WaPEtJ8hjRMYIA6IAyOtkVz+5/G0YAqIO9toZQ0QW89SKCVCa+LA08daheLbOWMlPS6mxnZdiaDrYmXG9zI99zPYkoZygR5UVtlmP1XiuXmYWKvmSRL3vjCi8JO76uqLhMjmZFE19QjptOUgnEdRE1A4IMFteS5LAXPU5lwW7yBoNs5A50Yrq8V68+b8j/I56pL8ysVhkI81BoT55WvJozUFbcQYYrBQIcTTuVq1InLWGQQBMbYiEHQ1R4JHPjlQ93ftVJYJ81kIvZNbWLp7W2iD8omEpGdbn2J/1rUM5GPZNM2m3obAArpwZ7lXAWLqv1ebBdzQCpGeSi3IAcFEuNKCcWwKseU+ES/kd/E+Co84QihBf/ZYJf2Dmh87LYZbH4rNVvmeFZMsfClzHdXt08TbtnIDb6Ug2QEPxvcM/M2fhHFkJ5kt3ZfjXy9EjHQD2deN/ncEAdeU5pbWTurXhYsWpZYtdo3+UXvrlN8YAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n_SORTABLE_COLUMNS = {\"username\", \"email\", \"age\"}\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if not isinstance(sort_by, str) or sort_by not in _SORTABLE_COLUMNS:\n        raise ValueError(\n            f\"sort_by must be one of {sorted(_SORTABLE_COLUMNS)!r}, got {sort_by!r}\"\n        )\n\n    # sort_by has been validated against a fixed whitelist, so it is safe to\n    # interpolate it as an identifier; values are never interpolated.\n    query = f\"SELECT username, email, age FROM users ORDER BY {sort_by} ASC\"\n\n    cursor = conn.cursor()\n    try:\n        cursor.execute(query)\n        rows = cursor.fetchall()\n    finally:\n        cursor.close()\n\n    return [(row[0], row[1], row[2]) for row in rows]\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 649,
+    "output_tokens_details": {
+      "thinking_tokens": 236
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

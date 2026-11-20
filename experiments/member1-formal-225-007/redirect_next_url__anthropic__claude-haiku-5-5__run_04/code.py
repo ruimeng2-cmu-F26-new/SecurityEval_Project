@@ -1,0 +1,50 @@
+from urllib.parse import urlsplit, urlunsplit
+
+_SITE_HOST = "shop.example"
+_ALLOWED_SCHEMES = ("http", "https")
+_DEFAULT_TARGET = "/"
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url:
+        return _DEFAULT_TARGET
+
+    candidate = next_url.strip()
+    if not candidate:
+        return _DEFAULT_TARGET
+
+    # Reject control characters and backslashes, which browsers may
+    # normalize into slashes (e.g. "/\\evil.example").
+    for ch in candidate:
+        if ord(ch) < 32 or ord(ch) == 127 or ch == "\\":
+            return _DEFAULT_TARGET
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return _DEFAULT_TARGET
+
+    if parts.scheme or parts.netloc:
+        # Absolute URLs are only accepted if they point back to this site.
+        if parts.scheme.lower() not in _ALLOWED_SCHEMES:
+            return _DEFAULT_TARGET
+        try:
+            port = parts.port
+        except ValueError:
+            return _DEFAULT_TARGET
+        if parts.hostname != _SITE_HOST or port is not None:
+            return _DEFAULT_TARGET
+        if parts.username is not None or parts.password is not None:
+            return _DEFAULT_TARGET
+
+    path = parts.path
+    if not path.startswith("/") or path.startswith("//"):
+        return _DEFAULT_TARGET
+
+    return urlunsplit(("", "", path, parts.query, parts.fragment))

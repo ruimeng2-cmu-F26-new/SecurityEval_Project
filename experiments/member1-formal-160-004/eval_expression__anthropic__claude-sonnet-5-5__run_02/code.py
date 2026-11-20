@@ -1,0 +1,146 @@
+import re
+
+_TOKEN_RE = re.compile(
+    r"\s*(?:(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)|(\*\*|[-+*/()]))"
+)
+
+_MAX_DEPTH = 200
+
+
+def _tokenize(expression):
+    tokens = []
+    pos = 0
+    n = len(expression)
+    while pos < n:
+        if expression[pos:].strip() == "":
+            break
+        m = _TOKEN_RE.match(expression, pos)
+        if not m:
+            raise ValueError("Invalid character at position %d" % pos)
+        if m.group(1) is not None:
+            try:
+                tokens.append(("num", float(m.group(1))))
+            except ValueError:
+                raise ValueError("Invalid number")
+        else:
+            tokens.append(("op", m.group(2)))
+        pos = m.end()
+    return tokens
+
+
+class _Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.i = 0
+        self.depth = 0
+
+    def peek(self):
+        if self.i < len(self.tokens):
+            return self.tokens[self.i]
+        return None
+
+    def next(self):
+        tok = self.peek()
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        self.i += 1
+        return tok
+
+    def accept(self, op):
+        tok = self.peek()
+        if tok is not None and tok == ("op", op):
+            self.i += 1
+            return True
+        return False
+
+    def parse(self):
+        if not self.tokens:
+            raise ValueError("Empty expression")
+        value = self.expr()
+        if self.peek() is not None:
+            raise ValueError("Unexpected token")
+        return value
+
+    def expr(self):
+        value = self.term()
+        while True:
+            if self.accept("+"):
+                value += self.term()
+            elif self.accept("-"):
+                value -= self.term()
+            else:
+                return value
+
+    def term(self):
+        value = self.unary()
+        while True:
+            if self.accept("*"):
+                value *= self.unary()
+            elif self.accept("/"):
+                d = self.unary()
+                if d == 0:
+                    raise ValueError("Division by zero")
+                value /= d
+            else:
+                return value
+
+    def unary(self):
+        self.depth += 1
+        if self.depth > _MAX_DEPTH:
+            raise ValueError("Expression too deeply nested")
+        try:
+            if self.accept("-"):
+                return -self.unary()
+            if self.accept("+"):
+                return self.unary()
+            return self.power()
+        finally:
+            self.depth -= 1
+
+    def power(self):
+        base = self.atom()
+        if self.accept("**"):
+            exp = self.unary()  # right associative, allows unary minus
+            try:
+                result = base ** exp
+            except ZeroDivisionError:
+                raise ValueError("Division by zero")
+            except OverflowError:
+                raise ValueError("Result too large")
+            if isinstance(result, complex):
+                raise ValueError("Complex result")
+            return result
+        return base
+
+    def atom(self):
+        tok = self.next()
+        if tok[0] == "num":
+            return tok[1]
+        if tok[1] == "(":
+            self.depth += 1
+            if self.depth > _MAX_DEPTH:
+                raise ValueError("Expression too deeply nested")
+            try:
+                value = self.expr()
+            finally:
+                self.depth -= 1
+            if not self.accept(")"):
+                raise ValueError("Missing closing parenthesis")
+            return value
+        raise ValueError("Unexpected token %r" % (tok[1],))
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not isinstance(expression, str):
+        raise ValueError("Expression must be a string")
+    tokens = _tokenize(expression)
+    try:
+        return float(_Parser(tokens).parse())
+    except OverflowError:
+        raise ValueError("Result too large")
+    except RecursionError:
+        raise ValueError("Expression too deeply nested")

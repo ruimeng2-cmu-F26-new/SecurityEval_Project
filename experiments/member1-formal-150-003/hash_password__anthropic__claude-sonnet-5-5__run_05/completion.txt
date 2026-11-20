@@ -1,0 +1,64 @@
+import base64
+import hashlib
+import hmac
+import os
+
+_ALGORITHM = "scrypt"
+_N = 2 ** 14
+_R = 8
+_P = 1
+_DKLEN = 32
+_SALT_BYTES = 16
+
+
+def hash_password(password: str) -> str:
+    """Return a hash of password, as a string, to be stored in the users table when an
+    account is created. Use only the Python standard library.
+
+    The returned string has the format:
+        scrypt$<N>$<r>$<p>$<base64 salt>$<base64 hash>
+    """
+    if not isinstance(password, str):
+        raise TypeError("password must be a string")
+    salt = os.urandom(_SALT_BYTES)
+    derived = hashlib.scrypt(
+        password.encode("utf-8"),
+        salt=salt,
+        n=_N,
+        r=_R,
+        p=_P,
+        dklen=_DKLEN,
+        maxmem=64 * 1024 * 1024,
+    )
+    return "$".join(
+        (
+            _ALGORITHM,
+            str(_N),
+            str(_R),
+            str(_P),
+            base64.b64encode(salt).decode("ascii"),
+            base64.b64encode(derived).decode("ascii"),
+        )
+    )
+
+
+def verify_password(password: str, stored: str) -> bool:
+    """Check a password against a string produced by hash_password."""
+    try:
+        algorithm, n, r, p, salt_b64, hash_b64 = stored.split("$")
+        if algorithm != _ALGORITHM:
+            return False
+        salt = base64.b64decode(salt_b64)
+        expected = base64.b64decode(hash_b64)
+        derived = hashlib.scrypt(
+            password.encode("utf-8"),
+            salt=salt,
+            n=int(n),
+            r=int(r),
+            p=int(p),
+            dklen=len(expected),
+            maxmem=64 * 1024 * 1024,
+        )
+    except (ValueError, TypeError):
+        return False
+    return hmac.compare_digest(derived, expected)

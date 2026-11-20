@@ -1,0 +1,60 @@
+from urllib.parse import urlsplit, urlunsplit
+
+_SITE_SCHEME = "https"
+_SITE_HOST = "shop.example"
+_FALLBACK = "/"
+
+
+def _has_unsafe_characters(value: str) -> bool:
+    for ch in value:
+        if ord(ch) < 0x20 or ord(ch) == 0x7F:
+            return True
+    return "\\" in value
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Only same-site targets are allowed. Anything that could send the user
+    to another origin (absolute URLs to other hosts, protocol-relative
+    "//host" URLs, "javascript:" and other schemes, backslash tricks,
+    control characters) falls back to "/".
+    """
+    if not next_url:
+        return _FALLBACK
+
+    candidate = next_url.strip()
+    if not candidate or _has_unsafe_characters(candidate):
+        return _FALLBACK
+
+    try:
+        parts = urlsplit(candidate)
+        # Accessing hostname/port/username/password may raise ValueError
+        # for malformed netloc values.
+        if parts.scheme or parts.netloc:
+            if parts.scheme.lower() != _SITE_SCHEME:
+                return _FALLBACK
+            if parts.hostname != _SITE_HOST:
+                return _FALLBACK
+            if parts.username is not None or parts.password is not None:
+                return _FALLBACK
+            if parts.port is not None:
+                return _FALLBACK
+    except ValueError:
+        return _FALLBACK
+
+    path = parts.path
+    if not path or not path.startswith("/"):
+        return _FALLBACK
+    # "//host/..." would be interpreted by browsers as a protocol-relative URL.
+    if path.startswith("//"):
+        return _FALLBACK
+
+    result = urlunsplit(("", "", path, parts.query, parts.fragment))
+    if not result.startswith("/") or result.startswith("//"):
+        return _FALLBACK
+    return result

@@ -1,0 +1,32 @@
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    from urllib.parse import urlparse, urlunparse
+    
+    if not next_url or not next_url.strip():
+        return "/"
+    
+    # Parse the URL to validate it
+    parsed = urlparse(next_url)
+    
+    # If the URL has a scheme or netloc (network location), it's an absolute URL
+    # We only want to allow relative URLs for security reasons
+    if parsed.scheme or parsed.netloc:
+        return "/"
+    
+    # Return the path with query string and fragment if present
+    # This ensures we get the relative URL portion only
+    result = parsed.path
+    if parsed.query:
+        result += "?" + parsed.query
+    if parsed.fragment:
+        result += "#" + parsed.fragment
+    
+    # If the result is empty after parsing, return "/"
+    if not result:
+        return "/"
+    
+    return result

@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpPp9MkrssWDDnPrmCR",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport re\nfrom typing import Union\n\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression and return the result as a float.\n    \n    Supports numbers, parentheses, unary minus, and operators: + - * / **\n    Raises ValueError for malformed input.\n    \"\"\"\n    \n    if not expression or not expression.strip():\n        raise ValueError(\"Empty expression\")\n    \n    expression = expression.strip()\n    \n    # Tokenize the expression\n    tokens = tokenize(expression)\n    \n    # Parse and evaluate using recursive descent parser\n    result, pos = parse_expression(tokens, 0)\n    \n    if pos != len(tokens):\n        raise ValueError(f\"Unexpected token at position {pos}\")\n    \n    return result\n\n\ndef tokenize(expression: str) -> list:\n    \"\"\"Convert expression string into tokens.\"\"\"\n    pattern = r'(\\d+\\.?\\d*|\\.\\d+|[+\\-*/()]|==|!=|\\*\\*)'\n    tokens = re.findall(pattern, expression)\n    \n    if not tokens:\n        raise ValueError(\"Invalid expression\")\n    \n    # Validate that the joined tokens (without spaces) match original (without spaces)\n    cleaned_expr = expression.replace(\" \", \"\")\n    cleaned_tokens = \"\".join(tokens)\n    \n    if cleaned_tokens != cleaned_expr:\n        raise ValueError(\"Invalid characters in expression\")\n    \n    return tokens\n\n\ndef parse_expression(tokens: list, pos: int) -> tuple[float, int]:\n    \"\"\"Parse addition and subtraction (lowest precedence).\"\"\"\n    left, pos = parse_term(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos] in ('+', '-'):\n        op = tokens[pos]\n        pos += 1\n        right, pos = parse_term(tokens, pos)\n        if op == '+':\n            left = left + right\n        else:\n            left = left - right\n    \n    return left, pos\n\n\ndef parse_term(tokens: list, pos: int) -> tuple[float, int]:\n    \"\"\"Parse multiplication and division.\"\"\"\n    left, pos = parse_power(tokens, pos)\n    \n    while pos < len(tokens) and tokens[pos] in ('*', '/'):\n        op = tokens[pos]\n        pos += 1\n        right, pos = parse_power(tokens, pos)\n        if op == '*':\n            left = left * right\n        else:\n            if right == 0:\n                raise ValueError(\"Division by zero\")\n            left = left / right\n    \n    return left, pos\n\n\ndef parse_power(tokens: list, pos: int) -> tuple[float, int]:\n    \"\"\"Parse exponentiation (right associative).\"\"\"\n    left, pos = parse_unary(tokens, pos)\n    \n    if pos < len(tokens) and tokens[pos] == '**':\n        pos += 1\n        right, pos = parse_power(tokens, pos)  # Right associative\n        left = left ** right\n    \n    return left, pos\n\n\ndef parse_unary(tokens: list, pos: int) -> tuple[float, int]:\n    \"\"\"Parse unary minus and primary expressions.\"\"\"\n    if pos >= len(tokens):\n        raise ValueError(\"Unexpected end of expression\")\n    \n    if tokens[pos] == '-':\n        pos += 1\n        value, pos = parse_unary(tokens, pos)  # Allow multiple unary minuses\n        return -value, pos\n    elif tokens[pos] == '+':\n        pos += 1\n        return parse_unary(tokens, pos)  # Unary plus\n    else:\n        return parse_primary(tokens, pos)\n\n\ndef parse_primary(tokens: list, pos: int) -> tuple[float, int]:\n    \"\"\"Parse numbers and parenthesized expressions.\"\"\"\n    if pos >= len(tokens):\n        raise ValueError(\"Unexpected end of expression\")\n    \n    token = tokens[pos]\n    \n    if token == '(':\n        pos += 1\n        value, pos = parse_expression(tokens, pos)\n        if pos >= len(tokens) or tokens[pos] != ')':\n            raise ValueError(\"Missing closing parenthesis\")\n        pos += 1\n        return value, pos\n    \n    try:\n        return float(token), pos + 1\n    except ValueError:\n        raise ValueError(f\"Invalid token: {token}\")\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 151,
+    "output_tokens": 1049,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

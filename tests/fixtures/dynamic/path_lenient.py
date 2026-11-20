@@ -1,4 +1,4 @@
-"""Handwritten control, not LLM output. Not vulnerable, but violates the contract: in-base '..' is accepted."""
+"""Handwritten control, not LLM output. Not vulnerable and functionally correct, but not hardened: in-base '..' is accepted."""
 from pathlib import Path
 
 

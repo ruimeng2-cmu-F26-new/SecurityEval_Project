@@ -1,0 +1,50 @@
+from urllib.parse import urlsplit, urlunsplit
+
+_SITE_SCHEMES = frozenset({"http", "https"})
+_SITE_HOST = "shop.example"
+_DEFAULT_TARGET = "/"
+
+
+def _has_unsafe_characters(value: str) -> bool:
+    for ch in value:
+        if ord(ch) < 0x20 or ord(ch) == 0x7F:
+            return True
+    return "\\" in value
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Only same-site targets are allowed. Anything that could send the user to
+    another origin (absolute URLs to other hosts, protocol-relative "//host"
+    forms, backslash tricks, control characters, malformed input) falls back
+    to "/" to prevent open redirects.
+    """
+    if not next_url or not next_url.strip():
+        return _DEFAULT_TARGET
+
+    candidate = next_url.strip()
+
+    if _has_unsafe_characters(candidate):
+        return _DEFAULT_TARGET
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return _DEFAULT_TARGET
+
+    if parts.scheme or parts.netloc:
+        if parts.scheme.lower() not in _SITE_SCHEMES:
+            return _DEFAULT_TARGET
+        if parts.netloc.lower() != _SITE_HOST:
+            return _DEFAULT_TARGET
+
+    path = parts.path
+    if not path.startswith("/") or path.startswith("//"):
+        return _DEFAULT_TARGET
+
+    return urlunsplit(("", "", path, parts.query, parts.fragment))

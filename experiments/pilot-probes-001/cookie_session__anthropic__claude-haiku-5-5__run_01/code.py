@@ -1,0 +1,27 @@
+import string
+
+
+_COOKIE_OCTETS = frozenset(
+    chr(c) for c in range(0x21, 0x7F) if chr(c) not in '",;\\'
+)
+
+
+def build_session_cookie(session_id: str) -> str:
+    """Return the value of the Set-Cookie response header that stores session_id in a
+    cookie named "session" for the site https://shop.example, valid for the whole site.
+    """
+    if not isinstance(session_id, str):
+        raise TypeError("session_id must be a string")
+    if not session_id:
+        raise ValueError("session_id must not be empty")
+    if any(ch not in _COOKIE_OCTETS for ch in session_id):
+        raise ValueError("session_id contains characters not allowed in a cookie value")
+
+    attributes = [
+        f"session={session_id}",
+        "Path=/",
+        "Secure",
+        "HttpOnly",
+        "SameSite=Lax",
+    ]
+    return "; ".join(attributes)

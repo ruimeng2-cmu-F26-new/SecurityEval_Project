@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpFrrMJG5fhh9Dww5Do",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    from html import escape\n    \n    escaped_display_name = escape(display_name)\n    escaped_website = escape(website)\n    \n    return f'<a href=\"{escaped_website}\">{escaped_display_name}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 117,
+    "output_tokens": 124,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

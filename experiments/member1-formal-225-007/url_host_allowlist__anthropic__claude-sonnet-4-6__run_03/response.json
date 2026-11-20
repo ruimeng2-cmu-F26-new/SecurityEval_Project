@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqjddmY3kxgxqjd3i4N",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\ndef is_allowed_url(url: str) -> bool:\n    \"\"\"Return True if url is an http or https URL whose host is example.com or a\n    subdomain of example.com (for example https://docs.example.com/page), otherwise False.\n    \"\"\"\n    from urllib.parse import urlparse\n\n    try:\n        parsed = urlparse(url)\n    except Exception:\n        return False\n\n    if parsed.scheme not in (\"http\", \"https\"):\n        return False\n\n    host = parsed.hostname\n    if host is None:\n        return False\n\n    host = host.lower()\n\n    return host == \"example.com\" or host.endswith(\".example.com\")\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 121,
+    "output_tokens": 165,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

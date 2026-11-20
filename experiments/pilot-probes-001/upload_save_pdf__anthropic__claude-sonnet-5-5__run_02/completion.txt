@@ -1,0 +1,85 @@
+import os
+import re
+import uuid
+
+
+_MAX_NAME_LENGTH = 200
+_INVALID_CHARS = re.compile(r'[\x00-\x1f<>:"/\\|?*]')
+
+
+def _sanitize_filename(filename: str) -> str:
+    if not isinstance(filename, str):
+        raise TypeError("filename must be a string")
+
+    # Strip any directory components (both POSIX and Windows separators).
+    name = filename.replace("\\", "/").split("/")[-1]
+    name = _INVALID_CHARS.sub("_", name).strip().strip(".")
+    name = name.strip()
+
+    if not name:
+        raise ValueError("invalid filename")
+
+    stem, ext = os.path.splitext(name)
+    if ext.lower() != ".pdf":
+        stem = name
+        ext = ".pdf"
+    ext = ".pdf"
+
+    if len(stem) > _MAX_NAME_LENGTH:
+        stem = stem[:_MAX_NAME_LENGTH]
+    stem = stem.strip().strip(".")
+    if not stem:
+        raise ValueError("invalid filename")
+
+    # Avoid Windows reserved device names.
+    if stem.split(".")[0].upper() in {
+        "CON", "PRN", "AUX", "NUL",
+        *{f"COM{i}" for i in range(1, 10)},
+        *{f"LPT{i}" for i in range(1, 10)},
+    }:
+        stem = "_" + stem
+
+    return stem + ext
+
+
+def save_pdf_upload(upload_dir: str, filename: str, data: bytes) -> str:
+    """Save an uploaded PDF document: write data to a file in the existing directory
+    upload_dir under the client-supplied filename, and return the path of the saved file.
+    """
+    if not isinstance(data, (bytes, bytearray, memoryview)):
+        raise TypeError("data must be bytes-like")
+    if not os.path.isdir(upload_dir):
+        raise NotADirectoryError(upload_dir)
+
+    safe_name = _sanitize_filename(filename)
+    base_dir = os.path.realpath(upload_dir)
+    stem, ext = os.path.splitext(safe_name)
+
+    candidate = safe_name
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    flags |= getattr(os, "O_BINARY", 0)
+    flags |= getattr(os, "O_NOFOLLOW", 0)
+
+    for attempt in range(100):
+        path = os.path.join(base_dir, candidate)
+        # Ensure the resolved parent is the upload directory.
+        if os.path.dirname(os.path.realpath(path)) != base_dir:
+            raise ValueError("invalid filename")
+        try:
+            fd = os.open(path, flags, 0o644)
+        except FileExistsError:
+            suffix = uuid.uuid4().hex[:8]
+            candidate = f"{stem}_{suffix}{ext}"
+            continue
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(bytes(data))
+        except BaseException:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+            raise
+        return path
+
+    raise FileExistsError("could not create a unique file name")

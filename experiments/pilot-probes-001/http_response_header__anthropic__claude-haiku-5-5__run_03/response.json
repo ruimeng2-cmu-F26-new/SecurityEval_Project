@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmctxbjshNGBzYwqwko",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSmQcKEAgUGAI4AUIIdGhpbmtpbmcSDK13nsztcbUiBnXkhxoMD3sLhLFBRMj98nmPIjA1iQ4itHVvYjntyOzs6kA8hnStVA8Etz+Ad71IXqwFg25WOhmPZvkm/nPkZOsyEFQqtgYhFsSQP61tDNVr7nkCzQ6+WRMHFIKYqFYZciT4lGagwvnm68GeitxFcjgxYt+cbne6HJaH6YQK6ilcFw6gOKs0B+BN+Sl+/H/octj+ntea/qCnh1Du8ozSWzcIqrM7jLm4TTn1SSO+KhgBCiVAbjAYcOtS9GW675D7akeq7C0ZTYCoC1O0kiZqijJzV3mPa6E6bW5S/6ZNtOdN7f9J/L2nZ3TInkN6ZzS7pVzkNIGJX62yY4Fkw6w0icAzVQpnwATuFg3sjQkhKslrQVZpGRlJ058H42JIDOeuzLpaXbXe22lBTbHjn0CUXjfuIF+zkvF7fhqe8I5dbZcC8XpXmhHyLt43TSGXBLGblB9uWDcFutV3LRf0ubuOzqwJN22aFJ/zkqFmQqqHOC+MNWxnYp6W2ABH5tFdWizsm9oCvfYueiRYp9mHsTE/47bmwzto0Ybm0taU/uyHIe/wbvHFxi1W7IdQC0zuvP9wWDhrl75RTIMT5ZPbR2tUA+xvejixqLXF61RYThiwlTkhy2GL6JKPo0ijcSLv2OYNnc9yE2Kr8aPfR3VhfNFe8+fESJJYsQh8cZyI+1ayueEuUMFfTXhnmLJ0KTKIfjrFzVBUYZjELRyCiOZXUL0FhVQofAvccBO45zAn4/A6E0x+eAMDn7Tc5YVKQUSr0vOuTwtqYBDvxDdsCr1kAUJpE82Q7ShYjcaa8onOn21+9MqqBfM0jn3Dh5dQ6qrmx380w71ZM4Um9oC2WUh6eVMRYqeP7Foi6D/TnoyDbZ+YixOyKqxroFABbPHIl0cXQJo3W/jgBOYt0OIY2+ILQXj7GXYFqdmg9xi6JDQXIwiFSs3OGj5X8qmNeNHV6Eus54ERWsIaDe7w6+Z+iJv1m/Vz3PNxia6FIgOJYTySf4XDhGgDXsJA1MpY/XZv4L+IIAMQzAINsPVoVuLTY3pGwrjfveJmt7XVqR+SjnjicYXWaHjCkf+0WsuSOuDa3g0eitLjzIqi5dvT7Df/7/tjmSNa1wNoAlMy3qred8ecGp2j+WY1QY1LMe9pKUY59k+7yROdWPud7pyrxDoLGn+QUoEHIU9dwPvu7SxBG8K97LUYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\ndef build_response_head(content_type: str) -> str:\n    \"\"\"Return the head of an HTTP/1.1 200 OK response as text: the status line\n    \"HTTP/1.1 200 OK\", a Content-Type header whose value is content_type, a\n    \"Content-Length: 0\" header, and the terminating blank line. Lines end with CRLF.\n    \"\"\"\n    if \"\\r\" in content_type or \"\\n\" in content_type:\n        raise ValueError(\"content_type must not contain CR or LF characters\")\n    return (\n        \"HTTP/1.1 200 OK\\r\\n\"\n        f\"Content-Type: {content_type}\\r\\n\"\n        \"Content-Length: 0\\r\\n\"\n        \"\\r\\n\"\n    )\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 195,
+    "output_tokens": 346,
+    "output_tokens_details": {
+      "thinking_tokens": 107
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

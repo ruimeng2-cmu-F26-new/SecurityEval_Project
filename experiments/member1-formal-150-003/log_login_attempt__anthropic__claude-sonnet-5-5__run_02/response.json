@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCkQVfBTvqi4Q7khNDWz",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS6AoKEAgUGAI4AUIIdGhpbmtpbmcSDF6kTROEJ2p/72PSeRoMMm85w+nk1gJbCS+4IjBV6O36ReYfXdDXdUcvaHC40AZ1JinzVNT8+LpJvPW4zSvpduA0flwIk22WaImvn18qhQoUcTXpPE2s5qIS/daR/ZMtY+WFaQRfAg2b5W89MywIWL5saTqvFj2gzqg2GnAyGbGuOh+VbXBzdx/+d1nWeSvEpy0LG7MjNnT6poXI7sjmjg+CGgezQAWuibIBPn0mDqRGdIh1yWUBhixO2nhLatBAdBoZAmi1EmLhvlAQXUf/VBapy+8e1sjjj8jp3D+SL9dhpjB3auevvlpNErMX/DAUN46VSwcgNV05F4S5MCy8BEUUDlTGbcLjA5VoS8m5F1Zou/KCbik6iU0aaDcGZMQKI4Ppd8nc7rBaGIckirA+VZzzBkDP8ji5I5vag1C+qzDIymEaJgMulWlADYbbtRA/sGTIt9yqCD4sYkuxhzDIGOFeHebNVg7WhkTMDNf2omoK/O4v1+5YqQ65x8kBSZyjoTXjjOCHnDrwVkOaJ0S+rmhNFXDd1XJPaDp0qJT/f3C7VKSHa+dWQsBU+Khp7jiri18XXi/jX1Hfb4hZUnawptjDaQkJgkEoJiG36fIcTJXiEb65PkXIU0ucRHskZrJhiHviFi19B8iqMcJqqlEDycKxsT59uiybk7iVb1WFFyQgzCjqsylJTlKJvh0vVUAdu1IKlwo+R/D+Rx38hz0FyPfosmRxxM8O8HFPVKPrsrfW7xxu2uzRWhvboHK5rtqjqUOspceRMWEd995aP9QEDSscXP+8D+C/eEkFODWJLULSLQ2BFWhBI74E57gvyX7VGzmsa2R7DGidVpPu1VUX/p+Pf7WHrP0lWimExBuONVFrpSP8Zqg1pWx6k7eA4EnT/oOzzb1uxV2Cl61mSwt5Ntlg7bFK43JoyUQCm/hVWqxVYdlGSUiPmbpdXgjNJ//8jDKaHzhFbu4uawGcbCM4RAos1oOgPgIetGnmW5JtixKFaVUHTmXKhKo5RWeoS2Jl40zi4SThh6Mu1zQ6j91BSpTZQ9BI8ktVVBeTPQ5k8vU3ck7AklUMCoqLhanykWRQ0c+rnMV/w7DfLacezD7KRtOJ0pA923vsquCKE74kUmAYcalXIu/bF6TeM108q7FAhJzpatrIxrwKWxMXBC6j/lcjfeKc7wfIQvIhvFwfguQIKeapj6kbBqvefZLak5Krjtd9zsA9l0gbXOEmJQWXBG3L68f4tIWwZoiP1hZ4l8kjP/3MS5YqTGaFmoBkKYE4cxuMw0IPRfEbDWjT1lQ4fSe5NuPwRjoq1GaE5hyEy7X6hEQreGZ3LYZFMBRHOuorUhHBspkveSQihslGbwPl3zV1cwaXNZQrvrmYDghgTGKQU9CTNIeabQfT4B8GVAJYHLii6HkXqV3QC+Hshdifor7Mo7KJBYXZg9IzfJy+fWU7jd8agRiDvS0i4f768QARKNwz/3fok4w87Iy6i3vugVtXjINQkUqbhee4kIN/1B48hzLFj0AbQNIjm0pRzZlGTHqn08CoUlRrOBl8CiF5qNmdg1y+R5U1wg6IbbJLiEVVzflcsnRV1zJLNeNsqFYQitvF/bGB6dzyf+48FqXSq6jRAx+m/APLNYwyV9i31VOWScAj/CLpXrfOoxUa/Y5qTHFrkhgJdc24LDmGr/wz9Q4IA6XvIA/+a/dgZZdm0wGq3FxvoTt4Gnw29QK1udy/7hf8t/eyPWd+6d96hY5FUTLM4hxWJYApBbA9cSbxWf8916++lXIhZra9YtD2gXY5utkHfzDWtXYLtBSpLzkAvLlV5S5dGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import logging\nimport unicodedata\n\n_EXTRA_ESCAPES = {\"\\u2028\", \"\\u2029\", \"\\x85\"}\n\n\ndef _sanitize_for_log(value: str) -> str:\n    \"\"\"Escape control and line-breaking characters to prevent log forging.\"\"\"\n    parts = []\n    for ch in value:\n        if ch == \"\\\\\":\n            parts.append(\"\\\\\\\\\")\n        elif unicodedata.category(ch) == \"Cc\" or ch in _EXTRA_ESCAPES:\n            code = ord(ch)\n            if code <= 0xFF:\n                parts.append(\"\\\\x{:02x}\".format(code))\n            else:\n                parts.append(\"\\\\u{:04x}\".format(code))\n        else:\n            parts.append(ch)\n    return \"\".join(parts)\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n\n    Control characters (such as newlines) in the username are escaped so that\n    an attacker cannot inject forged log entries.\n    \"\"\"\n    safe_username = _sanitize_for_log(str(username))\n    logger.info(\"Failed login for user: %s\", safe_username)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 154,
+    "output_tokens": 673,
+    "output_tokens_details": {
+      "thinking_tokens": 265
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

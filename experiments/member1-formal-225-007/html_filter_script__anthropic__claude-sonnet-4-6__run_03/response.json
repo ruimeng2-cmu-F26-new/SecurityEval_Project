@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqXke7B6BT7Pq1QSeCP",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport re\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n    pattern = re.compile(r'<script\\b[^>]*>.*?</script>', re.IGNORECASE | re.DOTALL)\n    return pattern.sub('', content)\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 93,
+    "output_tokens": 89,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

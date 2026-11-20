@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCqpE2LZvh2wkLdhcDoY",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS5QwKEAgUGAI4AUIIdGhpbmtpbmcSDKHtappXakBmFShn+xoMs9ntjdkpeliDTI92IjDLcAZdcNSo3M+kYCtrvvtD7PtPyRTp/qBFgr+8b7tbgRZJ6uGH04XCnwLfnhvpfMIqggxTq8T+Nf7TOLbxc9SVYNcu9c1AgRXay8z2Hz7xtGpPMb3mPUcO9bKeurIm/QBRC2Go985BdGKFfzYgUnBPoXeC3S4yYYb2EbdTqHZWCgYdUrrzGHg2PO+1cgiFkOwypH8P/tmGkCNI4ssJsaKWQ0JYJV8DKGBkaHreeVP20Ce7Ei/4dm2GboNE4fYQYPMikNlYG3sIeEBXYXiPEC43o2XiDEY94wBmjc37co7K3w7uaoOi2jxzPbebmVgbu4aKMD6a0U75RhYFhEcn8a+F0y3zt5Q+0yIUcaBvHJbkoxA1XUM4EqUPUXIh4O6a9fVKHMB9mAwteVrKMkgleWcwilUcRpEOe5qJUUbpdGbq1sdeqGaRQ3CbdaENU7Bz4PBETzZYpIrC13LjaBTcDK4GXggacsi5hfjwJVGeuRTynlcL2W+MWul6gBpxtKPusAnkYvBc7yGbxJyobZmHpqImkIE1GjcmKuFb6IpAka21iMM2PbCEq7iulTY5FT8WkXXZc6CEpjqhAHyQK70WuQW08Y60kWQ9uG0/GFHnMxUSp/b7zizQin66JKkjM6Vpmpdwsd2OAaUW9dA/MWJiQZrzySBfGirUe6L3hwFOwfxf9nKCJXuBF4zvRm2rClhUQUSABDmy4L3jwx8cRQL7qh9lnSXopawuHoHoISvI0s4Vsb1wl3ZCNQunJu+cpke5po9zXMchbrnVVT6VwNf/lOGqq9BqNhuJyBbmPe+q2ZS0JCNDz0mbHGCWB7MTdl/Mc1Bd8/zBhBNYg37Il4gHevagjozdmgVjOluY2ITUMk56tYD04XwOVbcfbFAH1xHVLzq8Xs80Fia1vkBesCpcvNqa0O+o1kR6GKv13QWvTZZ61lvgt/46duMzdiEQ6rjDLbNklOCxtcbFAa1sKXf7Syy0OCFkGei7GUSsMkst0vsKcP9VcoLiC86Yr2bRJ4K4U/8S2fifZDfC0ap0bw1pmf7yIzYnJnHBXt84PgdhjWw+rHDdc2d7leXu3sk6cyL2U7/48VcgcTY/mQz/aWZrOgWcpPLoZinCDZOL/aZ/Yo+UhtFkodOXX87j1TB1vR402wppZnau82sjEUY1v8OWKe+ItHm8ZIhhNhoLiIYj1a7tJNmuK07Fbu3GYsDycn0q9Sg/f1QSuU1DASo7q6qfTas9MDCFGwubIxRDjxJAoYf/1ML2xjAnZAgbAL/3WY1k8P1eLPVfUf+//dniBGLIXnxK290p6O6o/yUwWK7QaQEkAMIrvrj46y8WzILN0a1t/W8bpEhgh6gmjEoh7i6uiD8ehzWf60IYuEuaX4hrvWj7t2Fi64CglfYaGMFC2U3d2ST7AG5UOvnWDilrykAebySAHdiAPJLAO0UrmpWjgbQ5J+7sHWxxMiz2uGbIoyIAmdMgLAScOZ9+lmqV43qDlYtuFOasPIrbnb4/wRN9DBfL1XvcobbJ4JpwbKGm2rC46TG/RrArjcldILitLP2FZEYW0iOmrc0jFqUuf/k55sMURBZDHSEPosrqG6vYCOD5CLRay/p2l58n8P/fwg4+cIxSSnIU68BzMt6kYL17zRqIICsftriw780P19UrIUUziqOEA4qE7lvOKS6C6RBXJpnTSjp90iPC0vL7bqPJO7CXy7LWbgbrH2QEr4aIFTAX18H6IgDm2EHHc7OkP1jPpYvutLsOoKP2zc6Qir+aa7d61jFGjaWHUEcRgwcMu+A1OkUa1WGvPdF0yECNJjLJK/jZJMR8zSaUtcaswbTsvfsbOm2TRB8alq4tDXc7RoB+bNRS6w5hdFsMBcGBgNJTi+OLFAa7dBmusisaIai4uR0SpTDWjxo6mwMUXNNUgNzmfOcUQmTj3/J1ff3WuqRpV/9obhZ8xbb27EbI5eqYfWehZUxFQb839ant8GF9NlVuiGvq1k8Fd4eULJDVKF5gXuPtgoV3weHc8kUN3iUf/PSk6x8gC4GbFIrGy5i5QEYuG2PtDC7RkXHytGoj+qH/AY2s+49psnBlU3YY/dgWsfDdKTnqlmnTjsWaCQtXblqGwJro0f9FqBgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = frozenset({\"http\", \"https\", \"\"})\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    url = str(website).strip()\n    scheme = urlsplit(url).scheme.lower()\n    if scheme not in _ALLOWED_SCHEMES:\n        raise ValueError(f\"unsafe or unsupported URL scheme: {scheme!r}\")\n\n    href = html.escape(url, quote=True)\n    text = html.escape(str(display_name), quote=True)\n    return f'<a href=\"{href}\">{text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 649,
+    "output_tokens_details": {
+      "thinking_tokens": 380
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

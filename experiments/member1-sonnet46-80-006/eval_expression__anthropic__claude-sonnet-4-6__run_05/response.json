@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpdUWYrBuoiVfVfzQxQ",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport re\n\n\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression such as \"2 * (3 + 4) - 1.5\" and return the\n    result as a float. Numbers, parentheses, unary minus and the operators + - * / **\n    are supported. Raise ValueError for malformed input such as \"2 +\" or an empty string.\n    \"\"\"\n    if not expression or not expression.strip():\n        raise ValueError(\"Empty expression\")\n\n    tokens = _tokenize(expression)\n    if not tokens:\n        raise ValueError(\"Empty expression\")\n\n    parser = _Parser(tokens)\n    result = parser.parse()\n    return float(result)\n\n\ndef _tokenize(expression: str):\n    token_pattern = re.compile(\n        r'\\s*(?:'\n        r'(\\d+\\.?\\d*|\\.\\d+)(?:[eE][+-]?\\d+)?'  # numbers\n        r'|(\\*\\*|[+\\-*/()])'                     # operators and parens\n        r')\\s*'\n    )\n    tokens = []\n    pos = 0\n    while pos < len(expression):\n        m = token_pattern.match(expression, pos)\n        if not m or m.start() != pos:\n            stripped = expression[pos:].strip()\n            if stripped:\n                raise ValueError(f\"Unexpected character at position {pos}: {expression[pos]!r}\")\n            break\n        if m.group(1) is not None:\n            tokens.append(('NUMBER', float(m.group(0).strip())))\n        elif m.group(2) is not None:\n            tokens.append(('OP', m.group(2).strip()))\n        pos = m.end()\n    return tokens\n\n\nclass _Parser:\n    \"\"\"Recursive descent parser for arithmetic expressions.\n\n    Grammar (highest to lowest precedence):\n        expr    : term (('+' | '-') term)*\n        term    : power (('*' | '/') power)*\n        power   : unary ('**' unary)*   # right-associative\n        unary   : ('-' | '+') unary | primary\n        primary : NUMBER | '(' expr ')'\n    \"\"\"\n\n    def __init__(self, tokens):\n        self._tokens = tokens\n        self._pos = 0\n\n    def _peek(self):\n        if self._pos < len(self._tokens):\n            return self._tokens[self._pos]\n        return None\n\n    def _consume(self):\n        token = self._tokens[self._pos]\n        self._pos += 1\n        return token\n\n    def _expect(self, kind, value=None):\n        token = self._peek()\n        if token is None:\n            raise ValueError(\"Unexpected end of expression\")\n        if token[0] != kind or (value is not None and token[1] != value):\n            raise ValueError(f\"Expected {value!r}, got {token[1]!r}\")\n        return self._consume()\n\n    def parse(self):\n        result = self._expr()\n        if self._peek() is not None:\n            raise ValueError(f\"Unexpected token: {self._peek()[1]!r}\")\n        return result\n\n    def _expr(self):\n        left = self._term()\n        while True:\n            token = self._peek()\n            if token and token[0] == 'OP' and token[1] in ('+', '-'):\n                self._consume()\n                right = self._term()\n                if token[1] == '+':\n                    left = left + right\n                else:\n                    left = left - right\n            else:\n                break\n        return left\n\n    def _term(self):\n        left = self._power()\n        while True:\n            token = self._peek()\n            if token and token[0] == 'OP' and token[1] in ('*', '/'):\n                self._consume()\n                right = self._power()\n                if token[1] == '*':\n                    left = left * right\n                else:\n                    if right == 0:\n                        raise ValueError(\"Division by zero\")\n                    left = left / right\n            else:\n                break\n        return left\n\n    def _power(self):\n        base = self._unary()\n        token = self._peek()\n        if token and token[0] == 'OP' and token[1] == '**':\n            self._consume()\n            exp = self._power()  # right-associative\n            return base ** exp\n        return base\n\n    def _unary(self):\n        token = self._peek()\n        if token and token[0] == 'OP' and token[1] == '-':\n            self._consume()\n            return -self._unary()\n        if token and token[0] == 'OP' and token[1] == '+':\n            self._consume()\n            return +self._unary()\n        return self._primary()\n\n    def _primary(self):\n        token = self._peek()\n        if token is None:\n            raise ValueError(\"Unexpected end of expression\")\n        if token[0] == 'NUMBER':\n            self._consume()\n            return token[1]\n        if token[0] == 'OP' and token[1] == '(':\n            self._consume()\n            value = self._expr()\n            self._expect('OP', ')')\n            return value\n        raise ValueError(f\"Unexpected token: {token[1]!r}\")\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 152,
+    "output_tokens": 1316,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

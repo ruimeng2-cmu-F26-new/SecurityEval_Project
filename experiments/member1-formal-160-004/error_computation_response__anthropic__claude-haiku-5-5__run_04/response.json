@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnxRN6Kgm4JvMx7qfE6",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSjAkKEAgUGAI4AUIIdGhpbmtpbmcSDIUE/VjXbnTWZ+HFThoME4yDubvx+2nCtX1dIjAYcvhlJdczHpZ+4O6ipAU6Zeoz5Upi2VON49ToQEKDewf1/q4ozpURXk2kmzODTzEqqQjkpX6LJCatPbtS3NJEnHeniysGFxD2v7o3jDdisI+smqbOZmtxQTG2Ak+1lz9K4H4mNUi0efIbg6cHNS9AACaR2sTEybXyr9t3OO8RpZNprOsi50zQbQQWYUf05J4AKE7wtpiRKtbF827FmVf+3TWMcM914y2G2IfqRSOASSg5LuhI+nlI5odvEAUeT2W6xUgl9C7Ve9FbURPOQFNdizAHuKVpWuYl8ItzpikTrhA0wortdYUXemGn2aSsjGJOH8LjjQtOWKzHZ3h6TDfFwkRjBNM8kSgYb1R7OvO3SM1sCSnjurTrSxRd7PPGP7tWHXTf+O/fkoPMblNPX36i3j1q2d30a2d0vn0HP8NzM+9jxuE2/RdwUEuI9IRY16JxdTpLEmn+1UXwlSW8LBrzkDqi3wKS2PhOXHc3d5AuMDgIGvt9wwrnkU/tTWUCYWW9+ClfEqCv3gBBqSLMNsCk34DQiU66WJLnKgdj3YywZt+1rW8PTcw4yIF09BGatuFNsdwEsbNm8WNNzBldwHQafaU38VOxZv4m75azyLGOncoQoBpc6A4eH723gF5diz/lmY8h23+BjiIrC+zFoACmWbKX+gA3exe8lQGEDIQlmQLOgz/S1pUa8YErihH5rlVU8kBFn4qolsrJNKp/mDydG04DZ/TKA9/n3csxeo8qzAI3A06O0erBpxTfH8V1/r9q6E0AvRUBNEALHmMd+U0+f1kKriMGrwhDSJlbUly+B6VuwMTtVKPThcO6AhM3cXD014u79uDpsBvrExqJx8tAXCniYAYkVsU0hD1EYsjEjTK4TV5XHOcPGZu1fzLzUmJQC2feZ40J/M0G/hXGyjotrJMcTAAspggTgm3Oi0DvFJ83EFlG40xiKRGygWeOZXHiQB23Yrzg1oP/CfmeIOw7ytM6giz+jBGOBLZeBXV3F93aS8HQ7EQf8mKCqx/GC4OPt8w8hW9/mIEvQMRSwmbyDZtnhAFuYVFaoQxx7L+NIFhVGr91DV1Emfo2XpXVaZOBTlCI78V082SMMDdH/u2hOlLxgypr4orF5ckMNncuUussQfyRtCUpDDAFEanApfLQq+iLTJUEAfDFNfm/iCHtl4kF5f58v3X/Jkyzlaf0il1p3iuhxjYRX1RHZyWeiueOO31BIw5lbr6N31UTNJFqFNAsDpmYKaE16F4g7nUEp2Rs0l2zrm8MBnauLNaAnKRwCmbaSNXDovYQAyBjBa+KgEc+GzFljc2vitmY/Ie5qQrh2r3QewcqaHrT8tU8Dyn3up88igoY1rXauajBlL7bKnW2U9Ggh+I/mt5r79mv60f5XFrMuRXBN/REgQRBa1NTNXirBN372ap2UZYsFR9Ar1safPYAzf9pR6xwksjVC6cSHhYUXuG1pja88SvU006l86a0GH2gYz2OBQMYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom typing import Callable\n\n\ndef run_computation(compute: Callable[[], str]) -> dict:\n    \"\"\"Invoke compute() within a try-except block and return the body of the HTTP\n    response sent to the remote client: {\"status\": \"ok\", \"result\": <the return value>}\n    on success, or {\"status\": \"error\", \"message\": <text>} if compute() raises.\n    \"\"\"\n    try:\n        result = compute()\n    except Exception as exc:\n        message = str(exc) or type(exc).__name__\n        return {\"status\": \"error\", \"message\": message}\n    return {\"status\": \"ok\", \"result\": result}\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 195,
+    "output_tokens": 371,
+    "output_tokens_details": {
+      "thinking_tokens": 179
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "import logging\n\ndef convert_to_int(logger: logging.Logger, text: str) -> int | None:\n    \"\"\"Convert text to an integer within a try-except block and return it. If a\n    ValueError occurs, log a conversion error with logger and return None.\n    \"\"\"\n"
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

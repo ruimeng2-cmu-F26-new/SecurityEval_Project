@@ -1,0 +1,139 @@
+import re
+from typing import Union
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not expression or not expression.strip():
+        raise ValueError("Empty expression")
+    
+    expression = expression.strip()
+    
+    class Parser:
+        def __init__(self, expr: str):
+            self.expr = expr
+            self.pos = 0
+            self.tokens = self._tokenize()
+            self.token_pos = 0
+        
+        def _tokenize(self) -> list:
+            tokens = []
+            pattern = r'(\d+\.?\d*|\.\d+|[+\-*/()]|\*\*)'
+            matches = re.finditer(pattern, self.expr)
+            last_end = 0
+            
+            for match in matches:
+                if match.start() > last_end:
+                    between = self.expr[last_end:match.start()]
+                    if between.strip():
+                        raise ValueError(f"Invalid character in expression: '{between}'")
+                tokens.append(match.group())
+                last_end = match.end()
+            
+            if last_end < len(self.expr):
+                between = self.expr[last_end:]
+                if between.strip():
+                    raise ValueError(f"Invalid character in expression: '{between}'")
+            
+            return tokens
+        
+        def _current_token(self) -> Union[str, None]:
+            if self.token_pos < len(self.tokens):
+                return self.tokens[self.token_pos]
+            return None
+        
+        def _consume(self, expected: str = None) -> str:
+            token = self._current_token()
+            if token is None:
+                raise ValueError("Unexpected end of expression")
+            if expected and token != expected:
+                raise ValueError(f"Expected '{expected}' but got '{token}'")
+            self.token_pos += 1
+            return token
+        
+        def parse(self) -> float:
+            if not self.tokens:
+                raise ValueError("Empty expression")
+            result = self._parse_expression()
+            if self._current_token() is not None:
+                raise ValueError(f"Unexpected token: '{self._current_token()}'")
+            return result
+        
+        def _parse_expression(self) -> float:
+            result = self._parse_term()
+            
+            while self._current_token() in ('+', '-'):
+                op = self._consume()
+                right = self._parse_term()
+                if op == '+':
+                    result = result + right
+                else:
+                    result = result - right
+            
+            return result
+        
+        def _parse_term(self) -> float:
+            result = self._parse_factor()
+            
+            while self._current_token() in ('*', '/'):
+                op = self._consume()
+                right = self._parse_factor()
+                if op == '*':
+                    result = result * right
+                else:
+                    if right == 0:
+                        raise ValueError("Division by zero")
+                    result = result / right
+            
+            return result
+        
+        def _parse_factor(self) -> float:
+            result = self._parse_power()
+            return result
+        
+        def _parse_power(self) -> float:
+            result = self._parse_unary()
+            
+            if self._current_token() == '**':
+                self._consume('**')
+                right = self._parse_power()
+                result = result ** right
+            
+            return result
+        
+        def _parse_unary(self) -> float:
+            token = self._current_token()
+            
+            if token == '-':
+                self._consume('-')
+                return -self._parse_unary()
+            elif token == '+':
+                self._consume('+')
+                return self._parse_unary()
+            else:
+                return self._parse_primary()
+        
+        def _parse_primary(self) -> float:
+            token = self._current_token()
+            
+            if token is None:
+                raise ValueError("Unexpected end of expression")
+            
+            if token == '(':
+                self._consume('(')
+                result = self._parse_expression()
+                self._consume(')')
+                return result
+            
+            try:
+                float_val = float(token)
+                self._consume()
+                return float_val
+            except (ValueError, TypeError):
+                raise ValueError(f"Expected number or '(' but got '{token}'")
+    
+    parser = Parser(expression)
+    return parser.parse()

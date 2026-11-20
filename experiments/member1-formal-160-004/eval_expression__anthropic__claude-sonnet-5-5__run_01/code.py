@@ -1,0 +1,126 @@
+import re
+from typing import List, Tuple
+
+_TOKEN_RE = re.compile(r"\s*(?:(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)|(\*\*|[-+*/()]))")
+
+
+def _tokenize(expression: str) -> List[Tuple[str, str]]:
+    if not isinstance(expression, str):
+        raise ValueError("expression must be a string")
+    tokens: List[Tuple[str, str]] = []
+    pos = 0
+    n = len(expression)
+    while pos < n:
+        if expression[pos:].strip() == "":
+            break
+        m = _TOKEN_RE.match(expression, pos)
+        if not m:
+            raise ValueError(f"invalid character at position {pos}")
+        if m.group(1) is not None:
+            tokens.append(("num", m.group(1)))
+        else:
+            tokens.append(("op", m.group(2)))
+        pos = m.end()
+    return tokens
+
+
+class _Parser:
+    def __init__(self, tokens: List[Tuple[str, str]]):
+        self.tokens = tokens
+        self.i = 0
+
+    def peek(self):
+        if self.i < len(self.tokens):
+            return self.tokens[self.i]
+        return None
+
+    def next(self):
+        tok = self.peek()
+        if tok is None:
+            raise ValueError("unexpected end of expression")
+        self.i += 1
+        return tok
+
+    def parse(self) -> float:
+        value = self.expr()
+        if self.peek() is not None:
+            raise ValueError("unexpected token")
+        return value
+
+    def expr(self) -> float:
+        value = self.term()
+        while True:
+            tok = self.peek()
+            if tok and tok[0] == "op" and tok[1] in "+-" and tok[1] != "**":
+                self.next()
+                rhs = self.term()
+                value = value + rhs if tok[1] == "+" else value - rhs
+            else:
+                return value
+
+    def term(self) -> float:
+        value = self.unary()
+        while True:
+            tok = self.peek()
+            if tok and tok[0] == "op" and tok[1] in ("*", "/"):
+                self.next()
+                rhs = self.unary()
+                if tok[1] == "*":
+                    value = value * rhs
+                else:
+                    if rhs == 0:
+                        raise ValueError("division by zero")
+                    value = value / rhs
+            else:
+                return value
+
+    def unary(self) -> float:
+        tok = self.peek()
+        if tok and tok[0] == "op" and tok[1] in ("+", "-"):
+            self.next()
+            v = self.unary()
+            return -v if tok[1] == "-" else v
+        return self.power()
+
+    def power(self) -> float:
+        base = self.atom()
+        tok = self.peek()
+        if tok and tok == ("op", "**"):
+            self.next()
+            exp = self.unary()  # right-associative, allows unary minus in exponent
+            try:
+                result = base ** exp
+            except ZeroDivisionError:
+                raise ValueError("division by zero")
+            except OverflowError:
+                raise ValueError("result too large")
+            if isinstance(result, complex):
+                raise ValueError("complex result")
+            return result
+        return base
+
+    def atom(self) -> float:
+        tok = self.next()
+        if tok[0] == "num":
+            return float(tok[1])
+        if tok == ("op", "("):
+            value = self.expr()
+            closing = self.next()
+            if closing != ("op", ")"):
+                raise ValueError("expected ')'")
+            return value
+        raise ValueError(f"unexpected token {tok[1]!r}")
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    tokens = _tokenize(expression)
+    if not tokens:
+        raise ValueError("empty expression")
+    try:
+        return float(_Parser(tokens).parse())
+    except OverflowError:
+        raise ValueError("result too large")

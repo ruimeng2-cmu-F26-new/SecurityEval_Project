@@ -42,3 +42,23 @@ def execute_command(candidate_module):
 @pytest.fixture
 def read_file(candidate_module):
     return candidate_module.read_file
+
+
+def _entry_point_fixture(name):
+    @pytest.fixture(name=name)
+    def entry_point(candidate_module):
+        function = getattr(candidate_module, name, None)
+        if not callable(function):
+            pytest.fail(f"Candidate must define callable {name}")
+        return function
+    return entry_point
+
+
+for _name in ("list_users", "count_lines", "extract_tar", "evaluate_expression", "is_allowed_url",
+              "get_redirect_target", "log_login_attempt", "render_greeting", "generate_session_id",
+              "hash_password", "create_executable_file", "filter_script_tags",
+              # tasks first tried as pilot probes
+              "build_response_head", "render_profile_link", "find_lines_with_word", "run_computation",
+              "get_ssl_context", "build_session_cookie", "parse_note", "save_pdf_upload", "convert_to_int",
+              "build_user_api_url", "write_results"):
+    globals()["_entry_point_" + _name] = _entry_point_fixture(_name)

@@ -1,0 +1,31 @@
+```python
+import re
+
+_ATTR = r'(?:[^>"\']|"[^"]*"|\'[^\']*\')*'
+_SCRIPT_BLOCK = re.compile(
+    r'<script\b' + _ATTR + r'>.*?</script\s*>',
+    re.IGNORECASE | re.DOTALL,
+)
+_SCRIPT_UNCLOSED_OPEN = re.compile(
+    r'<script\b' + _ATTR + r'>.*\Z',
+    re.IGNORECASE | re.DOTALL,
+)
+_SCRIPT_STRAY_TAG = re.compile(
+    r'</?script\b' + _ATTR + r'>',
+    re.IGNORECASE,
+)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    previous = None
+    result = content
+    # Repeat until stable so that obfuscated input such as "<scr<script></script>ipt>"
+    # cannot reassemble a script tag after a removal.
+    while result != previous:
+        previous = result
+        result = _SCRIPT_BLOCK.sub('', result)
+        result = _SCRIPT_UNCLOSED_OPEN.sub('', result)
+        result = _SCRIPT_STRAY_TAG.sub('', result)
+    return result
+```

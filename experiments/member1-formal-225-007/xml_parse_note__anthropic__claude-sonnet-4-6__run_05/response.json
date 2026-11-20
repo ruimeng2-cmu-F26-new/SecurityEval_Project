@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqWwgrhKqRJWT654MPX",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport xml.etree.ElementTree as ET\n\ndef parse_note(xml_text: str) -> str:\n    \"\"\"Parse the XML document in xml_text, whose root element is <note>, and return the\n    text content of its <body> child element.\n    \"\"\"\n    root = ET.fromstring(xml_text)\n    body = root.find('body')\n    if body is None:\n        raise ValueError(\"No <body> element found in the <note> document.\")\n    return body.text or ''\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 121,
+    "output_tokens": 126,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

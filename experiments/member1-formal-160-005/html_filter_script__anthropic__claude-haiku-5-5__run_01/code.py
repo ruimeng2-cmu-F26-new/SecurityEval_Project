@@ -1,0 +1,28 @@
+import re
+
+_QUOTED_ATTRS = r"(?:[^>\"']|\"[^\"]*\"|'[^']*')*"
+
+_SCRIPT_ELEMENT = re.compile(
+    r"<script\b" + _QUOTED_ATTRS + r"/\s*>"
+    r"|"
+    r"<script\b" + _QUOTED_ATTRS + r">.*?</script\s*>",
+    re.IGNORECASE | re.DOTALL,
+)
+
+_SCRIPT_STRAY_TAG = re.compile(
+    r"</?script\b" + _QUOTED_ATTRS + r">",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    previous = None
+    result = content
+    # Repeat until stable so that constructs like nested or fragmented
+    # script tags cannot reassemble into a new script tag.
+    while result != previous:
+        previous = result
+        result = _SCRIPT_ELEMENT.sub("", result)
+        result = _SCRIPT_STRAY_TAG.sub("", result)
+    return result

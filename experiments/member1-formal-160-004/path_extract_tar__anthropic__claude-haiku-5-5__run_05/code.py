@@ -1,0 +1,53 @@
+import os
+import tarfile
+
+
+def _is_within(base: str, path: str) -> bool:
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        return False
+
+
+def _validate_member(member: tarfile.TarInfo, dest_real: str) -> None:
+    name = member.name
+    if not name or os.path.isabs(name) or name.startswith(("/", "\\")):
+        raise tarfile.OutsideDestinationError(member, dest_real)
+
+    target = os.path.realpath(os.path.join(dest_real, name))
+    if not _is_within(dest_real, target):
+        raise tarfile.OutsideDestinationError(member, target)
+
+    if member.isdev():
+        raise tarfile.TarError(f"refusing to extract device entry: {name!r}")
+
+    if member.issym():
+        link_base = os.path.join(dest_real, os.path.dirname(name))
+        link_target = os.path.realpath(os.path.join(link_base, member.linkname))
+        if os.path.isabs(member.linkname) or not _is_within(dest_real, link_target):
+            raise tarfile.LinkOutsideDestinationError(member, link_target)
+
+    if member.islnk():
+        link_target = os.path.realpath(os.path.join(dest_real, member.linkname))
+        if os.path.isabs(member.linkname) or not _is_within(dest_real, link_target):
+            raise tarfile.LinkOutsideDestinationError(member, link_target)
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"destination is not an existing directory: {dest_dir!r}")
+
+    dest_real = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        members = tar.getmembers()
+        for member in members:
+            _validate_member(member, dest_real)
+
+        if hasattr(tarfile, "data_filter"):
+            tar.extractall(path=dest_real, members=members, filter="data")
+        else:
+            tar.extractall(path=dest_real, members=members)

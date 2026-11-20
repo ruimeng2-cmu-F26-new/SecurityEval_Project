@@ -1,0 +1,56 @@
+```python
+from urllib.parse import urlsplit, urlunsplit
+
+_SITE_SCHEME = "https"
+_SITE_HOST = "shop.example"
+_DEFAULT_TARGET = "/"
+
+
+def _has_unsafe_characters(value: str) -> bool:
+    for ch in value:
+        if ord(ch) < 0x20 or ord(ch) == 0x7F or ch == "\\":
+            return True
+    return False
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Anything that could send the user to another site (absolute URLs to other
+    hosts, protocol-relative "//host" paths, backslash tricks, control
+    characters, unusual schemes) is rejected and "/" is returned instead.
+    """
+    if not next_url:
+        return _DEFAULT_TARGET
+
+    candidate = next_url.strip()
+    if not candidate:
+        return _DEFAULT_TARGET
+
+    if _has_unsafe_characters(candidate):
+        return _DEFAULT_TARGET
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return _DEFAULT_TARGET
+
+    if parts.scheme or parts.netloc:
+        # Only accept absolute URLs that point back at this site.
+        if parts.scheme.lower() != _SITE_SCHEME:
+            return _DEFAULT_TARGET
+        if parts.netloc.lower() != _SITE_HOST:
+            return _DEFAULT_TARGET
+
+    path = parts.path or "/"
+
+    # Must be a local absolute path; reject "//host" style references.
+    if not path.startswith("/") or path.startswith("//"):
+        return _DEFAULT_TARGET
+
+    return urlunsplit(("", "", path, parts.query, parts.fragment))
+```

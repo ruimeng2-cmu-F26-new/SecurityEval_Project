@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCpSA7hkRiMMQnEraW4q",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSzgkKEAgUGAI4AUIIdGhpbmtpbmcSDB9Bv5Cw/5xCT528MxoMWLiIZMu4ymCjlq6JIjBvZLWHgBi2Tt+efwbMb/MOcFPZB9P7A05tjexhQJVdES7TZVRDfQ6Ur3eU6SEGXyQq6wh+LOreilt7Jr5cP7hrk5V7kL10I9vap71MLDiC3JxgRJ/1CLINQ+pNupsAetD6/da0k52JnJw8Jp6kZgbGYBhAawJU9iBlwnu0AaekOWDV03kCLl4IlEazXgchtXcvFuOzKBIsZXkibZao+py7W/jzNlKMeb3X7Cc/8Y8GSwJHEMHlWUHJT6uQGAmfASsQn+rC8Zc0hXNJjEZpI8ABf8JQBf0HEs+zE9dk7Hfe7159zOeD+f8t+h2iCSTLRUB5wvkDWCPySc7CvT6+TacyOSNS6xmrEG0MptQFQFA4a4qD1W1I9J1TM3LnxKgA3kP7j1OO0Ab5VVwys77+J86PM9YWwdlySTl7PEZCg3Qu726uMyWLDoinGu3d0A9VEATSA1CstnHb1iqUedQajvL+5YS1B9QgJWHmX2NB+efnscQeS0cm85Qt9cYOW24M29hPH58U5rjlM6dssJoS62hzHo+fXtksvL5OGenTsjNdSerO+DbP92JtamDK4+M4bu1r5tJGjTcAjg2vqsUocqyRdPrmAp3kJTqYxuZAhXKyIb8lOBfWwCwK9BKyKf+HwuJyPw0rcM3xIHGOpc1LI2vgO08kslAkmkAvyy0qY+7jn61xmEbzNDnMsikK+uBcHIEDooXR7UarLwiYR2iqIit84GPOsUW5jurhxB6UMqbazzDavh2oOZl84ppJqIhk5OIDau/k8W8Y9cAoQ9HdjALJo4Kb8bi3wgxO3GODILJkeXTHBQ7Ns45fxGdt+1y80ugg2FNRvmYgvude//86CeLH0MuNUO5D7d351DOeeg6+wKnnVQXLyNLK1TP3DKWLU3QGpZC6gSvEFXfcbhNbULk5Hvq1qiBHFMLE4Of/QHZ+74PoNCWlcUm9/qL2KpYCFtZwXfZyjpMW0//+tIi1cQZQD7nBWvnGXSHcEcVR035o5MiAOrNAtofj6IFFETiI8fXHbV9kJjDjFtJZmG9BKPhf8C6hsbKbXSQQO+GUMpEAXTc9NykHaKIU5NGF/qV0o0R6dwsuRDh8TaCpBX5TUf2Qnun4MQ+AC7fqUAy8evAbKE9BTHqdRRWFU00MSAnBGhgoUHuscDOknlNCw5x11NhhOBVE+OmF3hpXk14KNwjPrQVqAH30wXnMNDX4Q3GKuCmVqUQA9lPmDX6DKKBzARoA5LcdeWq6S6X2k8UFeQ8chDf7lhemv2DSKZVwnQYVzIl1RT1KBOz+gMyr+Jd1P9SXYINRn9TIb6qYh0Wm4ubmL3z7hQi4TghwD4D44oEEoNGQ6gfP0A2k9r1kM2XBJ4bMfPh7Qu9W/LaUKfiOBmX+05Fw03TELXKNsWpn6MlLAtiRLTG7BztDx9ILbRtK1Ox9T4nbiTryLy3vhnYv11ubT1R1O06Frkw9n/ak9O9v72PwvNobZpfWocSHsJpCpXgUAQCVy8kuhvU2uoPRU9pmRPMElQPIMcpBaw4+XqGscye1CxRoBocT+uQZum5zR0piUGP3u3AFyp4JR2yPQYsYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import logging\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n    logger.info(\"Failed login for user: %s\", username)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 154,
+    "output_tokens": 299,
+    "output_tokens_details": {
+      "thinking_tokens": 204
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

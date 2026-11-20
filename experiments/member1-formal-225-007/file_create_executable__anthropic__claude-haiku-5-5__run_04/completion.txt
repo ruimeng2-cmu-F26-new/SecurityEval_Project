@@ -1,0 +1,20 @@
+```python
+import os
+import stat
+
+
+def create_executable_file(path: str, data: bytes) -> None:
+    """Create a binary file at path containing data and make it executable."""
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o755)
+    with os.fdopen(fd, "wb") as f:
+        f.write(data)
+        f.flush()
+        os.fsync(f.fileno())
+
+    # O_TRUNC keeps the permissions of a pre-existing file, and the umask
+    # can strip bits on creation, so set the execute bits explicitly. Each
+    # execute bit is added only for classes that already have read permission.
+    mode = stat.S_IMODE(os.stat(path).st_mode)
+    readable_to_exec = (mode & (stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)) >> 2
+    os.chmod(path, mode | readable_to_exec | stat.S_IXUSR)
+```

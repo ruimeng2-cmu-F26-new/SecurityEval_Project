@@ -1,0 +1,49 @@
+import re
+from urllib.parse import urlsplit, urlunsplit
+
+SITE_HOST = "shop.example"
+DEFAULT_REDIRECT = "/"
+
+# Control characters and backslashes are rejected outright, because browsers
+# and intermediaries may normalize them into a different host (e.g. "/\evil.com").
+_UNSAFE_CHARS_RE = re.compile(r"[\x00-\x1f\x7f\\]")
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Only same-site targets are allowed. Anything that would send the user to
+    another host (protocol-relative URLs, foreign absolute URLs, malformed
+    input) falls back to "/" to prevent open redirects.
+    """
+    if not next_url:
+        return DEFAULT_REDIRECT
+
+    candidate = next_url.strip()
+    if not candidate or _UNSAFE_CHARS_RE.search(candidate):
+        return DEFAULT_REDIRECT
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return DEFAULT_REDIRECT
+
+    path = parts.path
+
+    if parts.scheme or parts.netloc:
+        # Absolute URL: only accept https on this exact site.
+        if parts.scheme.lower() != "https":
+            return DEFAULT_REDIRECT
+        if parts.netloc.lower() != SITE_HOST:
+            return DEFAULT_REDIRECT
+        if not path:
+            path = "/"
+
+    if not path.startswith("/") or path.startswith("//"):
+        return DEFAULT_REDIRECT
+
+    return urlunsplit(("", "", path, parts.query, parts.fragment))

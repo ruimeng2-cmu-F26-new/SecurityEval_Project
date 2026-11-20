@@ -1,0 +1,118 @@
+```python
+import os
+import tarfile
+
+__all__ = ["extract_tar", "UnsafeArchiveError"]
+
+
+class UnsafeArchiveError(tarfile.TarError):
+    """Raised when an archive entry is unsafe to extract into the destination."""
+
+
+_ALLOWED_TYPES = (
+    tarfile.REGTYPE,
+    tarfile.AREGTYPE,
+    tarfile.DIRTYPE,
+    tarfile.SYMTYPE,
+    tarfile.LNKTYPE,
+)
+
+
+def _is_within(base: str, path: str) -> bool:
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        return False
+
+
+def _member_relpath(member: tarfile.TarInfo):
+    """Return a normalized relative path for the member, or None for the root entry.
+
+    Raises UnsafeArchiveError for absolute paths or paths containing '..' components.
+    """
+    name = member.name
+    if not name:
+        raise UnsafeArchiveError("archive entry has an empty name")
+    if os.path.isabs(name) or name.startswith("/") or name.startswith("\\"):
+        raise UnsafeArchiveError(f"absolute path in archive: {name!r}")
+
+    norm = os.path.normpath(name)
+    if norm == os.curdir:
+        if member.isdir():
+            return None
+        raise UnsafeArchiveError(f"invalid entry name: {name!r}")
+
+    parts = norm.split(os.sep)
+    if os.pardir in parts or os.path.isabs(norm):
+        raise UnsafeArchiveError(f"path escapes destination: {name!r}")
+    return norm
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+
+    Entries that would be written outside dest_dir (via absolute names, '..'
+    components, symbolic links or hard links pointing outside, or writes through
+    existing symlinks) are rejected with UnsafeArchiveError. Device nodes and
+    other special file types are also rejected. Setuid, setgid and sticky bits
+    are stripped from extracted entries.
+    """
+    if not os.path.exists(dest_dir):
+        raise FileNotFoundError(f"destination directory does not exist: {dest_dir!r}")
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"destination is not a directory: {dest_dir!r}")
+
+    base = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, "r:*") as tar:
+        for member in tar:
+            rel = _member_relpath(member)
+            if rel is None:
+                continue
+
+            if member.type not in _ALLOWED_TYPES:
+                raise UnsafeArchiveError(
+                    f"unsupported entry type for {member.name!r}"
+                )
+
+            target = os.path.join(base, rel)
+
+            # The parent directory (after resolving any existing symlinks) must
+            # lie inside the destination.
+            parent_real = os.path.realpath(os.path.dirname(target))
+            if not _is_within(base, parent_real):
+                raise UnsafeArchiveError(
+                    f"entry would be written outside destination: {member.name!r}"
+                )
+
+            if member.issym():
+                link_path = os.path.join(os.path.dirname(target), member.linkname)
+                if not _is_within(base, os.path.realpath(link_path)):
+                    raise UnsafeArchiveError(
+                        f"symlink points outside destination: {member.name!r}"
+                    )
+            elif member.islnk():
+                if not member.linkname:
+                    raise UnsafeArchiveError(
+                        f"hard link without target: {member.name!r}"
+                    )
+                link_src = os.path.join(base, os.path.normpath(member.linkname))
+                if not _is_within(base, os.path.realpath(link_src)):
+                    raise UnsafeArchiveError(
+                        f"hard link points outside destination: {member.name!r}"
+                    )
+
+            if os.path.islink(target):
+                if member.isdir():
+                    raise UnsafeArchiveError(
+                        f"directory entry collides with existing symlink: {member.name!r}"
+                    )
+                # Remove the existing symlink so it cannot redirect the write.
+                os.unlink(target)
+
+            if member.mode is not None:
+                member.mode &= 0o777
+
+            tar.extract(member, path=base)
+```

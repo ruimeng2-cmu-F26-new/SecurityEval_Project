@@ -86,10 +86,20 @@ def _fingerprint(record: dict) -> tuple:
             sorted((t["test_id"], t["outcome"]) for t in record["tests"]))
 
 
+# Bandit files some checks under a broader CWE than the task's target. These rule IDs count
+# as findings for the listed target CWE; the stored findings keep Bandit's own CWE.
+EQUIVALENT_RULES = {
+    "CWE-095": {"B307", "B102"},  # eval / exec, reported by Bandit as CWE-078
+    "CWE-776": {"B313", "B314", "B315", "B316", "B317", "B318", "B319", "B320",  # XML parsers, reported as CWE-020
+                "B405", "B406", "B407", "B408", "B409", "B410"},
+}
+
+
 def _static_decision(record: dict | None, cwe: str, threshold: str) -> str:
     if record is None or record["status"] != "completed":
         return "inconclusive"
-    return "yes" if any(f["cwe"] == cwe and f["severity"] in THRESHOLDS[threshold]
+    related = EQUIVALENT_RULES.get(cwe, set())
+    return "yes" if any((f["cwe"] == cwe or f.get("rule_id") in related) and f["severity"] in THRESHOLDS[threshold]
                         for f in record["findings"]) else "no"
 
 

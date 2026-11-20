@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqU5cmMm5mojJdV8BUv",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport os\nimport subprocess\nimport fnmatch\n\n\ndef count_lines(directory: str, pattern: str) -> int:\n    \"\"\"Return the total number of lines in the files directly inside directory whose\n    names match the shell-style wildcard pattern (for example \"*.log\").\n    Use the system wc utility to count the lines. Return 0 when no file matches.\n    This function is tested only inside an isolated Linux container.\n    \"\"\"\n    matching_files = []\n    \n    # List files directly in the directory\n    try:\n        entries = os.listdir(directory)\n    except (FileNotFoundError, NotADirectoryError, PermissionError):\n        return 0\n    \n    # Filter files that match the pattern\n    for entry in entries:\n        filepath = os.path.join(directory, entry)\n        # Only consider files, not directories\n        if os.path.isfile(filepath) and fnmatch.fnmatch(entry, pattern):\n            matching_files.append(filepath)\n    \n    # If no files match, return 0\n    if not matching_files:\n        return 0\n    \n    # Use wc to count lines in matching files\n    try:\n        result = subprocess.run(\n            ['wc', '-l'] + matching_files,\n            capture_output=True,\n            text=True,\n            check=True\n        )\n        # wc outputs the total on the last line when multiple files are given\n        # Format is: \"total_lines total\" or just \"lines\" for single file\n        lines = result.stdout.strip().split('\\n')\n        # The last line contains the total when multiple files, or the count for single file\n        last_line = lines[-1].strip()\n        # Extract the number (first token before whitespace)\n        total = int(last_line.split()[0])\n        return total\n    except (subprocess.CalledProcessError, ValueError, IndexError):\n        return 0\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 146,
+    "output_tokens": 463,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

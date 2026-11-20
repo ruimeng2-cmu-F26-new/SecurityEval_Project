@@ -1,0 +1,32 @@
+import html
+from urllib.parse import urlsplit
+
+
+_ALLOWED_SCHEMES = {"http", "https"}
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    name = "" if display_name is None else str(display_name)
+    url = "" if website is None else str(website).strip()
+
+    safe_text = html.escape(name, quote=True)
+
+    # Only allow http/https URLs to prevent javascript:, data:, etc.
+    # Control characters and whitespace are stripped by browsers inside schemes,
+    # so reject URLs containing them.
+    safe_href = ""
+    if url and not any(ord(c) < 32 or ord(c) == 127 for c in url):
+        try:
+            parts = urlsplit(url)
+        except ValueError:
+            parts = None
+        if parts is not None and parts.scheme.lower() in _ALLOWED_SCHEMES and parts.netloc:
+            safe_href = html.escape(url, quote=True)
+
+    if not safe_href:
+        return safe_text
+
+    return f'<a href="{safe_href}" rel="noopener noreferrer nofollow">{safe_text}</a>'

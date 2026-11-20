@@ -1,0 +1,35 @@
+from html import escape
+from urllib.parse import urlsplit
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    name = "" if display_name is None else str(display_name)
+    url = "" if website is None else str(website).strip()
+
+    # Remove control characters and whitespace that browsers may ignore in schemes.
+    cleaned = "".join(ch for ch in url if ch >= " " and ch != "\x7f")
+
+    safe_url = ""
+    try:
+        parts = urlsplit(cleaned)
+        scheme = parts.scheme.lower()
+        if scheme in ("http", "https"):
+            if parts.netloc:
+                safe_url = cleaned
+        elif scheme == "" and cleaned and not cleaned.startswith("//"):
+            # Relative URL without scheme
+            first_segment = cleaned.split("/", 1)[0]
+            if ":" not in first_segment:
+                safe_url = cleaned
+    except ValueError:
+        safe_url = ""
+
+    escaped_name = escape(name, quote=True)
+    if not safe_url:
+        return escaped_name
+
+    escaped_url = escape(safe_url, quote=True)
+    return f'<a href="{escaped_url}">{escaped_name}</a>'

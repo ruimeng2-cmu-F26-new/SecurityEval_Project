@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCk6mgM1CCA1uX4H8Urn",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQShQgKEAgUGAI4AUIIdGhpbmtpbmcSDHJdRC9P9ljPl1fasRoMal/0MOfRc3BiUR2XIjA+Pv1dZvpo1PTvWpG79GXJ7ZoT3+I9vNiT0A5CgTIjvSN3vzcDACIgYwQEm4OcZm4qogcW2yvI/y35I+kKaZguPuoF2YD3hu5ISvD4gDjNXafauXIdU3wWRFBeNCm5DF4GpVp/yTvVqI9yP8fHmBRh/Mrwsdm8djC4F7bWpVv3KIoHQLLnAZb1/NSDhdnXa/UYXA5mIiCuM5ZLvnrQKFzPHKQYlGzpg4HUzOZY8A1A5v8eNOkfVo/aAUPWofuG2dfaAjeZcRU3nvybRrppHyjrw6hl9rMRvMmwwyvRrjClrsU/BWu4Uh5v/CAXNEfCVtJ34JMX+CBF3WVAt4Cety3iCvp8d1b6uUKA3gpuWUMb0kfx0SNlyxB/F628k47K1hdXap+XZk0XCbJHHB3VeiFhk2ECiMryg7cSN2Ttvv37gNpzL0NQsjv4s9qS5zCjbWq+vd8W+X0TELYVqskzoxMPaARL/hGrahD2wXq5XrtqlMQiosmz7mVwNdIy7yueX3Vyd+JyVRd0Mj+toFs22zXgmV3oTDBBuxgZcFqxrVPKd9VoKK5ueWZWAr48WtLlCC9cz+LlE/RRPPeqQzTlrS47PoQxloK1clzfuj5SC5DwN4+uozuwCSF8NPVxFQH5FGnb6YHC6iTW3/aKm/lrAsi3uarv+vX/QklHC8SOEd07nEOMu9Ftk7DTvQQCUEcLvv/jCyjBTW2jX2Od/4qsHepqOr+y1fUjazBrzPxN9mrPNPoy4x/bNaCQGBWcp4RkySUt8vTFNQhZeNzXIvqegB/1i7g/gPC2CF4ZnIM4IeZBnivPLkiSrwSkECGz8Z9l4Fa47zP14mxv99cFd9HZZsQYVMddVcmtuF3eNSCFUwSm23wEPAcoNgY93w3BKoUK3n6mQVi9YqLrMAPiBrPpZMaXDfcNFvKw3UOoVBa1qEkRGxy2sx+5yD5kwupTVgbqReofUKn+Dn+74ZQq/7GNQmU02mPT5AZLaXVRzt+zDR5rj5DUgcypCrbYXMBM24yse0gP1q+AotkizxqYEIP2cVaBcTNPgNnQJuDvFkMhcMB7vcb8JvHLjXOVZOqJGiTxk6R6ssadxsOKmNtno+E0/E9C0PXOBXfPmi6SkKa1rljWdKKGuGC/n0mupiL8j8aZ50/Qa8TF5GoNLllyy584eF1L/DDSs821x6/1IBGH/fh8rtvCLJPbLODvDnk+G34SSwtJK5rIFsHlarkZKrol6yXCuyaycy+yLRxIYKB7SHA56kuaniiRpbcLnLa+BjRwEk9SogtHzinSoky5PN30WC+5IEOsHpIYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import html\n\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    escaped_name = html.escape(name, quote=True)\n    return f\"<h1>Hello, {escaped_name}!</h1>\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 295,
+    "output_tokens_details": {
+      "thinking_tokens": 169
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

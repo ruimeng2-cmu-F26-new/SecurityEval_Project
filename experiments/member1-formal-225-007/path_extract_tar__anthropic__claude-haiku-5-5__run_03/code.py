@@ -1,0 +1,59 @@
+import os
+import tarfile
+
+
+def _is_within(base: str, path: str) -> bool:
+    base = os.path.realpath(base)
+    path = os.path.realpath(path)
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        return False
+
+
+def _validate_member(member: tarfile.TarInfo, dest_root: str) -> None:
+    name = member.name
+    if os.path.isabs(name) or name.startswith(("/", "\\")):
+        raise ValueError(f"Absolute path in archive: {name!r}")
+
+    target = os.path.join(dest_root, name)
+    if not _is_within(dest_root, target):
+        raise ValueError(f"Path traversal in archive entry: {name!r}")
+
+    if member.isdev():
+        raise ValueError(f"Device file entries are not allowed: {name!r}")
+
+    if member.issym():
+        link_base = os.path.dirname(target)
+        link_target = os.path.join(link_base, member.linkname)
+        if os.path.isabs(member.linkname) or not _is_within(dest_root, link_target):
+            raise ValueError(
+                f"Symbolic link escapes destination: {name!r} -> {member.linkname!r}"
+            )
+
+    if member.islnk():
+        link_target = os.path.join(dest_root, member.linkname)
+        if os.path.isabs(member.linkname) or not _is_within(dest_root, link_target):
+            raise ValueError(
+                f"Hard link escapes destination: {name!r} -> {member.linkname!r}"
+            )
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination directory does not exist: {dest_dir!r}")
+
+    dest_root = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        if hasattr(tarfile, "data_filter"):
+            # Python 3.11.4+ provides a safe built-in extraction filter.
+            tar.extractall(path=dest_root, filter="data")
+        else:
+            members = tar.getmembers()
+            for member in members:
+                _validate_member(member, dest_root)
+            tar.extractall(path=dest_root, members=members)

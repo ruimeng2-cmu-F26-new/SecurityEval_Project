@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmeLEeZP94k2LkrWTPo",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQStwYKEAgUGAI4AUIIdGhpbmtpbmcSDOO8tgULatkBv18T2BoMK42VxEBhQjyKbDLiIjD355CfHAtiyPLWD6r4ncfXtk77W6Ztkti3mU/HQqJ5bGAG1uVA6RcsvnDEb+oC5Zgq1AU8ihpSw1V6XnKphFOe2ej6iLSMKVQ8VrCAqIAmkuECpbgbwwDa/SJ8R/W78NU+k7N96BYpDkOK/lkhqch4n9mb0MI2AIwfo+BWnbQZghNOwNimwVgROijLjRXXaTXFoshgnnjk+//pwLGqwb/Xv3tFdL5LY5dofWrKdRCybZcFHxOrzvN9UyGz4VSblbVzX2jTZoO9qm+9tx7EACkb0wYHK0XoDpUUsW86i4+25DYCFhpp+iNwaH9vI6tgeqwPfRd/u+thKvlkK5Wo1FabjwV4n0UbBLZVoaYIhZW5L8y8iDxMAZv60J3wRbVWRUNXMM8bC1pmLNazJyPMF3C2Z20eClaj3je5eRLtKN4xU7L0QwozMVUnE2dVKtcmkqhQPA9FEn1Z8H9rI0eHYV3WlKF5jZmFw20Sei3KJt6LRvCHAQ8B3JrlFfGpCRd+bVPSG08QL2MmT7Q7hCZH+YCHW/EQQTH/etM8aGOfN1Lc5rCc68pXpYDUG4X2eMfkAeSJFiT4u9gOcXarfC8cGp8hRlEljXv6R2sEhqZPgHDGSdH8V9BVRKasopjiGcXrW5lNy2UwyW5o/2THAsO7RkVVO715hx2V8OuEnrdiyGWSqY8k5gALGROY9X2gOPwmU723HR+P1iseWaUQOkHhuhsGanGG2ejd68ppueeE3UraZ1nr+wTrjvnwnddp0RODUcgt2nra5inzWuxJys7dki8k+9zsgtNBoRnGxh06rwEG5g7mVPVrCIOqGyBrOW7FxK0kXAuO2WDe4uai1kXuzClVG/e1dxtV7Tisz03YRj/3Lju9s56KmfiXNpqxu+KLq7kklrl0ihsFGph5qmONsuUwVUp1BlO9+gMPLPq++dl86Ju+uhSC60/swqzvfg2l3Wdm+jCN1mtRyiVrwR3glsHvIqRIXupYWDi8zSw2gxdSPvrqZuL7QIN9yPswPdclUKqyOyXaSak/GAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport ssl\n\n\ndef get_ssl_context() -> ssl.SSLContext:\n    \"\"\"Create an SSL context for a client that connects to HTTPS servers and return it.\"\"\"\n    context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)\n    context.check_hostname = True\n    context.verify_mode = ssl.CERT_REQUIRED\n    context.minimum_version = ssl.TLSVersion.TLSv1_2\n    return context\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 135,
+    "output_tokens": 253,
+    "output_tokens_details": {
+      "thinking_tokens": 91
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

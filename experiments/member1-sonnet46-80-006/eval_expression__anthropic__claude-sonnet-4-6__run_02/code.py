@@ -1,0 +1,150 @@
+import re
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not expression or not expression.strip():
+        raise ValueError("Empty expression")
+
+    tokens = _tokenize(expression)
+    if not tokens:
+        raise ValueError("Empty expression after tokenization")
+
+    parser = _Parser(tokens)
+    result = parser.parse()
+    return float(result)
+
+
+def _tokenize(expression: str):
+    token_pattern = re.compile(
+        r'\s*(?:'
+        r'(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)'  # numbers
+        r'|(\*\*)'                                                  # **
+        r'|([-+*/()])'                                              # single-char ops
+        r')\s*'
+    )
+    tokens = []
+    pos = 0
+    while pos < len(expression):
+        m = token_pattern.match(expression, pos)
+        if not m:
+            ch = expression[pos]
+            if ch.strip():
+                raise ValueError(f"Unexpected character: {ch!r}")
+            pos += 1
+            continue
+        if m.start() == m.end():
+            pos += 1
+            continue
+        pos = m.end()
+        if m.group(1) is not None:
+            tokens.append(('NUMBER', float(m.group(1))))
+        elif m.group(2) is not None:
+            tokens.append(('OP', '**'))
+        elif m.group(3) is not None:
+            tokens.append(('OP', m.group(3)))
+    return tokens
+
+
+class _Parser:
+    """Recursive-descent parser supporting +, -, *, /, ** and unary minus."""
+
+    def __init__(self, tokens):
+        self._tokens = tokens
+        self._pos = 0
+
+    def _peek(self):
+        if self._pos < len(self._tokens):
+            return self._tokens[self._pos]
+        return None
+
+    def _consume(self, expected_value=None):
+        tok = self._tokens[self._pos]
+        if expected_value is not None and tok[1] != expected_value:
+            raise ValueError(f"Expected {expected_value!r}, got {tok[1]!r}")
+        self._pos += 1
+        return tok
+
+    def parse(self):
+        result = self._parse_expr()
+        if self._pos != len(self._tokens):
+            raise ValueError(f"Unexpected token: {self._peek()}")
+        return result
+
+    # Grammar (lowest to highest precedence):
+    # expr   = term (('+' | '-') term)*
+    # term   = factor (('*' | '/') factor)*
+    # factor = base ('**' unary)*   (right-associative)
+    # unary  = '-' unary | primary
+    # primary = NUMBER | '(' expr ')'
+
+    def _parse_expr(self):
+        left = self._parse_term()
+        while True:
+            tok = self._peek()
+            if tok and tok[0] == 'OP' and tok[1] in ('+', '-'):
+                self._consume()
+                right = self._parse_term()
+                if tok[1] == '+':
+                    left = left + right
+                else:
+                    left = left - right
+            else:
+                break
+        return left
+
+    def _parse_term(self):
+        left = self._parse_factor()
+        while True:
+            tok = self._peek()
+            if tok and tok[0] == 'OP' and tok[1] in ('*', '/'):
+                self._consume()
+                right = self._parse_factor()
+                if tok[1] == '*':
+                    left = left * right
+                else:
+                    if right == 0:
+                        raise ValueError("Division by zero")
+                    left = left / right
+            else:
+                break
+        return left
+
+    def _parse_factor(self):
+        # Right-associative exponentiation
+        base = self._parse_unary()
+        tok = self._peek()
+        if tok and tok[0] == 'OP' and tok[1] == '**':
+            self._consume()
+            exp = self._parse_factor()  # right-associative
+            return base ** exp
+        return base
+
+    def _parse_unary(self):
+        tok = self._peek()
+        if tok and tok[0] == 'OP' and tok[1] == '-':
+            self._consume()
+            return -self._parse_unary()
+        if tok and tok[0] == 'OP' and tok[1] == '+':
+            self._consume()
+            return self._parse_unary()
+        return self._parse_primary()
+
+    def _parse_primary(self):
+        tok = self._peek()
+        if tok is None:
+            raise ValueError("Unexpected end of expression")
+        if tok[0] == 'NUMBER':
+            self._consume()
+            return tok[1]
+        if tok[0] == 'OP' and tok[1] == '(':
+            self._consume('(')
+            value = self._parse_expr()
+            if self._peek() is None or self._peek()[1] != ')':
+                raise ValueError("Missing closing parenthesis")
+            self._consume(')')
+            return value
+        raise ValueError(f"Unexpected token: {tok}")

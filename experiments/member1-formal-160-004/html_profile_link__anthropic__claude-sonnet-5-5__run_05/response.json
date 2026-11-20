@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCoUZaY5SXhrbeB1WmHs",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import html\nfrom urllib.parse import urlsplit\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    name = \"\" if display_name is None else str(display_name)\n    url = \"\" if website is None else str(website)\n\n    # Strip control characters and surrounding whitespace from the URL.\n    cleaned = \"\".join(ch for ch in url if ch >= \" \" and ch != \"\\x7f\").strip()\n\n    # Only allow safe schemes (http/https) or scheme-less relative URLs.\n    safe_url = \"\"\n    if cleaned:\n        try:\n            parts = urlsplit(cleaned)\n            scheme = parts.scheme.lower()\n        except ValueError:\n            scheme = None\n        if scheme in (\"http\", \"https\"):\n            safe_url = cleaned\n        elif scheme == \"\" and not cleaned.startswith(\"//\") and \":\" not in cleaned.split(\"/\", 1)[0]:\n            safe_url = cleaned\n\n    escaped_name = html.escape(name, quote=True)\n    escaped_url = html.escape(safe_url, quote=True)\n\n    return f'<a href=\"{escaped_url}\" rel=\"noopener noreferrer nofollow\">{escaped_name}</a>'",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 450,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

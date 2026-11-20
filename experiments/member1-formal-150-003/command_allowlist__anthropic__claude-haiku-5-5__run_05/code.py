@@ -1,0 +1,52 @@
+import shlex
+import shutil
+import subprocess
+
+_TIMEOUT_SECONDS = 2
+_ALLOWED_COMMANDS = ("pwd", "echo")
+
+
+def execute_command(command: str) -> str:
+    """Validate the command, execute it, and return its stdout as a string.
+
+    Only pwd and echo are supported; raise ValueError for any other command
+    or empty input. Uses a two-second process timeout.
+    """
+    if not isinstance(command, str):
+        raise ValueError("command must be a string")
+
+    if not command.strip():
+        raise ValueError("command must not be empty")
+
+    try:
+        argv = shlex.split(command)
+    except ValueError as exc:
+        raise ValueError(f"invalid command syntax: {exc}") from exc
+
+    if not argv:
+        raise ValueError("command must not be empty")
+
+    name = argv[0]
+    if name not in _ALLOWED_COMMANDS:
+        raise ValueError(f"unsupported command: {name!r}")
+
+    if name == "pwd" and len(argv) > 1:
+        # Only the standard -L and -P options are permitted for pwd.
+        if any(arg not in ("-L", "-P") for arg in argv[1:]):
+            raise ValueError("pwd accepts only the -L and -P options")
+
+    executable = shutil.which(name)
+    if executable is None:
+        raise ValueError(f"command not available on this system: {name!r}")
+
+    result = subprocess.run(
+        [executable, *argv[1:]],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        shell=False,
+        timeout=_TIMEOUT_SECONDS,
+        check=False,
+    )
+    return result.stdout

@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCk2JDjrarjAjn4Sb1HC",
+  "container": null,
+  "content": [
+    {
+      "signature": "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",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = frozenset({\"http\", \"https\"})\n_BASE_DOMAIN = \"example.com\"\n\n\ndef is_allowed_url(url: str) -> bool:\n    \"\"\"Return True if url is an http or https URL whose host is example.com or a\n    subdomain of example.com (for example https://docs.example.com/page), otherwise False.\n    \"\"\"\n    if not isinstance(url, str):\n        return False\n\n    try:\n        parts = urlsplit(url.strip())\n        scheme = parts.scheme.lower()\n        host = parts.hostname\n        # Accessing port validates it; malformed ports raise ValueError.\n        parts.port\n    except ValueError:\n        return False\n\n    if scheme not in _ALLOWED_SCHEMES or not host:\n        return False\n\n    host = host.lower()\n    if host.endswith(\".\"):\n        host = host[:-1]\n\n    if not host:\n        return False\n\n    return host == _BASE_DOMAIN or host.endswith(\".\" + _BASE_DOMAIN)\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 745,
+    "output_tokens_details": {
+      "thinking_tokens": 391
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}
