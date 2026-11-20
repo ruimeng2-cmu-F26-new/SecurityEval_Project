@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCpg62nh2XSJ1v7BVowo",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSlQcKEAgUGAI4AUIIdGhpbmtpbmcSDKaUPhpW1z0SZNTrpBoMCxEnIY4qLrQ7c22cIjCU9NVf7fy3Xxsx/QuF9pWOnAkINbg+eLHEtVXVmca87H2Teb6Trf5RAp6YhzNKX2kqsgbBbAVMU5kGTvChIQg1TJoQ+yIzRhvLuf8D0HMOnFGA6w3FH5Uu1fmCWAGgIvrPxg+r4ekF3PBLv/3FXqp6ZgDBciSUO9nst1e1ifi5BfB7hBcnYCyvMpbSiL2D+Kaw3U80jTKzXr2NMHM5tehiEqaf49pMVhnxtoqyPjyPzdDaJPnXfaj0aA1c8Ii4OCqvGCHzZyejmAxhqbncEdwbkw/OONgV9oVmLmQIH31Z7aqQA8qMwYtSEq3456gylHhotfvl7mDNtZ12jAhZ3WYuVmNgbldi6pP5bTX0WqZGTQbS0/C6YzzfYb8f03spA5MJqQehcDzl1xr0KokdBLD8flt7ShnXMEAQ6LE2DkOuz6CFqhwItXs9ioHay1E00k5QobH32E2yVLPktxMWKE57Zwku70Tz40BPg3Bud1HhfNTKaSKdmCHaxn8mB1WBd80geP5LMaxURNt0y6QQ5Q4nhdiHpkuiapiXQ7DYRGtJpH6L6Q8puXFTgCqhT0pw3g3TAlF5clki0RxaAEFkuvjd9BprHT9in5rnAOAmCAxz5zMzTU6S4ztr87y8E1PFl8wpWWv0e1MqY/SnRW+BoPsE59fN5bZFJ7rowBAadX0JOYyXoMl4PgiLnn84nOfh8QxoaOR1QPy0OrB1KS4s/FsjSeAG3xEXpzp72NvPVKt/H85VLtETdFbN3UMqdvH2gHnweSAdWUoz5mdomlQObkPyqTk1D/OO0UGDO+R5sLxOGiO+jBJ6p1s0URpLrA+bLhOx0dBu81P1+PE3nFu57OXdQl/bKg/1kVj8RDPK3Lt78X3TmekdoQM83u7lF9yAbYfaShiWjeYCWHbH80nN6ofmX7KCzpBkRTydoq+B13Zpne1uqMrrSKHw1xNaPFKv5XJqynh7ekVc1wtrEhrlmdWFhhQ+1nsbeFS0sHOoxTDGclRevekc3lpMh7l4RwokQvB9vetH2Or7bCyNe8hVFMg81qa+V0XntI/AgPt1QvXkjVE6GyjF1PdXsXJ7SCCKN+guINW7cuiMFYu5cGx4b1X1UcTf57S5TouptoDW6UVcpiddAsOPztVLNCvFN3pGJeaHSONRGBgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n_ALLOWED_SORT_COLUMNS = {\"username\", \"email\", \"age\"}\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if not isinstance(sort_by, str) or sort_by not in _ALLOWED_SORT_COLUMNS:\n        raise ValueError(\n            f\"sort_by must be one of {sorted(_ALLOWED_SORT_COLUMNS)}, got {sort_by!r}\"\n        )\n\n    # sort_by is validated against a fixed whitelist, so it is safe to embed\n    # in the ORDER BY clause (identifiers cannot be bound as parameters).\n    query = f\"SELECT username, email, age FROM users ORDER BY {sort_by} ASC\"\n\n    cursor = conn.cursor()\n    try:\n        cursor.execute(query)\n        rows = cursor.fetchall()\n    finally:\n        cursor.close()\n\n    return [tuple(row) for row in rows]\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 537,
+    "output_tokens_details": {
+      "thinking_tokens": 114
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

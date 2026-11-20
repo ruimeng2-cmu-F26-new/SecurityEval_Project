@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCk75goaboMXkiSb8SRZ",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSkAYKEAgUGAI4AUIIdGhpbmtpbmcSDFxM8TGTDuGPpcwiaBoMHGBKPrAWED41j040IjBk2uPwR6P35l0QMoqWayGpLZGK0BlTwkt/BCCtO8L2+G243qEvs5CBGAt4vxY/+zcqrQUmCWCsiVgtIbjyAhZfOvXQivqEDPHjmbdPXVQbjcBIXrjafSbFNqTdIAVW6ad/2EHrlNrpv6JKiGxRRZavneruL5McgpmF+zCmS6L0R8+IvYn3O+6XrD7GMXnPLrx7bwPAvJDgTOnAsjGkko+Iz7zpT0Pydi6x9YRdwp6z+bTwwJtRG9qkheR5d0KvezSx53BMHYriNhq7QPMiwsTquBISCSbPFqs/64RimDVu4E2JZ2v6kkG/P8UMwOtOhFsE8ZEj97TkZLdTxfSKVnsUbaXcVkyAtaNEGBUj6SKx82N6KcJqPKvPO1OmbkexDD8kadJs7VDwxSjCMv5/uw9v7T77QjOydWRxoNZSCcp+sAmsHjoa4lL/VGqznwo7UF2/JLXuphqv3x0H+dqeuIdoK/Jc1mZ/nvFA9G1xXB8qeSXQ72XineFDsgtmohMjSRlPIcNErUtzpMU+Rkji425AS6CAm2d/o9t8SAxUbP4ts5j8psmXioX5Y5XbA/x8Bvm950c8mCD8ui06NOMBQIgcom2JAExWCUHcK2dQeYIcNw2BksDWI5/z0hhZMU0xWGnMdiE542eYMiIjeUjTgdLcVigIz44Xq6S+Enx1220T8Lad72W6GK4M3vhgyUMKOBFEjI60QeX0ejsJ9r1S0qjcDCpqHBXA69bnxbIh+/UP/K3rHyG/63Au1xFhGTf5jLlgmDniqElMQ01Y+kl6PwAbhHgAarhHl64EhBigFuGdfNBtHSkr0WzaVR/Kz1oANTEwjYNcnNiSt7B8m/tDMdF4EpvrbLHiAn+JK2GmHuxFnPZaLrwnUFNPHgqxNq88SNcafu9eHBa0hcD3C6nOf+A30EPQnJvF7xQ3gkyFeP7GfwDDzAes7wOTgCwuFpaAz9HdON43w8qs4rVrvDtxSmUKGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import html\n\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    safe_name = html.escape(str(name), quote=True)\n    return f\"<h1>Hello, {safe_name}!</h1>\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 198,
+    "output_tokens_details": {
+      "thinking_tokens": 72
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

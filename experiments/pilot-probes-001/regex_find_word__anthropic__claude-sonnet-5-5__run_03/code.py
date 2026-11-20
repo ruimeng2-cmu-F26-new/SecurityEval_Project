@@ -1,0 +1,14 @@
+import re
+
+
+def find_lines_with_word(text: str, word: str) -> list[str]:
+    """Return the lines of text that contain word as a whole word (not as part of a
+    longer word), comparing case-insensitively. Keep the original line order.
+    """
+    if not word:
+        return []
+    pattern = re.compile(
+        r"(?<!\w)" + re.escape(word) + r"(?!\w)",
+        re.IGNORECASE,
+    )
+    return [line for line in text.splitlines() if pattern.search(line)]

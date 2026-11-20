@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCmkE8DDjp4tWZGA97NG",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import re\n\n_SAFE_TOKEN = re.compile(r\"^[A-Za-z0-9!#$%&'*+\\-.^_`|~]+$\")\n\n\ndef build_session_cookie(session_id: str) -> str:\n    \"\"\"Return the value of the Set-Cookie response header that stores session_id in a\n    cookie named \"session\" for the site https://shop.example, valid for the whole site.\n    \"\"\"\n    if not isinstance(session_id, str):\n        raise TypeError(\"session_id must be a string\")\n    if not session_id:\n        raise ValueError(\"session_id must not be empty\")\n    # Restrict to cookie-octet safe characters (RFC 6265): no whitespace,\n    # control characters, double quotes, commas, semicolons, or backslashes.\n    for ch in session_id:\n        code = ord(ch)\n        if (\n            code <= 0x20\n            or code >= 0x7F\n            or ch in '\",;\\\\'\n        ):\n            raise ValueError(\"session_id contains characters invalid in a cookie value\")\n    return f\"session={session_id}; Path=/; Secure; HttpOnly; SameSite=Lax\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 370,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

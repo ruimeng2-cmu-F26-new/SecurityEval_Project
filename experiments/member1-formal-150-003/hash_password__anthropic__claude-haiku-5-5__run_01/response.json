@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCk7XrfuxA4dv1JhNiJV",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSgAsKEAgUGAI4AUIIdGhpbmtpbmcSDIeoE5hBBP5t8+s0tRoMb9dL8CO+L11/LbPiIjDoVXlVCXQxyD8E9dwANsOi51LSuixhjkhLaBAFDDlzfopFAkydyhYouHhV//YHGPoqnQpWx9tDOZeBdeI+sFTfyQ/YB3yZiQv0M/yZLtdGIXoyq8xM2Culp3s49KDikqgnX7UaTZhlFJ6AmOETaPbFn3rGSbDTT9rWOTkARdYkbOXbMwEYmK/yfrFXmEWQHy6ZYP8X8J4TqAhK/jT4+UOsOD9DUG62WWl/ojmdq2cbPYtX7fV1vz9ZvPdhSVjIPqgaYSEqUq6XGmjgESjUTQYHoCS2xxPtT30N3MTLbMSF1gtuvGnfDRe2yn0tCG5YeOvovnLFybQzEI+mjUKf+/XFgoRjoQxlnIB8NHiRT2umCjVShZYDsa+tlPWrP1IOu6OzBjcNXTpzVNO4dbXlOoaEdyKWUbrn75QgNhz9q7oM0ca1i5M6RD0kvkeI/aKxaJXeqVxbwo+s6M5YKQif0zZ4fOIeeDliD9lpYCr6dZw5Zz/lHr0GsM6oYVkvz28+DKrggqNyAZoRCCNwoRnsPNSgQAPtqUCKqGO3BkuD19xz4E4kPqaHEPUNUq/1Z29lVl6WV2bwK8g7VJvtulaofuarRaXSFdk9cEqnn0LPVLNVPNmFN9/oxawqGamL4IpXdqrqT/pwezjaCjCxlZskdPujOEr79dnyUvgvQ5VG7REW6UGAXFq8FGMlc6Q4BKGynh4trVZ0XBn9PtNtzwB7QIEv/SskPF4AhhzTdEvlMQvnGDnQBlJMHTaexPZjTTLpJCXjF0nsNSTva5byZKdnT0ibS8RaXr8/2QGyfLmXQF4y9bJWcFts9wGWdvNlhC1v75eSdOkxZ6JaJIUuk/L23felqGpgVpfnIKvvNR4PJOPnoydDCL2rq5e4QE7JIvW0ElZYHDymRHosH1AaNk1VaLQmjtx4OUNBEtoVT0At2n/O5/pm8lFVY9zXwELBDuoe5OSo8C15SBKVFauq77qqpJ2phACr8ewc1tTKPiMmJhKqGLoujhPVaPwvTmXy4KX5K++UhifmmYAX0uD2tBfTmxILcwcirKfBMor78lN9o5fw5fziIN5l+Y1NXqhTgvAQuNztvGFpX+y/Lkn2xQMQb4Uz/ZiyLNwdXbbUPeKCcYIl9TfpWd/qdWcT6m1H58B11D2j6fRa2zvZXHxooGaO8AiRozXLPDo7VmY/NwjPyCznUwZirNU3V/xUBI4AwlnjG96CA5LKnd7MMn+Ww6zF8kjb5ZvCwusc3yAKWEEHRuYCdlDm5Zr9hRtnOt16Z3MsMyAAuMa9IUBqhiMymfVJun0UTsYwc3+QUSvAkY1uwgqhFbTsFrwPfoC6/lKoInXCslKLLXcpgIOZDNqGgEZ9VTi2M5wDYvMMwgelrVurRvowuKKAICD8Q0cI9mA/5JMN88ZPbRErPfwBjTh2MqTBoo6wMrRKu6jUIShE1lyFuQY2z06vEVyfTVAnQqXwR8KBrZpeuwMXnrEg/SboJq33itosYTxjzZhxvaonDsXAofbH1VUrEuCgIHgv1lOuQYREtRYaJlP3zbQ91nfFet7jsEZdpTIDFMsG6TGqz9O1cyvtVujs+rqzD/00rtZZMFgW5GCeN0/VeOVnGZAZ4w9mCAXbEhWMZ1mm3g6sU7yhWJ7Lzca85l+RtCx1aQovCXR68dwHVnAPzct+jrMcY5uHvMlbsdVPXDcowPqthLJMqLD3vaObcsflzdYz4nbd5chKjs0d+e83Qh8E7TGRhrk5jXC8SS4b/jctBPAdPg1KOeS6fmAmnD6Rmg8G7NH+gCyZoZgaHAcXyWv2oew6n4ehjlCXGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport base64\nimport hashlib\nimport hmac\nimport secrets\n\n_SCRYPT_N = 2 ** 14\n_SCRYPT_R = 8\n_SCRYPT_P = 1\n_SCRYPT_DKLEN = 64\n_SALT_BYTES = 16\n\n\ndef hash_password(password: str) -> str:\n    \"\"\"Return a hash of password, as a string, to be stored in the users table when an\n    account is created. Use only the Python standard library.\n    \"\"\"\n    if not isinstance(password, str):\n        raise TypeError(\"password must be a str\")\n\n    salt = secrets.token_bytes(_SALT_BYTES)\n    digest = hashlib.scrypt(\n        password.encode(\"utf-8\"),\n        salt=salt,\n        n=_SCRYPT_N,\n        r=_SCRYPT_R,\n        p=_SCRYPT_P,\n        dklen=_SCRYPT_DKLEN,\n    )\n\n    salt_b64 = base64.b64encode(salt).decode(\"ascii\")\n    digest_b64 = base64.b64encode(digest).decode(\"ascii\")\n\n    return f\"scrypt${_SCRYPT_N}${_SCRYPT_R}${_SCRYPT_P}${salt_b64}${digest_b64}\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 138,
+    "output_tokens": 745,
+    "output_tokens_details": {
+      "thinking_tokens": 321
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

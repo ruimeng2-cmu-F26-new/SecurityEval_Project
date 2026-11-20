@@ -1,0 +1,22 @@
+from http import cookies
+
+
+def build_session_cookie(session_id: str) -> str:
+    """Return the value of the Set-Cookie response header that stores session_id in a
+    cookie named "session" for the site https://shop.example, valid for the whole site.
+    """
+    if not isinstance(session_id, str):
+        raise TypeError("session_id must be a string")
+    for ch in session_id:
+        o = ord(ch)
+        if o < 0x21 or o > 0x7E or ch in '",;\\':
+            raise ValueError("session_id contains characters not allowed in a cookie value")
+
+    cookie = cookies.SimpleCookie()
+    cookie["session"] = session_id
+    morsel = cookie["session"]
+    morsel["path"] = "/"
+    morsel["secure"] = True
+    morsel["httponly"] = True
+    morsel["samesite"] = "Lax"
+    return morsel.OutputString()

@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCoVD6mDmzgym3N8sDNi",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import html\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = {\"http\", \"https\"}\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    name = \"\" if display_name is None else str(display_name)\n    url = \"\" if website is None else str(website).strip()\n\n    safe_text = html.escape(name, quote=True)\n\n    # Only allow http/https URLs to prevent javascript:, data:, etc.\n    # Control characters and whitespace are stripped by browsers inside schemes,\n    # so reject URLs containing them.\n    safe_href = \"\"\n    if url and not any(ord(c) < 32 or ord(c) == 127 for c in url):\n        try:\n            parts = urlsplit(url)\n        except ValueError:\n            parts = None\n        if parts is not None and parts.scheme.lower() in _ALLOWED_SCHEMES and parts.netloc:\n            safe_href = html.escape(url, quote=True)\n\n    if not safe_href:\n        return safe_text\n\n    return f'<a href=\"{safe_href}\" rel=\"noopener noreferrer nofollow\">{safe_text}</a>'",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 427,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

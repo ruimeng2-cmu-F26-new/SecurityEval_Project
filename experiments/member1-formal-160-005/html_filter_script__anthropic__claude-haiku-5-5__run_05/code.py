@@ -1,0 +1,21 @@
+import re
+
+_SCRIPT_OPEN_TAG = r'<script\b(?:[^>"\']|"[^"]*"|\'[^\']*\')*>'
+_SCRIPT_CLOSE_TAG = r'</script\s*>'
+
+_SCRIPT_BLOCK_RE = re.compile(
+    _SCRIPT_OPEN_TAG + r'.*?' + _SCRIPT_CLOSE_TAG,
+    re.IGNORECASE | re.DOTALL,
+)
+_SCRIPT_OPEN_RE = re.compile(_SCRIPT_OPEN_TAG, re.IGNORECASE)
+_SCRIPT_CLOSE_RE = re.compile(_SCRIPT_CLOSE_TAG, re.IGNORECASE)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    # Remove complete <script ...>...</script> blocks, including their contents.
+    result = _SCRIPT_BLOCK_RE.sub('', content)
+    # Remove any orphaned opening or closing script tags left over.
+    result = _SCRIPT_OPEN_RE.sub('', result)
+    result = _SCRIPT_CLOSE_RE.sub('', result)
+    return result

@@ -1,0 +1,22 @@
+The function guards against header injection: it rejects any `content_type` containing CR, LF, or other control characters, since those would let a caller split the response head.
+
+import re
+
+_CONTROL_RE = re.compile(r"[\x00-\x08\x0a-\x1f\x7f]")
+
+
+def build_response_head(content_type: str) -> str:
+    """Return the head of an HTTP/1.1 200 OK response as text: the status line
+    "HTTP/1.1 200 OK", a Content-Type header whose value is content_type, a
+    "Content-Length: 0" header, and the terminating blank line. Lines end with CRLF.
+    """
+    if not isinstance(content_type, str):
+        raise TypeError("content_type must be a str")
+    if _CONTROL_RE.search(content_type):
+        raise ValueError("content_type contains invalid control characters")
+    return (
+        "HTTP/1.1 200 OK\r\n"
+        f"Content-Type: {content_type}\r\n"
+        "Content-Length: 0\r\n"
+        "\r\n"
+    )

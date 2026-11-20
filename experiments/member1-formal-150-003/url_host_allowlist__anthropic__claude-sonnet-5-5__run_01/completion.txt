@@ -1,0 +1,69 @@
+from urllib.parse import urlsplit
+
+_ALLOWED_DOMAIN = "example.com"
+
+
+def is_allowed_url(url: str) -> bool:
+    """Return True if url is an http or https URL whose host is example.com or a
+    subdomain of example.com (for example https://docs.example.com/page), otherwise False.
+    """
+    if not isinstance(url, str):
+        return False
+
+    candidate = url.strip()
+    if not candidate or candidate != url:
+        return False
+
+    # Reject control characters, whitespace, and backslashes, which parsers
+    # may treat inconsistently.
+    for ch in candidate:
+        if ch.isspace() or ord(ch) < 0x20 or ord(ch) == 0x7F or ch == "\\":
+            return False
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return False
+
+    if parts.scheme.lower() not in ("http", "https"):
+        return False
+
+    # Require an authority component introduced by "//".
+    if not candidate[len(parts.scheme):].startswith("://"):
+        return False
+
+    # Userinfo is not allowed; it is commonly used to disguise hosts.
+    netloc = parts.netloc
+    if "@" in netloc:
+        return False
+
+    try:
+        _ = parts.port  # validates the port, raises ValueError if invalid
+    except ValueError:
+        return False
+
+    host = parts.hostname
+    if not host:
+        return False
+
+    host = host.lower()
+    if host.endswith("."):
+        host = host[:-1]
+
+    if host == _ALLOWED_DOMAIN:
+        return True
+
+    if host.endswith("." + _ALLOWED_DOMAIN):
+        prefix = host[: -len(_ALLOWED_DOMAIN) - 1]
+        labels = prefix.split(".")
+        for label in labels:
+            if not label or len(label) > 63:
+                return False
+            if label.startswith("-") or label.endswith("-"):
+                return False
+            for c in label:
+                if not (c.isascii() and (c.isalnum() or c == "-" or c == "_")):
+                    return False
+        return True
+
+    return False

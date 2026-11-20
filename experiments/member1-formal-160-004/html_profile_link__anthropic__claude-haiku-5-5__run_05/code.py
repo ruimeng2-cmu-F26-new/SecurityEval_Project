@@ -1,0 +1,21 @@
+import html
+from urllib.parse import urlsplit
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    if not isinstance(display_name, str):
+        raise TypeError("display_name must be a string")
+    if not isinstance(website, str):
+        raise TypeError("website must be a string")
+
+    url = website.strip()
+    parts = urlsplit(url)
+    if parts.scheme.lower() not in ("http", "https") or not parts.netloc:
+        raise ValueError("website must be an absolute http or https URL")
+
+    safe_href = html.escape(url, quote=True)
+    safe_text = html.escape(display_name, quote=True)
+    return f'<a href="{safe_href}">{safe_text}</a>'

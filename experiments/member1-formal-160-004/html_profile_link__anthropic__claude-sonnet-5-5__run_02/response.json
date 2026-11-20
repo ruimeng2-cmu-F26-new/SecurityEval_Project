@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCoTqjrNgDfyAaauwDPG",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import html\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = {\"http\", \"https\"}\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    name = \"\" if display_name is None else str(display_name)\n    url = \"\" if website is None else str(website).strip()\n\n    safe_text = html.escape(name, quote=True)\n\n    # Only permit safe, explicit web schemes (or scheme-less relative URLs),\n    # preventing javascript:, data:, vbscript:, etc.\n    cleaned = \"\".join(ch for ch in url if ch not in \"\\x00\\t\\r\\n\")\n    try:\n        parts = urlsplit(cleaned)\n        scheme = parts.scheme.lower()\n    except ValueError:\n        return safe_text\n\n    if scheme and scheme not in _ALLOWED_SCHEMES:\n        return safe_text\n\n    # Reject control characters and a colon appearing before any path\n    # separator when no scheme was recognised (ambiguous scheme-like input).\n    if any(ord(ch) < 32 or ord(ch) == 127 for ch in cleaned):\n        return safe_text\n    if not scheme and \":\" in cleaned.split(\"/\", 1)[0].split(\"?\", 1)[0].split(\"#\", 1)[0]:\n        return safe_text\n\n    if not cleaned:\n        return safe_text\n\n    safe_href = html.escape(cleaned, quote=True)\n    return f'<a href=\"{safe_href}\" rel=\"noopener noreferrer nofollow\">{safe_text}</a>'",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 564,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "eval_expression__anthropic__claude-sonnet-5-5__run_08",
+  "sample_id": "eval_expression",
+  "run_index": 8,
+  "status": "generated",
+  "provider": "anthropic",
+  "requested_model": "claude-sonnet-5-5",
+  "returned_model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "thinking_type": "adaptive",
+  "max_tokens": 16000,
+  "stop_reason": "end_turn",
+  "failure_kind": null,
+  "created_at": "2026-11-19T19:03:19.189642+00:00",
+  "completed_at": "2026-11-19T19:03:26.699263+00:00",
+  "request_file": "request.json",
+  "sample_file": "sample.json",
+  "prompt_sha256": "8b189caa4954acf20f82114ff38f77eebb11c775256e1ad8976180fb6ecbf72a",
+  "request_sha256": "36ce30ba7e6750bf0164e1504917f0d3e7fa2a5b8fd2a38bc9367d6bcd912bb0",
+  "response_file": "response.json",
+  "response_sha256": "2e650c7d33719bc56d8478fd2bf9adcfc40fccbeb76ecfdb879be9073a868ea6",
+  "raw_output_file": "completion.txt",
+  "code_file": "code.py",
+  "code_sha256": "b57a1041f0d69d68a0db685381f4da5f3ca896eff517ae29642c749e700bf55c",
+  "syntax_valid": true,
+  "response_id": "msg_011ChCohk6fGYZYTq1huoSqM",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 1441,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "estimated_cost_usd": 0.01481,
+  "error": null
+}

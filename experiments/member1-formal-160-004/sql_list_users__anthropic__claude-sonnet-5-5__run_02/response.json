@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCoZbk9gNQMUesWHKJhV",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import sqlite3\n\n_ALLOWED_COLUMNS = {\n    \"username\": \"username\",\n    \"email\": \"email\",\n    \"age\": \"age\",\n}\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if not isinstance(sort_by, str) or sort_by not in _ALLOWED_COLUMNS:\n        raise ValueError(f\"Invalid sort column: {sort_by!r}\")\n    column = _ALLOWED_COLUMNS[sort_by]\n    query = f\"SELECT username, email, age FROM users ORDER BY {column} ASC\"\n    cursor = conn.execute(query)\n    try:\n        rows = cursor.fetchall()\n    finally:\n        cursor.close()\n    return [tuple(row) for row in rows]",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 348,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

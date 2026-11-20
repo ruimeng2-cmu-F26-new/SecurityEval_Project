@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpGUaS5Ua2KucXP1vZg",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport re\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n    return re.sub(r'<script\\b[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 92,
+    "output_tokens": 83,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

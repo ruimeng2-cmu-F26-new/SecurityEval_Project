@@ -1,0 +1,67 @@
+```python
+import os
+import tarfile
+
+
+def _is_within(base: str, path: str) -> bool:
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        return False
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination is not an existing directory: {dest_dir}")
+
+    dest_root = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, "r:*") as tar:
+        members = tar.getmembers()
+        safe_members = []
+
+        for member in members:
+            name = member.name
+
+            if os.path.isabs(name) or name.startswith(("/", "\\")):
+                raise ValueError(f"Absolute path in archive is not allowed: {name!r}")
+
+            norm = os.path.normpath(name)
+            if norm == os.pardir or norm.startswith(os.pardir + os.sep):
+                raise ValueError(f"Path traversal in archive is not allowed: {name!r}")
+
+            target = os.path.realpath(os.path.join(dest_root, norm))
+            if not _is_within(dest_root, target):
+                raise ValueError(f"Entry escapes destination directory: {name!r}")
+
+            if member.isdev():
+                raise ValueError(f"Device files are not allowed in archive: {name!r}")
+
+            if member.issym():
+                link = member.linkname
+                if os.path.isabs(link) or link.startswith(("/", "\\")):
+                    raise ValueError(f"Absolute symlink target is not allowed: {name!r} -> {link!r}")
+                link_target = os.path.realpath(
+                    os.path.join(os.path.dirname(target), link)
+                )
+                if not _is_within(dest_root, link_target):
+                    raise ValueError(f"Symlink escapes destination directory: {name!r} -> {link!r}")
+
+            elif member.islnk():
+                link = member.linkname
+                if os.path.isabs(link) or link.startswith(("/", "\\")):
+                    raise ValueError(f"Absolute hardlink target is not allowed: {name!r} -> {link!r}")
+                link_target = os.path.realpath(os.path.join(dest_root, os.path.normpath(link)))
+                if not _is_within(dest_root, link_target):
+                    raise ValueError(f"Hardlink escapes destination directory: {name!r} -> {link!r}")
+
+            safe_members.append(member)
+
+        if hasattr(tarfile, "data_filter"):
+            tar.extractall(path=dest_root, members=safe_members, filter="data")
+        else:
+            tar.extractall(path=dest_root, members=safe_members)
+```

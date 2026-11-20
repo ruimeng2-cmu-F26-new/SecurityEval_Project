@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnzPU3ZrCGhmLGokpvg",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS8AgKEAgUGAI4AUIIdGhpbmtpbmcSDBySXrTo8neIK9vV9RoMkt746GMSb7P/1VVbIjCdJVodJsVvekPrNJorbLzULYp+gQCCKIof3bvyA8quA3FCDuuiUJwkd0/Zc3AXjc0qjQh13triTHCq5WfhtNzZ5Mc7BHTmVpcytW1CtUKj/FNPwrCJuMg19dXTPK+HCIAVBxRWF33koG44Zt1FuGslwPDyTUa/85CJHPkeJGjGEfdrLlhVJmMTzl+vKdKCMVDo5ul2Vqq8bvy2+7J0hNR7UHgaNOwSUIrMchdWTCjO7nTX9bTYZWtR50DDvCM/75nkpy53S5H+gVcCMv1G4Ealn7u1XV821xQeH8rvZXU398/lAkYvedWoJKyPDrUvSQL2ax2g7M2ypp27CWQvnT211qMVSpHr0pO1ZXF+fd5tHXCaLrPmyrhN6lvImI2dztMdu66BAw6++IIyYEEOEeqbppCOqckXxOqT9+RdEhCVwojbMjefIgVXnUysjI6ZYUnef7xa4b5NWeRihSJWh9vH3qS+s10WAeamam6+7FN1FOHM1Hwj+qAIpRZfiDoCNtX1RFRaPjA0DXi3aY/x/bTc8sIGswjHiwnhX9u/kUwLVJ2k+ZFWHJRM+Ik/fyo/+YlvYLYPREsNedrtx8eNUXiI6I3o/gx4H51FhQviNAsxb/6/wP/lmD/J3dbmmx8ZBcBNRWwx22MqnDXFpqyR7+FE7htXnq2JMrIOLdOOE7zgp5954rzCz3jz4KThOrAuAmbzdSfuD6iJ/I8sAwMNjlIp7Qud5u0oHeKwes9D4T33jEHrvKfFS8LX4UHPZIWFQvDcOqsjF3k01ZcUFrslzKzK6cN1qkuLxbFCVQL+qg6tmze/cGryLqx134lTyllzNhs+Rxmax3ulXxlFtNcHLx0tpHDxZFsPnD9f25JCu6XnOEk3ErF1oCpsVQO1C6+ZIAGtHo9zk7eBNT/SnJ63Vg8kX71Jud8o2JVf47B4Nwl3Q9BNjlVI0nM3EGeO9ZaMPg0C9ERrgwu+yt1yLvlI0lSoyjPA4LqmTkBpbc7e+FQRSQHuhJhoTVN3fG8UTuLU3nvoeUoC6PzNZWMcphjFDsf9b/uWD1MUpGlIZZl5Qg8lV34N/KthNd0mtNgBofrOwE2qlOW8dt3Y9QaOGopaKLxQmb6EByuHcbdTeVQeEl0OwF+iQWCcQ55dJEkSEXtCA8ulWAkhujwJ67J5BjiHRUsgsY7Qxhdjbb08VsulOAszHVelCHVsvvnxHH/tcr6euNnQ4Sm5Www8lffDle+tJtl06Qq01Jl7YteOVOxHbp2/yuBdwBGNqvyG1WV+PViSUHqhfKddEq/QbjBbMpCz1YlwSvetZE6Ztbuj4NnWj5S/67EbHmU8qU2ExSw/hk/Psq2Ayx32hyYEDGrs/OkDKgEzLM3bOynfOIcfqGW6L2DO8i9PiuOZrfV+07Is9tBqbV3dsjQQlzCPouAfyBBU17z79arhAH0DkPdQUB4wkWuxkhgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\nfrom urllib.parse import urlsplit\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    if not isinstance(display_name, str):\n        raise TypeError(\"display_name must be a string\")\n    if not isinstance(website, str):\n        raise TypeError(\"website must be a string\")\n\n    url = website.strip()\n    parts = urlsplit(url)\n    if parts.scheme.lower() not in (\"http\", \"https\") or not parts.netloc:\n        raise ValueError(\"website must be an absolute http or https URL\")\n\n    safe_href = html.escape(url, quote=True)\n    safe_text = html.escape(display_name, quote=True)\n    return f'<a href=\"{safe_href}\">{safe_text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 475,
+    "output_tokens_details": {
+      "thinking_tokens": 180
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

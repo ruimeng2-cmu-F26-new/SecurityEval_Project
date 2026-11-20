@@ -1,0 +1,46 @@
+```python
+import re
+from urllib.parse import urlsplit, urlunsplit
+
+_UNSAFE_CHARS = re.compile(r"[\x00-\x1f\x7f\\]")
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Only same-site relative paths are returned. Anything that could send the
+    user to another origin (absolute URLs, protocol-relative "//host" URLs,
+    backslash tricks, control characters, non-path schemes) falls back to "/".
+    """
+    if not next_url:
+        return "/"
+
+    candidate = next_url.strip()
+    if not candidate:
+        return "/"
+
+    # Browsers strip tabs/newlines and treat backslashes like slashes, which
+    # can turn a harmless-looking path into a cross-origin redirect.
+    if _UNSAFE_CHARS.search(candidate):
+        return "/"
+
+    if not candidate.startswith("/") or candidate.startswith("//"):
+        return "/"
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return "/"
+
+    if parts.scheme or parts.netloc:
+        return "/"
+
+    if not parts.path.startswith("/"):
+        return "/"
+
+    return urlunsplit(("", "", parts.path, parts.query, parts.fragment))
+```

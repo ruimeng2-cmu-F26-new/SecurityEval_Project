@@ -1,0 +1,31 @@
+from urllib.parse import urlparse, urljoin
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url or not next_url.strip():
+        return "/"
+
+    base = "https://shop.example"
+    resolved = urljoin(base, next_url)
+    parsed = urlparse(resolved)
+
+    # Only allow redirects that stay on the same host (open-redirect protection)
+    base_parsed = urlparse(base)
+    if parsed.netloc and parsed.netloc != base_parsed.netloc:
+        return "/"
+
+    # Reconstruct the path (+ query + fragment) without the scheme/host
+    result = parsed.path
+    if not result:
+        result = "/"
+    if parsed.query:
+        result += "?" + parsed.query
+    if parsed.fragment:
+        result += "#" + parsed.fragment
+
+    return result

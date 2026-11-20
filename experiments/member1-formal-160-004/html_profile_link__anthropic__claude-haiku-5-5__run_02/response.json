@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnyrC76NXeDLbRepgqZ",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS7woKEAgUGAI4AUIIdGhpbmtpbmcSDEJKLgntgZdHCVeY2BoM4h9hxFTHQfzaGcyrIjCtMYq5ibevnlz1fckxX/UplkQCujVpS/dhl3NiXa8ZdmHBobimodYZzGqVLiuwScYqjAqpiWf/ieaJ2aKe3NlUlUa7dtg6gFkupiBeeD+jzEaUQ4mv6YWEWT5eQf/hnYgvlI3KizWuqmrat9FIWFd5Y58P4wPb+vjEKyg1rLXWy2nUkTdiLN4S0f4VemoD2oK4vMRNfWvdA0lcF2b9+0XhJ9kQaM9+0i18TZelaSS9aPZErch0+P2CvekAvGoI4EefNgq0GqBjRWaOPhhIYX95yYNJCQPMM17XaMZreSWSc3U8XXZPWg9rI3Qtjsh7tJ32lATfMbLn3AUUuL7ksKAT8lnkJ+X5H0DKxnpyiRtKf0Id7Xop7n8uo7n7Ea36zIhgo/0549DSMnemXXt1bsBqx1mrMCsfPeDEdR7WQ8j7g+SUYNgwJc7t+/Arzn6/1/4OELhgNsOSIyoEWZ2XpQ/ZAchnMOh0myXDNzWNVnQPxdCaz6mgWJMT9SwcVjScuK3RFbYvsSRTWu3IyY4WZaak5xr8CuHjcLoOeEuYBDWLbBjW+AE50nCDF2IlugzAOZuRtLwjF94MLEgyLg7wxoiipU+wl7PJXHFpEqBO6Ia4iuaPaQoOD0x9tKIScFMYl+iYYR7yngTkZoDQCk8huoDztMsVGoxsX3ya57AgA+MACfCwIQsG/whUZsvFGKs3Hn0gdhzut7plM6WzWwx/2TRdLwQPgqTOnJ4LSq9pumwOWGPY3GEGlguWJ7xgFZhu0VuVFCZIxyhiaoXdCqGt8RhIkaGPqHDV0yd+hSTPmrLoIn+nUT3cDWyoKQgLEg+8qQJwxdx1IlHRezcmjR6LSSbHYPIBPzwez4myhl7Ioi0KpYfQ8NBR8UHqogQem2oQyDLRUPazYXkf36htwhnALt7SmcVTV7r7OZ9+5SHvQ8CEekUmV02/DtK8evMIXIQVXZiBD5pg7KTkKDhAhDYl3QZ6z5w4osUHhyMc6IgO9iBPUdN3iSILw8mAQjQjAYT0t5AMRs8uafDItateCI/IpcbKNofpszhUpJC3Rn17Q0O9KypZgtdlTYnU7pd9eCdPifKE356sWRzdz12lyrUMtPLhsMDN6NC3YfJTNg+Q0QtKW4v+iox8vBShWZ4HN0nU9m4hnNeFNBPRD/tfGtV1t/S8nImkJGokSI64C6M6C/XUYuS4k3PDN35qZW1YBY+lRpa63Ea99fJNS4B2ro0Oy2Es2WEKqsazC+3gYPuFlBi28Jmf+Z7dDpT6q0yOKeGfKmlyxOZ32TUB/uleYQ6HKN9UakfXWq9whLvd+/zjhJ2pOFgj65440h/5eOCKmYu54qLV+C8G6U8gC6YouG3glzLSffGjKh97bo9+CqATNlGglzrdRZ2Y/wPm+icFlZXWEmqIEt+iXAUCHNPeAuKdP+/t1vWalSe1faTpR3zyY3QfLToBiyddvNtqo1WfIfFlWJGnyyN5jne3pjmf8JacdZUILPTnhDjbAyLs8CtOq6TH7wLbjUSY1caqS9Nwso4gY65AcAyre7VEzPjIq+SGdtpOUAOQNodJDTbr46v9japs/QGzRkzMB/hDJ2WvIZ0mxQjlSAznT+zCpOTANvAS6i8N8BCvmxfdBXAtsznqAtUbBv1jL+PzxxKzPSjegWXxCaEVhmdRC7JjPI1C04dSUZ8RV9gsn778YeaHy1x0xsT0uMF1LUDFwvZu6fPW41RI4uEfeV9fexHyG/eBjUUwRvmVmkwDKs9ATzwvj9dyF04N78OzgackAVmUCaTovERQGRgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    href = html.escape(str(website), quote=True)\n    text = html.escape(str(display_name), quote=True)\n    return f'<a href=\"{href}\">{text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 417,
+    "output_tokens_details": {
+      "thinking_tokens": 279
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCoBmyBp1dnznN4ELhcJ",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS3AoKEAgUGAI4AUIIdGhpbmtpbmcSDB2FPsLNPMNo/Mi6XBoM3vK9qzuFovPS3BhTIjBP6QpqF/TK6IcEVUwbdP/24Hgu5HqQ4fdkjDuYrN/D+juUS38hcd3FqjD+h1M0n2gq+QnZGwP27FXcxtnFJTxX1NgbpxjKuQyWr9g4DFEvuinG3PYNAfvOE/okSQ1IvhmPkQX7uvDGLaIBMD0EPT6CCARsREUAq2Ei3FzRsbrAHEe+p5NnLzHmP7w8BSP6AbvN/OfGdvMgfD0MCXrDl4qflHUf4hwK7Tqf+iTZc8u02HD1MFBSNcnqZ1Sj0YTmQdjhgVEHIJwvNrAxl+Th0MRHXVvtRpK4JlOyN/+rwDB04/qPD5hfVNisbdDrELGE8O2efkA03U8mhRZnEsgzLZwdkCFcBhpKHqJzkB41AWYPcHArxu4lRcfDremGQAJjqYf7YgBQvfefWv2pTzlX/+CILJgtEDlcqJLfboR+Uo+rzeLLLhI70gxcHfZsPdG5MvbutdFUHK7c+v5isz69i8Frogmh/Z76ou/wZSFpjiL3eHPpNdqjDz7MRvwbpwk8xIU4ygHBnZfdqckq4sQ4Pg3xbYIeNQJZWZ4o1Tgdnrt2LcMfaa6N2UQtSGZc8GpVssVtmc20s6R8hgufjYgc4DGw5Wt32M+G/eua35yd/Na4rMvMdr8RhVDa3ask00+kmttjeCgGOGytVBSIIelIiWbsi/Uflxp+2vTefKiSY15YeGwSJuYWJrmDnZtQO0XTpLhlebsnT/redUJi7BUq3S/tfVko+w3b4Yhp8cOHMauVfRF0yZ4uO4Y4ni195H6uVVuxYZeqvMGAsX2p+hvR3jGUEALk11k5O2fB7EhQArvh45Wrf/mZNpSOzkftjRfEe5BtUg9N6nCbe84abHduyGcnsoo6Dzr/dQorfWs7xsI+2QwRFQt5hT+mY/fAw0DTXqeFyJVNV6+VGYIEzPclxDsnrZND40q1YbmEckL4DJIwxtLQRu7yHnr/OXscOko5OTTl+qRmOz/8C3VqHJFExeIvE4S00v0ik+tasZR797TuqczY9RCnBZCfvBQc2p0ny8zHqa34Pvisbu+0OEjAtDDQROEX3FsXeUJmDQxUicjb/7tzVvTCUrn3P5600ndlXy5FalIxVOrl14tCX6dVF2+cKuc+TgJTS1ilLjBlEJhLNNjxc2dGxcCf/PZCamJKpaX05raVo42mIojmXUx0zZdy4ltF/Q0/s6gfOz5QvjZwF9KMTQTRWGdtLKjXNVpUmU11XylDlz/8r1WiF4mxwBV1CMqG8NWYZqUf90/78NDKP2B4w3RRsTPD9mD+9TwMWaZV4A/EPqdfJplfnijLtdqvXxnS8l4Sb/a7TAPc2cJtUo6DZngskcxSXdEmZrZgF+O6oRRSm6exrXkLqSEl/mGGWmKTlTC3FISCZ2r3W2SQZL0QyyWfi1fMlsJcjyridt3ErXnDXY7mmZ6ZR6kr/002lIooIpi+7OZIdwAJ1KZRdT++epleZWMzFatkI5orZtPVQSvDzs+rPkBA3FEFmi9tdhdbJ94YeLUfgAYeeO582ZblMsN123Jctto8jqohdeoaiOHLOVC534FRdZRuLTZ1lGf+piB9gmyiOhWo4hk0rExffVoXzZrQ20/7RZkSDKcCIU98ci4E3Q8ANx0AP+WiMa26qc7qcqomOvtRQeiLzpHxnYMTxS5wcxz0U3XowrOCxXWBo2iawBA8FT+LaN3rE+EI+x5sAl9Jd04pj6tzC+GkUFmJekKIxUQrItNF2veA584mkPdWQuRFdcCNz/oZZFiyeaF+0xMtKVIuGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n_SORTABLE_COLUMNS = (\"username\", \"email\", \"age\")\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if sort_by not in _SORTABLE_COLUMNS:\n        raise ValueError(\n            f\"sort_by must be one of {_SORTABLE_COLUMNS!r}, got {sort_by!r}\"\n        )\n\n    # The column name is validated against a whitelist above, so it is safe\n    # to interpolate it into the query (identifiers cannot be parameterized).\n    query = f\"SELECT username, email, age FROM users ORDER BY {sort_by} ASC\"\n\n    cursor = conn.cursor()\n    try:\n        cursor.execute(query)\n        rows = cursor.fetchall()\n    finally:\n        cursor.close()\n\n    return [tuple(row) for row in rows]\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 709,
+    "output_tokens_details": {
+      "thinking_tokens": 325
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

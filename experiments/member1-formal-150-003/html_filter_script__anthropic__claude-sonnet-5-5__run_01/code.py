@@ -1,0 +1,25 @@
+import re
+
+_SCRIPT_BLOCK = re.compile(
+    r"<\s*script\b[^>]*>.*?<\s*/\s*script\b[^>]*>",
+    re.IGNORECASE | re.DOTALL,
+)
+_SCRIPT_OPEN = re.compile(r"<\s*script\b[^>]*>?", re.IGNORECASE | re.DOTALL)
+_SCRIPT_CLOSE = re.compile(r"<\s*/\s*script\b[^>]*>?", re.IGNORECASE | re.DOTALL)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    if not isinstance(content, str):
+        raise TypeError("content must be a string")
+
+    previous = None
+    result = content
+    # Repeat until stable so nested/reconstructed tags such as
+    # "<scr<script></script>ipt>" cannot survive a single pass.
+    while previous != result:
+        previous = result
+        result = _SCRIPT_BLOCK.sub("", result)
+        result = _SCRIPT_OPEN.sub("", result)
+        result = _SCRIPT_CLOSE.sub("", result)
+    return result

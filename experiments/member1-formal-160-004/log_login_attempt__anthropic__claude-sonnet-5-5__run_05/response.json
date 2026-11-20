@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCoPMoxyu8a3rdX3j719",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS/wsKEAgUGAI4AUIIdGhpbmtpbmcSDC1iYW0YrC8iy3rTIxoMmgoZtr6FFcy4z8hmIjDgAf2eiIgE6XM54f//2mIAmvsPuUmcmtFCsXTg+xvxQKB8PMu5VbjWWb3OH8kGxSQqnAsvM4FBpYtnxLGr82kZNhCjSF7IDuHQ06XVW/mIZ2Sso7zd5Aj3ZecB1ecg4iu4neQhujJ9RIxs9DSI8YPtcjquwvGDCTQ1UmfufKeeZouyDKjphNIYkiKlQT8YguvMo7KDnrni/kBmvum5biZj/z+ycSZkGCJ8yegJUbPfqEaElRBdoE0gwqzlcyPpfcO8jQuxtQR3zjXjJ1EcLKO/GQzQTGD3l+I9mMWm5iIdpFYbuPYxQPVJD7yivl8GLFUVHkZvt+E2Rfh5sh9P+AIMcyOxK8heFAmCec5QjuEqLSoQts9JKXWEOm+KzOD77KIXHsVlaZ1zii/qTFu7mYiT870e70FkBWqQ9AUcG/Sjk+FcanMCxZal8qqhJQHZHY6MiFIMZ7JGnWkyXcLE735mhxOnCWO3uckT1UnH+lPIhNalzW34ZOYcfwA9tC7wO82kvPwESLnaYiJykSOOkFvwbfpUt9LLEjTHJc4LEv8eZOoeuyND3rZ2BbeiWuj1vs3dnqm+S8Ln6Im+Nn2sA8SxBQfjMe7pOLTdl94L4PgBcEMnhKG/iq8EebgeDJYna08oiQU/n+U/2AdyKgIaObYbDM3FJWLnx+1BB8X8PerR2ELEaEy9MnQFfdWvoJOnlWU5DG5yHOYqEoVoToefGdg8puQ2cCFR/Aqip5zPS/eF28CntU4HZmNNOerpqlkT5vDMi3GHqE2T55qwmoxAOnyDrcD1uOlo47u1aBenBPCLmAyBpWEXxUQuGOsYu/cUPD6KMGgtxDLkOCFlvufzcK4oI2AXqDD/5APjAZly4mPX+HCuivG66mSRWBcNPDXKUT1MYq2NUyGvx44ci+qoDFthAzn0hCkAqx59QS05g2Sg8JDrdDCmx+0d5PwUwEdbj1JcPPxuv4yynel70+AdRQ2BxWtb51Y4xchrF45kVh6mdTWBB6BvRant8YxKbGkXKsFMiGtmc/bJmHpDVKGVVsXfBACeaAbeifyKaREZGs4EWUCimLvQVRNQ2T08vVtLPZjGOWH1gLJP1cSYQK5+ezU5VTa7QEjyHC/kjEHplQNXzSu0Pr2VgS9dZ1pJ2cqrvjjnV141UVLT7iJ/rEWWRUArfpXvs4NughN9s8cfi9vJiqMI/nnrNUXm7RMIOV/SLIfg7Bg9Uaxz9vwi4U1jUxGB3VVSmME8NSS55+g1Y6dKRLm9Vxhp+YUpltoCKHdqhWP3AiKo4oDUdc2yacla1f1XjWpPpGEBcEbsaoQAeb5yLvwyhxZJZLGyDAeS/C+BG7qRXTntLrfKd6KLYm7raWAGBDFvHo4XHxx06XrneN1e5fAYjwr4WGSPhBc0hLH9aRgeMGuoth9/smrv/tQBpoMGpTOJM/XmAFlCLij8rWZOzKfqxFVbaChhlsGnAdfpQ3re4Dl6/8fOCT/BAv5VZq3jGG7MqkE32tSaI/GmA7HNoG62MpiujPbPTxcflfIV2ShCNjUGToiS7yYb8Grp6O2SKJ09C9zanvS76E95xie8IH43LlV4zikoJOSwyjo51eGFQZscbNrR5HekFZ8cneyskeaWVbz8VA7Ao2lu3WXP7EbjLgjZk0gkzkzP9k6HpCNQI29pKr8AoXFPnyYVd6JGdnx/Dwt2fBAgmlHvdbVWwjKdR2QQkNpHU8SmBSnVY4XZMUMC0P85fH3Jmdj5a7GCXw6/2y1c+2C2yirmJfDKDRTytcaffwhfNRCzafT8I6iS/r216lGeqxmxwVH0NhBhPoAwzO4b1pmEaZ9+PQSd4HEXuwD6rXRPObZlK1PMNFas+IiC/sQHvb2RnhSQ/Kf9oA5Cu6RaR01soK07Z0YGUg17fi97/vzh6tlN6Zqd34wWfVbBXaKJWiXjsV11W/xHdGu9RauDsXD4utUxc91CSDL9J1WfEi2PpqLpvVGAXRgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import logging\n\n\ndef _sanitize_for_log(value: str) -> str:\n    \"\"\"Escape control and line-breaking characters to prevent log forging.\"\"\"\n    out = []\n    for ch in str(value):\n        code = ord(ch)\n        if ch == \"\\\\\":\n            out.append(\"\\\\\\\\\")\n        elif code < 32 or code == 127 or 0x80 <= code <= 0x9F or ch in (\"\\u2028\", \"\\u2029\"):\n            if ch == \"\\n\":\n                out.append(\"\\\\n\")\n            elif ch == \"\\r\":\n                out.append(\"\\\\r\")\n            elif ch == \"\\t\":\n                out.append(\"\\\\t\")\n            elif code <= 0xFF:\n                out.append(\"\\\\x%02x\" % code)\n            else:\n                out.append(\"\\\\u%04x\" % code)\n        else:\n            out.append(ch)\n    return \"\".join(out)\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n\n    Control characters in the username are escaped so that attacker-supplied\n    input cannot inject additional log lines.\n    \"\"\"\n    message = \"Failed login for user: \" + _sanitize_for_log(username)\n    logger.log(logging.INFO, message)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 154,
+    "output_tokens": 733,
+    "output_tokens_details": {
+      "thinking_tokens": 307
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

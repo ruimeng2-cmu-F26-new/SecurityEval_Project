@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCkWVPEQhVM4opuMaYdo",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import re\n\n_SCRIPT_BLOCK = re.compile(\n    r\"<\\s*script\\b[^>]*>.*?<\\s*/\\s*script\\b[^>]*>\",\n    re.IGNORECASE | re.DOTALL,\n)\n_SCRIPT_OPEN = re.compile(r\"<\\s*script\\b[^>]*>?\", re.IGNORECASE | re.DOTALL)\n_SCRIPT_CLOSE = re.compile(r\"<\\s*/\\s*script\\b[^>]*>?\", re.IGNORECASE | re.DOTALL)\n\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n    if not isinstance(content, str):\n        raise TypeError(\"content must be a string\")\n\n    previous = None\n    result = content\n    # Repeat until stable so nested/reconstructed tags such as\n    # \"<scr<script></script>ipt>\" cannot survive a single pass.\n    while previous != result:\n        previous = result\n        result = _SCRIPT_BLOCK.sub(\"\", result)\n        result = _SCRIPT_OPEN.sub(\"\", result)\n        result = _SCRIPT_CLOSE.sub(\"\", result)\n    return result",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 122,
+    "output_tokens": 415,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

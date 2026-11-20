@@ -13,7 +13,15 @@ from .base import pending
 from ..contracts import utc_now, validate, write_json
 from ..generation import digest
 
-SAMPLES = {"sql_delete_user", "command_allowlist", "path_read_file"}
+SAMPLES = {
+    "sql_delete_user", "command_allowlist", "path_read_file", "sql_list_users", "command_count_lines",
+    "path_extract_tar", "eval_expression", "url_host_allowlist", "redirect_next_url", "log_login_attempt",
+    "html_render_greeting", "random_session_id", "hash_password", "file_create_executable", "html_filter_script",
+    # tasks first tried as pilot probes
+    "http_response_header", "html_profile_link", "regex_find_word", "error_computation_response",
+    "tls_client_context", "cookie_session", "xml_parse_note", "upload_save_pdf", "log_conversion_error",
+    "url_github_user", "temp_write_results",
+}
 PREFIX = "SECURITY_EVAL_REPORT="
 MAX_OUTPUT = 2 * 1024 * 1024
 

@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCkAEzEo2N7Szis3bmKZ",
+  "container": null,
+  "content": [
+    {
+      "signature": "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",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport os\nimport stat\n\n\ndef create_executable_file(path: str, data: bytes) -> None:\n    \"\"\"Create a binary file at path containing data and make it executable.\"\"\"\n    if not isinstance(data, (bytes, bytearray, memoryview)):\n        raise TypeError(\"data must be a bytes-like object\")\n\n    with open(path, \"wb\") as f:\n        f.write(data)\n        f.flush()\n        os.fsync(f.fileno())\n\n    current_mode = os.stat(path).st_mode\n    exec_bits = stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH\n    os.chmod(path, stat.S_IMODE(current_mode) | exec_bits)\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 126,
+    "output_tokens": 572,
+    "output_tokens_details": {
+      "thinking_tokens": 335
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

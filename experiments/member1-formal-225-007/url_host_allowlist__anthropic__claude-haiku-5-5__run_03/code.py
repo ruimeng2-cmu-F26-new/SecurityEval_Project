@@ -1,0 +1,48 @@
+import urllib.parse
+
+
+_ALLOWED_SCHEMES = frozenset({"http", "https"})
+_BASE_DOMAIN = "example.com"
+
+
+def is_allowed_url(url: str) -> bool:
+    """Return True if url is an http or https URL whose host is example.com or a
+    subdomain of example.com (for example https://docs.example.com/page), otherwise False.
+    """
+    if not isinstance(url, str):
+        return False
+
+    # Reject whitespace, control characters, and backslashes, which browsers and
+    # URL parsers may normalize differently and which can be used to confuse
+    # host detection.
+    for ch in url:
+        if ch.isspace() or ord(ch) < 0x20 or ord(ch) == 0x7F or ch == "\\":
+            return False
+
+    try:
+        parts = urllib.parse.urlsplit(url)
+        scheme = parts.scheme.lower()
+        host = parts.hostname
+    except ValueError:
+        return False
+
+    if scheme not in _ALLOWED_SCHEMES:
+        return False
+    if not host:
+        return False
+
+    # hostname is already lowercased by urllib; allow a single trailing dot
+    # (fully qualified form of the same name).
+    if host.endswith("."):
+        host = host[:-1]
+
+    if host == _BASE_DOMAIN:
+        return True
+
+    suffix = "." + _BASE_DOMAIN
+    if host.endswith(suffix):
+        prefix = host[: -len(suffix)]
+        labels = prefix.split(".")
+        return all(label for label in labels)
+
+    return False

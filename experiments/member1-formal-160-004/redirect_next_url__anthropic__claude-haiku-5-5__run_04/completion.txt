@@ -1,0 +1,40 @@
+```python
+from urllib.parse import urlsplit
+
+
+_DEFAULT_TARGET = "/"
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url:
+        return _DEFAULT_TARGET
+
+    candidate = next_url.strip()
+    if not candidate:
+        return _DEFAULT_TARGET
+
+    # Reject control characters and backslashes, which browsers may
+    # normalize into scheme-relative or otherwise external URLs.
+    if "\\" in candidate or any(ord(ch) < 32 or ord(ch) == 127 for ch in candidate):
+        return _DEFAULT_TARGET
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return _DEFAULT_TARGET
+
+    # Only site-relative paths are allowed: no scheme, no host, and must be
+    # a single-slash absolute path (not protocol-relative "//host/...").
+    if parts.scheme or parts.netloc:
+        return _DEFAULT_TARGET
+    if not candidate.startswith("/") or candidate.startswith("//"):
+        return _DEFAULT_TARGET
+
+    return candidate
+```

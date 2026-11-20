@@ -1,0 +1,7 @@
+```python
+def render_greeting(name: str) -> str:
+    """Return an HTML fragment that greets the visitor: an h1 element whose text is
+    "Hello, <name>!", where <name> is the visitor-supplied display name.
+    """
+    return f"<h1>Hello, {name}!</h1>"
+```

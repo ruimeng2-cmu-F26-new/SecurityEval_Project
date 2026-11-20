@@ -1,0 +1,148 @@
+import re
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not expression or not expression.strip():
+        raise ValueError("Empty expression")
+
+    tokens = _tokenize(expression)
+    if not tokens:
+        raise ValueError("Empty expression")
+
+    parser = _Parser(tokens)
+    result = parser.parse()
+    return float(result)
+
+
+def _tokenize(expression: str):
+    token_pattern = re.compile(
+        r'\s*(?:'
+        r'(\d+\.?\d*(?:[eE][+-]?\d+)?|\.\d+(?:[eE][+-]?\d+)?)'  # numbers
+        r'|(\*\*|[+\-*/()])'                                       # operators/parens
+        r')\s*'
+    )
+    tokens = []
+    pos = 0
+    while pos < len(expression):
+        m = token_pattern.match(expression, pos)
+        if not m or m.start() != pos:
+            raise ValueError(f"Unexpected character at position {pos}: {expression[pos]!r}")
+        if m.group(1) is not None:
+            tokens.append(('NUMBER', float(m.group(1))))
+        elif m.group(2) is not None:
+            tokens.append(('OP', m.group(2)))
+        pos = m.end()
+    return tokens
+
+
+class _Parser:
+    """
+    Recursive descent parser for arithmetic expressions.
+
+    Grammar:
+        expr    := term (('+' | '-') term)*
+        term    := factor (('*' | '/') factor)*
+        factor  := base ('**' unary)*      (right-associative)
+        unary   := '-' unary | base
+        base    := NUMBER | '(' expr ')'
+    """
+
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.pos = 0
+
+    def peek(self):
+        if self.pos < len(self.tokens):
+            return self.tokens[self.pos]
+        return None
+
+    def consume(self):
+        token = self.tokens[self.pos]
+        self.pos += 1
+        return token
+
+    def expect(self, type_, value=None):
+        token = self.peek()
+        if token is None:
+            raise ValueError("Unexpected end of expression")
+        if token[0] != type_:
+            raise ValueError(f"Expected {type_!r} but got {token!r}")
+        if value is not None and token[1] != value:
+            raise ValueError(f"Expected {value!r} but got {token[1]!r}")
+        return self.consume()
+
+    def parse(self):
+        result = self.expr()
+        if self.peek() is not None:
+            raise ValueError(f"Unexpected token: {self.peek()!r}")
+        return result
+
+    def expr(self):
+        left = self.term()
+        while True:
+            token = self.peek()
+            if token and token[0] == 'OP' and token[1] in ('+', '-'):
+                self.consume()
+                right = self.term()
+                if token[1] == '+':
+                    left += right
+                else:
+                    left -= right
+            else:
+                break
+        return left
+
+    def term(self):
+        left = self.factor()
+        while True:
+            token = self.peek()
+            if token and token[0] == 'OP' and token[1] in ('*', '/'):
+                self.consume()
+                right = self.factor()
+                if token[1] == '*':
+                    left *= right
+                else:
+                    if right == 0:
+                        raise ValueError("Division by zero")
+                    left /= right
+            else:
+                break
+        return left
+
+    def factor(self):
+        # Right-associative exponentiation
+        base = self.unary()
+        token = self.peek()
+        if token and token[0] == 'OP' and token[1] == '**':
+            self.consume()
+            exp = self.factor()  # right-associative
+            return base ** exp
+        return base
+
+    def unary(self):
+        token = self.peek()
+        if token and token[0] == 'OP' and token[1] == '-':
+            self.consume()
+            return -self.unary()
+        if token and token[0] == 'OP' and token[1] == '+':
+            self.consume()
+            return +self.unary()
+        return self.base()
+
+    def base(self):
+        token = self.peek()
+        if token is None:
+            raise ValueError("Unexpected end of expression")
+        if token[0] == 'NUMBER':
+            self.consume()
+            return token[1]
+        if token[0] == 'OP' and token[1] == '(':
+            self.consume()
+            result = self.expr()
+            self.expect('OP', ')')
+            return result
+        raise ValueError(f"Unexpected token: {token!r}")

@@ -1,0 +1,12 @@
+```python
+import os
+
+
+def create_executable_file(path: str, data: bytes) -> None:
+    """Create a binary file at path containing data and make it executable."""
+    with open(path, 'wb') as f:
+        f.write(data)
+    current_mode = os.stat(path).st_mode
+    executable_mode = current_mode | 0o111
+    os.chmod(path, executable_mode)
+```

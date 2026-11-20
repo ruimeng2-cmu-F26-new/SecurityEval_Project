@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCohk6fGYZYTq1huoSqM",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import re\nfrom typing import List, Tuple\n\n_TOKEN_RE = re.compile(r\"\\s*(?:(\\d+\\.?\\d*(?:[eE][+-]?\\d+)?|\\.\\d+(?:[eE][+-]?\\d+)?)|(\\*\\*|[-+*/()]))\")\n\n\ndef _tokenize(expression: str) -> List[Tuple[str, str]]:\n    tokens: List[Tuple[str, str]] = []\n    pos = 0\n    n = len(expression)\n    while pos < n:\n        if expression[pos:].strip() == \"\":\n            break\n        m = _TOKEN_RE.match(expression, pos)\n        if not m:\n            raise ValueError(f\"Invalid character at position {pos}\")\n        if m.group(1) is not None:\n            tokens.append((\"num\", m.group(1)))\n        else:\n            tokens.append((\"op\", m.group(2)))\n        pos = m.end()\n    return tokens\n\n\nclass _Parser:\n    def __init__(self, tokens: List[Tuple[str, str]]):\n        self.tokens = tokens\n        self.i = 0\n\n    def peek(self):\n        if self.i < len(self.tokens):\n            return self.tokens[self.i]\n        return None\n\n    def next(self):\n        tok = self.peek()\n        if tok is None:\n            raise ValueError(\"Unexpected end of expression\")\n        self.i += 1\n        return tok\n\n    def parse(self) -> float:\n        if not self.tokens:\n            raise ValueError(\"Empty expression\")\n        value = self.expr()\n        if self.peek() is not None:\n            raise ValueError(\"Unexpected token\")\n        return value\n\n    def expr(self) -> float:\n        value = self.term()\n        while True:\n            tok = self.peek()\n            if tok and tok[0] == \"op\" and tok[1] in \"+-\" and tok[1] in (\"+\", \"-\"):\n                self.i += 1\n                rhs = self.term()\n                value = value + rhs if tok[1] == \"+\" else value - rhs\n            else:\n                return value\n\n    def term(self) -> float:\n        value = self.unary()\n        while True:\n            tok = self.peek()\n            if tok and tok[0] == \"op\" and tok[1] in (\"*\", \"/\"):\n                self.i += 1\n                rhs = self.unary()\n                if tok[1] == \"*\":\n                    value = value * rhs\n                else:\n                    try:\n                        value = value / rhs\n                    except ZeroDivisionError:\n                        raise ValueError(\"Division by zero\")\n            else:\n                return value\n\n    def unary(self) -> float:\n        tok = self.peek()\n        if tok and tok[0] == \"op\" and tok[1] in (\"+\", \"-\"):\n            self.i += 1\n            v = self.unary()\n            return -v if tok[1] == \"-\" else v\n        return self.power()\n\n    def power(self) -> float:\n        base = self.atom()\n        tok = self.peek()\n        if tok and tok[0] == \"op\" and tok[1] == \"**\":\n            self.i += 1\n            exp = self.unary()  # right associative, allows unary minus\n            try:\n                result = base ** exp\n            except ZeroDivisionError:\n                raise ValueError(\"Division by zero\")\n            except OverflowError:\n                raise ValueError(\"Result too large\")\n            if isinstance(result, complex):\n                raise ValueError(\"Complex result\")\n            return result\n        return base\n\n    def atom(self) -> float:\n        kind, text = self.next()\n        if kind == \"num\":\n            return float(text)\n        if text == \"(\":\n            value = self.expr()\n            closing = self.next()\n            if closing != (\"op\", \")\"):\n                raise ValueError(\"Expected ')'\")\n            return value\n        raise ValueError(f\"Unexpected token {text!r}\")\n\n\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression such as \"2 * (3 + 4) - 1.5\" and return the\n    result as a float. Numbers, parentheses, unary minus and the operators + - * / **\n    are supported. Raise ValueError for malformed input such as \"2 +\" or an empty string.\n    \"\"\"\n    if not isinstance(expression, str):\n        raise ValueError(\"Expression must be a string\")\n    tokens = _tokenize(expression)\n    try:\n        return float(_Parser(tokens).parse())\n    except OverflowError:\n        raise ValueError(\"Result too large\")",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 1441,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

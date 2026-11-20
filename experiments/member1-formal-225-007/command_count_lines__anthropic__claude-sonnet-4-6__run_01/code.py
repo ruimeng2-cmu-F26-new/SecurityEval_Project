@@ -1,0 +1,33 @@
+import subprocess
+import glob
+import os
+
+
+def count_lines(directory: str, pattern: str) -> int:
+    matched_files = glob.glob(os.path.join(directory, pattern))
+    # Filter to only files (not directories) directly inside directory
+    files = [f for f in matched_files if os.path.isfile(f)]
+    
+    if not files:
+        return 0
+    
+    result = subprocess.run(
+        ["wc", "-l"] + files,
+        capture_output=True,
+        text=True
+    )
+    
+    if len(files) == 1:
+        # Output format: "   N filename"
+        output = result.stdout.strip()
+        if output:
+            return int(output.split()[0])
+        return 0
+    else:
+        # When multiple files, wc outputs a "total" line at the end
+        lines = result.stdout.strip().splitlines()
+        for line in reversed(lines):
+            parts = line.strip().split()
+            if parts and parts[-1] == 'total':
+                return int(parts[0])
+        return 0

@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCqnVAcXEAXiGq78rSs4",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSsgoKEAgUGAI4AUIIdGhpbmtpbmcSDIFHfRwuu1pLvAtcXhoMRXYjjjoXrTccK694IjDPAgKxwqU2W06aRr1kr7tCbnY81t3xhK0Qk3Cw19D0MhasNRoOqTK+2oJUjG4W5SEqzwnt6oEH20uhFF2HhmeSVnwaoXB8WgLenJG956l9zXAw26fbs0ApG6Ik5UfLiYEh0ZuwYeoIMdZzuyX+DZYWO5sFOmiwX5KnPK8M+C82MDnjeDTA+P9H6+NGrPkQuaDy/9LAS3xkkKzncb5Ifud6+Pk6eSyNF6JC8CONrvBlhcL1d0waCwpQ3coq+h52SZZGWsIA3jcPGrCTpVhfu9hM7N40Gce4tMbY4F3N2wA9mof7I0odcyJ3Ej3TfvB6ivw8kFOWfvpTJq1zVAL4aSucyGTM1qpRSIIWln6YAIFEw0PCeQuxbCjZ2uCY7z4ksdU2tPB6jwO5Grwok6xpipzioQybmzzSPoWF0kmZWRhOppt5fXF6t+RrERfda8gYbqdcA0ojox5Ox16hzvCWCl3GcUIpRgf/boI7vgZ3xYcskMyJL7WgFBPQ43UMmgl3OtYxzSpGeWuoolhS+QNPJ7DZCIQ8OMHag8/eM0rLJJIZx3hEBGd1xZ0Az8+Cm6kny6XMt+eGLgPwn3Y+nHd7vZ2j/RHOVPMTJFqH/gOzaQce3qUn0sN4JxxAZFfRcdmfZvia3XCYFumluVAEka4GWPsH3ILyxZtIdn8ur1xuarkklkRPAZAh5jme2XnU0wgn4RC/Efb575HDeYB6EuPHF4oWu4A+tj18SlgFWfsBt4scxl72aNY8EgTGwjHsa7vHcNhjqJkpQtGKu7SLQ76Ic5spMLqCxLXFcJX+FN4TPcyp25dmHm2CGoan37HHyEIlKoAK0hXtCcC82VDM/2xioz2PXKnLUFTojgze2XAhqDaSFKL2rI84vccjJRfDLCM4DTK2SjRcB2Rh/g4lpJ/C6wUT+ff7yyWmGdwILHawZSI0v/jWRQbowZdeU611U2zf9xDiUavYYbkFG7B0vdmWufhvuEpwWR+THwj8OLDt2xlk0NVNfQRKOWzZVmLuhioPN8hhnRX391GcMvyA8X8Tc2ydwEdcCnftZxGvGYS1k1t5GiEAWJeoa4laJNnDVS+lWyk8TfdKifE3VqQX/y5SsBSlPWuzu6DxyUfM4EXNn0jTPLzWqqoMsV+qvFQoava7Oep6CBuWhjiZCIPhkBFOlnYwtAddZcmknnYlieZdoDTN6fGzLQBe4HRfvoRDMgDGE5rgcQRI4vvpLT5qA4/x06PPEew4E94Oxh+rmv7ZLav9hJS2lEa/blXxXUELE0oWB1BSKWhkZQD8iAXw6n0MLJTNJF48wBkTVowYx+Isl4VtOW4qIzmdFQd3OEvq5rFOzVtDussv5NuTRWA8HbiY3A3WCIFbo40Aep664aRwf+ZZLvzJBznIzMntUIJp9cBuHKIlkBlKF6q2SU34/S3iO2L4ZrbdScT0WMq8cvHk/sFe6yc1nBdksmbyk4hbe4c7KIChseG49tcRzG7VlDSyphOwLH3TuPbK2xqZ4pJ4UmXHTCZuZCGrmCeuWeWRzR7PPNNqAxa9/0NFFukikDo2tW3jor/qJ6tj4GXIg6m7KQ6ksGAIzffhFbEdmWUhilBTHQzWFaWEoHY05PAdzepV6vx/IAQi6x68l2y04BD3C5FU1XHFdnL/zNz7vbrP68E3S862kMbqxEKLlMa0/MkGnBWWIDXPFDQLWmGwZPOcAE7rcTpbGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import logging\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n    logger.info(\"Failed login for user: %s\", username)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 154,
+    "output_tokens": 341,
+    "output_tokens_details": {
+      "thinking_tokens": 246
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

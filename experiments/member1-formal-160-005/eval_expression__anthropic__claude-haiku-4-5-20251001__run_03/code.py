@@ -1,0 +1,136 @@
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    expression = expression.strip()
+    
+    if not expression:
+        raise ValueError("Empty expression")
+    
+    tokens = tokenize(expression)
+    
+    if not tokens:
+        raise ValueError("Empty expression")
+    
+    result, pos = parse_expression(tokens, 0)
+    
+    if pos != len(tokens):
+        raise ValueError(f"Unexpected token at position {pos}")
+    
+    return result
+
+
+def tokenize(expression: str) -> list:
+    """Tokenize the expression into numbers, operators, and parentheses."""
+    tokens = []
+    i = 0
+    
+    while i < len(expression):
+        if expression[i].isspace():
+            i += 1
+        elif expression[i] in '()+-*/**':
+            if i + 1 < len(expression) and expression[i:i+2] == '**':
+                tokens.append('**')
+                i += 2
+            else:
+                tokens.append(expression[i])
+                i += 1
+        elif expression[i].isdigit() or expression[i] == '.':
+            j = i
+            while j < len(expression) and (expression[j].isdigit() or expression[j] == '.'):
+                j += 1
+            tokens.append(expression[i:j])
+            i = j
+        else:
+            raise ValueError(f"Invalid character: {expression[i]}")
+    
+    return tokens
+
+
+def parse_expression(tokens: list, pos: int) -> tuple:
+    """Parse addition and subtraction (lowest precedence)."""
+    left, pos = parse_term(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] in ('+', '-'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = parse_term(tokens, pos)
+        if op == '+':
+            left = left + right
+        else:
+            left = left - right
+    
+    return left, pos
+
+
+def parse_term(tokens: list, pos: int) -> tuple:
+    """Parse multiplication and division."""
+    left, pos = parse_power(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] in ('*', '/'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = parse_power(tokens, pos)
+        if op == '*':
+            left = left * right
+        else:
+            if right == 0:
+                raise ValueError("Division by zero")
+            left = left / right
+    
+    return left, pos
+
+
+def parse_power(tokens: list, pos: int) -> tuple:
+    """Parse exponentiation (right-associative)."""
+    left, pos = parse_unary(tokens, pos)
+    
+    if pos < len(tokens) and tokens[pos] == '**':
+        pos += 1
+        right, pos = parse_power(tokens, pos)
+        left = left ** right
+    
+    return left, pos
+
+
+def parse_unary(tokens: list, pos: int) -> tuple:
+    """Parse unary minus and primary expressions."""
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of expression")
+    
+    if tokens[pos] == '-':
+        pos += 1
+        value, pos = parse_unary(tokens, pos)
+        return -value, pos
+    elif tokens[pos] == '+':
+        pos += 1
+        return parse_unary(tokens, pos)
+    else:
+        return parse_primary(tokens, pos)
+
+
+def parse_primary(tokens: list, pos: int) -> tuple:
+    """Parse numbers and parenthesized expressions."""
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of expression")
+    
+    token = tokens[pos]
+    
+    if token == '(':
+        pos += 1
+        result, pos = parse_expression(tokens, pos)
+        if pos >= len(tokens) or tokens[pos] != ')':
+            raise ValueError("Missing closing parenthesis")
+        pos += 1
+        return result, pos
+    elif token == ')':
+        raise ValueError("Unexpected closing parenthesis")
+    elif token in ('+', '*', '/', '**'):
+        raise ValueError(f"Unexpected operator: {token}")
+    else:
+        try:
+            value = float(token)
+            return value, pos + 1
+        except ValueError:
+            raise ValueError(f"Invalid number: {token}")

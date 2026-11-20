@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnvgikwghxkS9wS4Hmf",
+  "container": null,
+  "content": [
+    {
+      "signature": "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",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport logging\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n    logger.info(f\"Failed login for user: {username}\")\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 154,
+    "output_tokens": 435,
+    "output_tokens_details": {
+      "thinking_tokens": 334
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCobizGVjs9i7UBrAucn",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "from urllib.parse import urlsplit\n\n_SITE_HOST = \"shop.example\"\n\n\ndef get_redirect_target(next_url: str) -> str:\n    \"\"\"Return the location to redirect a user to after login on https://shop.example.\n\n    Only same-site relative paths (or absolute URLs on shop.example) are\n    honored; anything else falls back to \"/\" to prevent open redirects.\n    \"\"\"\n    if not next_url or not isinstance(next_url, str):\n        return \"/\"\n\n    candidate = next_url.strip()\n    if not candidate:\n        return \"/\"\n\n    # Reject control characters and backslashes (browsers treat \"\\\" like \"/\").\n    if any(ord(c) < 32 or ord(c) == 127 for c in candidate) or \"\\\\\" in candidate:\n        return \"/\"\n\n    try:\n        parts = urlsplit(candidate)\n    except ValueError:\n        return \"/\"\n\n    if parts.scheme or parts.netloc:\n        # Allow only absolute https URLs pointing at this site.\n        if parts.scheme == \"https\" and parts.hostname == _SITE_HOST and parts.port in (None, 443) \\\n                and not parts.username and not parts.password:\n            path = parts.path or \"/\"\n            result = path\n            if parts.query:\n                result += \"?\" + parts.query\n            if parts.fragment:\n                result += \"#\" + parts.fragment\n            return result\n        return \"/\"\n\n    # Relative reference: must be an absolute path on this site, not\n    # protocol-relative (\"//evil.com\").\n    if not candidate.startswith(\"/\") or candidate.startswith(\"//\"):\n        return \"/\"\n\n    return candidate",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 187,
+    "output_tokens": 530,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

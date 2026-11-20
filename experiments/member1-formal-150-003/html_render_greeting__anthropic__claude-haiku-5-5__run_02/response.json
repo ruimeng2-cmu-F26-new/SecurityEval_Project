@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCk6tizyeLDVqvD5Vj6c",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSgAcKEAgUGAI4AUIIdGhpbmtpbmcSDFLkn5vdDBUxkCvtxRoMrtSh1SdVchyfSTWNIjB+QTmqFbdO8L7uuyIsfeXePhKcx1o+gUr5wA99mL+0vTeWXtGIiRqRJJni9NamUYgqnQY7FkPgqJ+t7UuH11RtsOzz3aWhl9a2qdij1uPUtt1NYGAQZUhm6cHYDjdHhbgWyxcQZ/w3rVhAttdIq3Hz0yrKgTW6PymcrB8dDTuHD5/ANIsMqCxSCDe3+HnwEZxlMJSqrImudN1Ty5kRz4OX2ieUL+bs/+aao6kJVEPD5ZEv9nw3xZLAeaE+RBvmDVww/p0Cp0jjt+kiMG7SUuErlxPmovJo+SATLPujZEhfkD3YO/5xGSDMX8hssJdfV458ByliU21Q7/GHqQsMhG67dQHGs+pcyUtfYYqCnOXLJCMVGw7D76gxxSQH+qbpSVUkgdP5mGShXyoM1xYt0c5t2sv5dE7HsQLSHHlt7ehrGyqEVr3XkjPeBVcvjY9pwqOX9cICE8+4NoJzEx6zBYQnEJCNdFyowl/emDM7fhs3sNuZoJu7qIfOWiLIn0C5q/tUfeGgtqPR6FJXsa0Q8eZUSqAgxrxokB3YlvjhBLj1G2G/aucMtbHTAQeYOumEIYJQE7gegL+tfUrTPH1tN1Q15tOob0eYCyLNP3ubPwyA2S4YF75SG+CNhRYbFo6Idfk7yxTMYH3N9dpmmqRg0/Oqrdsn+HrEpzo/Vzoh6hiMpLhui5OJLKjl30Lu12Eim3veCr/iCF/xmZelGQesSEXq1wlXsxYekNllmHbOf16aKhVoSxapezy4jqyYWDm8AD24T9ukSVOT6FcWl0LRE7kPNbv+2Y35ZIvD8KA4hiZSO96Wo+SegNwnysEDKe4pWImlQR5HSGv9Z7STzq9mX7G38VqGxHkPMgCCKglooRhiSoRduTxCTgwqUzjZBiL+b4DRfCLUYuJEXZthGQYoALkhJdLS+Uvyj9bhAKFSUZYQe2M3ULuiyR+FmwkphSv98lvgS1GT17WshvJN6FL0tH2L3E0RxpQpSugRETYW/b/iDKxSbrt9qp7E9O1sB9ZWzRw7PKNRfmMlPjCCV4JeO1LZVTqQRc5xGWsTpca/xZRv3RVM98w8P+g4J+Xbh2qj7qGNDZc0bDf1167h6VJPIedYoqTWnFPeSS1T1ti9ALSTHhgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import html\n\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    safe_name = html.escape(str(name), quote=True)\n    return f\"<h1>Hello, {safe_name}!</h1>\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 224,
+    "output_tokens_details": {
+      "thinking_tokens": 98
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}
