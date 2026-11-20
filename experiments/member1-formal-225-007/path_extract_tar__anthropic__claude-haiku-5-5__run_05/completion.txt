@@ -1,0 +1,74 @@
+```python
+import os
+import tarfile
+
+
+def _is_within(base: str, path: str) -> bool:
+    """Return True if path is base itself or located beneath base."""
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        return False
+
+
+def _validate_member(member: tarfile.TarInfo, dest_real: str) -> None:
+    name = member.name
+
+    if not name or "\0" in name:
+        raise ValueError(f"Invalid member name: {name!r}")
+    if os.path.isabs(name) or name.startswith(("/", "\\")):
+        raise ValueError(f"Absolute path in archive: {name!r}")
+
+    target = os.path.realpath(os.path.join(dest_real, name))
+    if not _is_within(dest_real, target):
+        raise ValueError(f"Path escapes destination directory: {name!r}")
+
+    if member.isdev():
+        raise ValueError(f"Device file not allowed: {name!r}")
+
+    if member.issym():
+        link = member.linkname
+        if not link or "\0" in link:
+            raise ValueError(f"Invalid symlink target for {name!r}")
+        if os.path.isabs(link):
+            raise ValueError(f"Absolute symlink target for {name!r}: {link!r}")
+        link_base = os.path.dirname(target)
+        link_target = os.path.realpath(os.path.join(link_base, link))
+        if not _is_within(dest_real, link_target):
+            raise ValueError(f"Symlink escapes destination directory: {name!r}")
+
+    elif member.islnk():
+        link = member.linkname
+        if not link or "\0" in link:
+            raise ValueError(f"Invalid hardlink target for {name!r}")
+        if os.path.isabs(link):
+            raise ValueError(f"Absolute hardlink target for {name!r}: {link!r}")
+        link_target = os.path.realpath(os.path.join(dest_real, link))
+        if not _is_within(dest_real, link_target):
+            raise ValueError(f"Hardlink escapes destination directory: {name!r}")
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination is not an existing directory: {dest_dir!r}")
+
+    dest_real = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        members = tar.getmembers()
+
+        # Validate every member before extracting anything, so that a malicious
+        # entry anywhere in the archive is rejected without partial extraction.
+        for member in members:
+            _validate_member(member, dest_real)
+
+        extra_kwargs = {}
+        if hasattr(tarfile, "data_filter"):
+            # Defense in depth on Python versions that support extraction filters.
+            extra_kwargs["filter"] = "data"
+
+        tar.extractall(path=dest_real, members=members, **extra_kwargs)
+```

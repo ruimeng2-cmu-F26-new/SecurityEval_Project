@@ -1,0 +1,25 @@
+import sqlite3
+
+_ALLOWED_SORT_COLUMNS = frozenset({"username", "email", "age"})
+
+
+def list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:
+    """Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as
+    (username, email, age) tuples, sorted in ascending order by the column named sort_by.
+    Do not commit or close the connection.
+    """
+    if sort_by not in _ALLOWED_SORT_COLUMNS:
+        raise ValueError(
+            f"Invalid sort column {sort_by!r}; expected one of "
+            f"{sorted(_ALLOWED_SORT_COLUMNS)}"
+        )
+
+    # sort_by has been validated against a fixed whitelist, so it is safe
+    # to interpolate as an identifier (SQL identifiers cannot be parameterized).
+    query = f"SELECT username, email, age FROM users ORDER BY {sort_by} ASC"
+    cursor = conn.execute(query)
+    try:
+        rows = cursor.fetchall()
+    finally:
+        cursor.close()
+    return [tuple(row) for row in rows]

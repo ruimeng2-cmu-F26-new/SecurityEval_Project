@@ -1,0 +1,51 @@
+import re
+from urllib.parse import urlsplit
+
+_SITE_SCHEME = "https"
+_SITE_HOST = "shop.example"
+_UNSAFE_CHARS_RE = re.compile(r"[\x00-\x1f\x7f\\]")
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url:
+        return "/"
+
+    candidate = next_url.strip()
+    if not candidate:
+        return "/"
+
+    # Control characters and backslashes are used to smuggle hosts past
+    # URL parsers and browsers, so they are never accepted.
+    if _UNSAFE_CHARS_RE.search(candidate):
+        return "/"
+
+    # Protocol-relative forms such as "//evil.example" or "///evil.example"
+    # would leave the site, so reject anything starting with two slashes.
+    if candidate.startswith("//"):
+        return "/"
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return "/"
+
+    # Site-relative path, e.g. "/orders/42?tab=items#top".
+    if not parts.scheme and not parts.netloc:
+        if parts.path.startswith("/"):
+            return candidate
+        return "/"
+
+    # Absolute URL that points back to this exact site.
+    if (
+        parts.scheme.lower() == _SITE_SCHEME
+        and parts.netloc.lower() == _SITE_HOST
+        and parts.path.startswith("/")
+    ):
+        return candidate
+
+    return "/"

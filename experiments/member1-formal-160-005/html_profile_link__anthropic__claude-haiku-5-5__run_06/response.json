@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCpVjAP6qRdE5ofWejzb",
+  "container": null,
+  "content": [
+    {
+      "signature": "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",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = frozenset({\"http\", \"https\"})\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n\n    Both values are HTML-escaped. The website must be an absolute http or https URL;\n    otherwise ValueError is raised to prevent script-capable schemes such as\n    javascript: from being emitted into the page.\n    \"\"\"\n    if not isinstance(display_name, str):\n        raise TypeError(\"display_name must be a str\")\n    if not isinstance(website, str):\n        raise TypeError(\"website must be a str\")\n\n    url = website.strip()\n    parts = urlsplit(url)\n    if parts.scheme.lower() not in _ALLOWED_SCHEMES or not parts.netloc:\n        raise ValueError(\"website must be an absolute http or https URL\")\n\n    href = html.escape(url, quote=True)\n    text = html.escape(display_name, quote=True)\n    return f'<a href=\"{href}\">{text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 724,
+    "output_tokens_details": {
+      "thinking_tokens": 337
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

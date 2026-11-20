@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmh7iR3ok7Gsxx41pMG",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS0AgKEAgUGAI4AUIIdGhpbmtpbmcSDAunI1JiIPD9fuVDqxoMPSITs8bkkVcxaHcvIjDDNWAZkfu/5ggfM774rc8KszlJ4hrbcm69uDgAPkxF6nCOkzIYFhAa6rU1hB/mBacq7Qcm2VMgaV5H9IpstC3rdET76EtaOMX/KwVG10ImXWFT1mF/gQ0ClucOZLbbVKnAZrfd9HNE+Ka+UjwTFPIwk7C62nJqjhsQME5Wiq0NlmFdlgv3JGGNA9i7l3QgimeQfoKGPDAXvglGsiMnslpzBH18ayzRF89YrHBrrqPlRXcQ8pHGNA3zmTnMT/3xMQletCEi5QP5HvES8cfJbxn6x9FjsuKigB1cEMcmjY7Rbl0QJmomlnyCy76IK3jOXb9YbH3lAmPWnpGdTJVIl9nvH0lmXU4oFh7upy7NIVeLzE4iDtDeqOdptK44tldAKUG71XvmbwNapSH8kYD6guU3dv22rHGtIi1ke7huX+CXglDA7W7QiSQCOfaigogJX4ufdJCJoV2TZCFiQOwN+B8hn7q53BBtKpm/rGj/6QZXsmwgXDXyauJlFprBm0vaYvFZPfNXwqlqlCG12JbpmumoavyMTiUXWOEa05tOxmazcxsLqQ0m2YOE+gNtyCL+Uq8xC+p/yw0xs+dmY/U5+wJfeMbKIyL4CDbyyydGrLo/zfFo0g9f0hn9YBCpy3Xsr+jsMnDsHnh8x5fyeGNkHLfMeFWzZIDwI20MYxXsK1rh++18WV1JIJQrKkZ10hRzOwGm7KKLJS7xwB6MJ289zBxNkkIS+kBTEANl1B/PYSN8e1tO68TWhBFV3y+pJ0DAo3bB67Bp1TpDFZPfiA28W3G2O4hJlbW8ifUmm+0YS/wp9hneta+jHfGO61MIzWyUyiZRPsnuBAIfM5zpSlevcwoRlN5OI6YkEgcWJf9hBL75V9fdqRTo3TJ+r1Y0n4ReChd/PeVjlkgmmlXAJqtH3e6kx5eKp6CsCuOYI00hwe3Xt1iWZcCFszM0fIDjHFiXNZopidxBjgcMbOYnC/sKB7B2XLhAXL+vAFndBLNFMXRi6ZhdwYoRDdYkQJmq8YqRK9U/Zd6KhU/Ns6rWMvK1Qg2kzZqCVvtdruOdoLxYRSddL6OnEcxdd/Zfq6nzwXWey6myw/K1GiThia6SyKvI3VpAXgQ+2A9967dDennhaEQKAUaxn751xTvhZoLcSxZxOtF18FNMU7iu4rKrKfsjzKkZXk4t5f0ovH+P27utpM6PkTlDy6ZFZG3ky8OqnFrqvzCHccMkz2CQQ2fSx+H30dopgaQTO0kBWZT8myoGZBPIUeoZckivxl0HTz3risx3XDsouqAdZScuwjuS8Ppnoa7Q2KseuQgfVyWZ/yHfmHvqLnHhnUrHZvqQkJBVjHud0flLHdLUHoaE4Tx8jNaxbqztxPgeRyCydu4yK2JlCmIX1doawBMOWwDOk4lTRzryjf4YAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom urllib.parse import quote\n\n\ndef build_user_api_url(user_id: str) -> str:\n    \"\"\"Return the GitHub REST API URL from which the profile of the user with the given\n    user_id is retrieved: https://api.github.com/users/<user_id>.\n    \"\"\"\n    return f\"https://api.github.com/users/{quote(user_id, safe='')}\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 319,
+    "output_tokens_details": {
+      "thinking_tokens": 197
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

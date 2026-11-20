@@ -1,0 +1,24 @@
+import html
+import re
+from urllib.parse import urlsplit
+
+
+_CONTROL_OR_SPACE = re.compile(r"[\x00-\x20\x7f]")
+_ALLOWED_SCHEMES = frozenset({"http", "https"})
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    # Browsers ignore ASCII control characters and whitespace inside URL schemes,
+    # so strip them before inspecting the scheme to avoid disguised schemes
+    # such as "java\tscript:".
+    normalized = _CONTROL_OR_SPACE.sub("", website)
+    scheme = urlsplit(normalized).scheme.lower()
+    if scheme and scheme not in _ALLOWED_SCHEMES:
+        raise ValueError(f"Unsupported URL scheme in website: {scheme!r}")
+
+    safe_href = html.escape(website, quote=True)
+    safe_text = html.escape(display_name, quote=True)
+    return f'<a href="{safe_href}">{safe_text}</a>'

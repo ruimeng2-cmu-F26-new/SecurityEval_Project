@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmhEoZRPjGGgaHsqR1o",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS8AgKEAgUGAI4AUIIdGhpbmtpbmcSDFc//JEszaxtHoFCyRoMIL/KBcBpUIQPr1s5IjB56k2XIk1mL/geU5ypXpKmMtzvBbWTTCkCCSXU+qPP42W5aZCTbs2ENfw9hR6n2mIqjQgKlZKNq85gdNIvCXeGNYraj87ZOtDbSSB+93njbnE/EnZ2PPxiV+AkkoYWSm8pwgAAEHdkunNuuEO2/bJoWlJP9g5RVKG8u2sHi9FhYtY7yzQj83HpHQkdpTOW8B+u31irV6z48Q851MfmdJkR3meLInUPv16Uf9y02ui09+jmCPeR7VS2HqRP1RBZtEG87ygNaZaiMxTPgB3Aw0i8DeIpiHVR4FeDV4/FfWq7mEvZv+C6xMhgIgj/XMEpgbNuwNkRhysI8RAcsTrGu5Aflj9QHOOaNx/ezRwKCaej+4K4zPuunlvwSEnk9LztD5uEisvUwbYFuLQ3pY5P9GpiipJCAkdDFlqKJSj9r5aAm+EDUKcHHYWd4RlnGIiroLVinTl/mLhfIsJVqepJ7AljdT26tVEWUQR9sc9NQ4x87uViWmaLRGQISJ3nPBW8vh1QBtHJ4J7SvxT0xxcccJYJOfoi6WwBh1QUKpWwJTQPA66gBmHIjJyHTvy84stcD4igd0sgiTdRTOrf3YAkkfAxMKuBTzcFXsRpF4s72ZQWln7I3R+k8+Dp/2pjcYd0H5L+NPzDTn2cUujN/MtDCmAsIyKLa6QTaN8YkFi2myXlSiLslKSA1YMMsbOcKmPjglbX4yB1KtAQXdkElyplmO9L3A/ljertBvpCfl/eN5T2CHwUw/ukVCTwMnb/6Rj6+vG9R9QAbFbifN6emub4bmFCYSaSA0aOxqf2tcqKuex7tSlMFGxh+TXw8ATHYGNeZsJS73wbrUXoOENeCheSZmke4aL973OaRcMG9M8Mvx5thsKjPq1ts8Jot9RfPaL+ZakuQW5pUgMIxhSdETMzkDJWGBHr8nQi1cROS908hPPqdpW0EJIEau2R2//I35G3nnUK6BxsK2E6ZgBSfSiWUPkivXC2OParjvBPtWV5s9fis7WQDT7fE5Ks3iJs/qIWYcQwxSCqkHFcZ7E/GL2WCjw22coaCIc/EWwMqL0RifLEw3+dkxBS62zPQVF8h/pChDudYm2k2mu+vvSpz9xoaxOJ5+Zw+fcTCimxFOt1x8XpsZ2cd49X1kGgl3y8fk12YDacpxDUKwu1GDzIldBE5gf2pKIG50WbG6kfJvwEiVwWzxR0FZHL4+WnvN7yqL4u+Q4QCOf3K4lDx14OSu2qF/6Vo+PkcOQxnVzdMotrY1fnXOjFBN/UrBFWaUuQ88uEhKWRLYkJ02r8q8oTKAY+2nHwx23uxnsO4Z4bg3+jNclSYB9dE7kbaYo5P3dvAfdqkxGMHnQc+Q65sFvWmcm4g6zoCXLtmHGjqNqWW5n72rEAz38qqH/J0ohZMjtKA3KNHew2jspcULta2P+G3P5z9S9e2D6QERwZTifelUBCAe4khRgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom urllib.parse import quote\n\n\ndef build_user_api_url(user_id: str) -> str:\n    \"\"\"Return the GitHub REST API URL from which the profile of the user with the given\n    user_id is retrieved: https://api.github.com/users/<user_id>.\n    \"\"\"\n    return f\"https://api.github.com/users/{quote(user_id, safe='')}\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 319,
+    "output_tokens_details": {
+      "thinking_tokens": 197
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

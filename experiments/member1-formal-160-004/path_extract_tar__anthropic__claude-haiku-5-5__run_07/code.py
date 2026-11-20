@@ -1,0 +1,63 @@
+import os
+import tarfile
+
+
+def _is_within(base: str, path: str) -> bool:
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        # Raised on Windows when paths are on different drives
+        return False
+
+
+def _check_member(member: tarfile.TarInfo, dest_root: str) -> None:
+    name = member.name
+
+    if not name or os.path.isabs(name) or name.startswith(("/", "\\")):
+        raise tarfile.OutsideDestinationError(member, dest_root)
+
+    target = os.path.realpath(os.path.join(dest_root, name))
+    if not _is_within(dest_root, target):
+        raise tarfile.OutsideDestinationError(member, target)
+
+    if member.isdev():
+        raise tarfile.SpecialFileError(f"Device file refused: {name!r}")
+
+    if member.issym():
+        link = member.linkname
+        if not link or os.path.isabs(link) or link.startswith(("/", "\\")):
+            raise tarfile.AbsoluteLinkError(member)
+        link_target = os.path.realpath(
+            os.path.join(os.path.dirname(target), link)
+        )
+        if not _is_within(dest_root, link_target):
+            raise tarfile.LinkOutsideDestinationError(member, link_target)
+
+    elif member.islnk():
+        link = member.linkname
+        if not link or os.path.isabs(link) or link.startswith(("/", "\\")):
+            raise tarfile.AbsoluteLinkError(member)
+        link_target = os.path.realpath(os.path.join(dest_root, link))
+        if not _is_within(dest_root, link_target):
+            raise tarfile.LinkOutsideDestinationError(member, link_target)
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination is not an existing directory: {dest_dir!r}")
+
+    dest_root = os.path.realpath(dest_dir)
+    use_filter = hasattr(tarfile, "data_filter")
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        for member in tar:
+            # Validate each member immediately before extraction so that
+            # symlinks extracted earlier cannot be used to escape dest_root.
+            _check_member(member, dest_root)
+            if use_filter:
+                tar.extract(member, path=dest_root, filter="data")
+            else:
+                tar.extract(member, path=dest_root)

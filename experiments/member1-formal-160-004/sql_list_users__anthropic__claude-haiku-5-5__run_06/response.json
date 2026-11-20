@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCoBycBebeCKQQgCjKFK",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS2wcKEAgUGAI4AUIIdGhpbmtpbmcSDMIq7k5CVRXRCigcrRoMdov1mPS9wiSXtbGQIjBbxXMqGf9hwRsDRGpfEEYeM1WLcbhN1cEQ3uXRB07Es7hIAFa/cpnmskqgq6ahdQkq+AYZ1K3LrUXXr8bIKCbODmnurDqOB9/K6zMLfR5AbSpnITHrWvAW9Mrtgvx4XKPtNW6YLbYT8CPScyUwBZP9BFuBjfNlO+wTluxh5VAG0i/qyZW1/8h4k8k/yO7T8c86PbqjJjYfSNgMx6mdIOpS2GXYmp6I2Ed8fK3SAPnvQbHltymVh0HUHLWkoo/skEBdath6XDYYY0R/Pfg4f4BQtPap7OSRG5Xio6LMI7pGoNeda7pMZeek8e5aV99FikACy8ucuT/3sXRo60mTLOocm/hV3m4tR+VBgqAk6bXjL6ahOkuc7p0ysJrTASvPrMoThH2bsnAmgCrE3K3HPG3yjJNd00/5ZO5bTqwDwwACZn+NXXMybHMr9tC9Lp61uEAi6rFQmQ2Mv3XTymb/KHLAc8ki61vD4ORsBQmxiH+XrVDgrqmRyo7EAu4F2ti319RtTngUiurQ4jvQmIE3YBiDDdLzunRSYdmQCbPhb4zb73Wq6iSYpIUDNotptkrt7HWoDWu1nvS16q3eQZ3tgqH9ona9YQwUxXOd4QK58LhHJIOuawVAGKDkrN50h7jVV1as2gztNkMb7T6gqfTfwuqNOq4ALwSNkAmWrqJg9xDeQdsEBT/c0xlao4l43c9ppehHho/Hbsp1/X4ltYZUEolOiasGSUmz+jXOgXrZXbP463XmMOrte8thu+kFqmpEIM6u2boo4aE8Q5aFc24/0gu07JvNwWL/8m5uAB5n74i0KIeRRFz75PcCqNSdILGWSnXP5hxTwbniGfrW7GSOVevK70ZOURaFN1RMFUxynB/2GzGQDCngl3EV6dNF26IoBoS15tYZdo4p/jyNYPyAlK3FZwSp/W3KbhN/YH0GvKnNcFD0GdZQGQNDoV9sZwbj+6svo/lhdb0s1L/hhvmEF/dNV72uW5eMCCPSGQf5Qt52HzJwojCmM5YDe06UQ6CZ1vC/uu8Ybs7N8f1LhQn8aX/WBZY3nGYxrg8R5PODJdExl5QzMM3pBuXVfgM2U7KoGyFEnRcyHHJsB5ad7ZBeroRsXfQty2AOjbyxozkLuQOxxgAfeuwrEu1sqjOH1OCP0Bh0H8e1pCpWVrGVzfV93GCLOOsOZS7YrcagbK3dqmRs6pi0ZAV2Dqag6KAkLBZMYZ0cIdAAOfKiplMKIgEP1liCTdAsSh+MIsYcjzwYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n_ALLOWED_SORT_COLUMNS = (\"username\", \"email\", \"age\")\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if sort_by not in _ALLOWED_SORT_COLUMNS:\n        raise ValueError(\n            f\"Invalid sort_by column {sort_by!r}; expected one of {_ALLOWED_SORT_COLUMNS}\"\n        )\n\n    # Column names cannot be bound as parameters, so the value is restricted to a\n    # fixed whitelist above before being interpolated into the query.\n    query = (\n        \"SELECT username, email, age FROM users \"\n        f\"ORDER BY {sort_by} ASC, username ASC, email ASC, age ASC\"\n    )\n    cursor = conn.cursor()\n    try:\n        cursor.execute(query)\n        rows = cursor.fetchall()\n    finally:\n        cursor.close()\n    return [tuple(row) for row in rows]\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 567,
+    "output_tokens_details": {
+      "thinking_tokens": 145
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

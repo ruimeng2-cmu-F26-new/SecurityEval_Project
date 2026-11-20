@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCmnTae8XQPCw9jA9FNh",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\nimport re\nimport uuid\n\n\n_MAX_NAME_LENGTH = 200\n\n\ndef _sanitize_filename(filename: str) -> str:\n    if not isinstance(filename, str):\n        raise TypeError(\"filename must be a string\")\n\n    # Normalize path separators and keep only the final component.\n    name = filename.replace(\"\\\\\", \"/\").split(\"/\")[-1]\n    # Remove control characters and null bytes.\n    name = re.sub(r\"[\\x00-\\x1f\\x7f]\", \"\", name)\n    # Replace characters that are problematic on common filesystems.\n    name = re.sub(r'[<>:\"|?*]', \"_\", name)\n    name = name.strip().strip(\".\")\n    name = name.strip()\n\n    if not name:\n        raise ValueError(\"invalid filename\")\n\n    stem, ext = os.path.splitext(name)\n    if ext.lower() != \".pdf\":\n        stem = name\n        ext = \".pdf\"\n    else:\n        ext = \".pdf\"\n\n    stem = stem.strip().rstrip(\".\")\n    if not stem:\n        raise ValueError(\"invalid filename\")\n\n    if len(stem) > _MAX_NAME_LENGTH:\n        stem = stem[:_MAX_NAME_LENGTH]\n\n    # Avoid Windows reserved device names.\n    if stem.split(\".\")[0].upper() in {\n        \"CON\", \"PRN\", \"AUX\", \"NUL\",\n        *(f\"COM{i}\" for i in range(1, 10)),\n        *(f\"LPT{i}\" for i in range(1, 10)),\n    }:\n        stem = \"_\" + stem\n\n    return stem + ext\n\n\ndef save_pdf_upload(upload_dir: str, filename: str, data: bytes) -> str:\n    \"\"\"Save an uploaded PDF document: write data to a file in the existing directory\n    upload_dir under the client-supplied filename, and return the path of the saved file.\n    \"\"\"\n    if not isinstance(data, (bytes, bytearray, memoryview)):\n        raise TypeError(\"data must be bytes-like\")\n    if not os.path.isdir(upload_dir):\n        raise NotADirectoryError(upload_dir)\n\n    safe_name = _sanitize_filename(filename)\n    base_dir = os.path.realpath(upload_dir)\n    stem, ext = os.path.splitext(safe_name)\n\n    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL\n    if hasattr(os, \"O_NOFOLLOW\"):\n        flags |= os.O_NOFOLLOW\n    if hasattr(os, \"O_BINARY\"):\n        flags |= os.O_BINARY\n\n    candidate = safe_name\n    attempt = 0\n    while True:\n        path = os.path.join(base_dir, candidate)\n        # Ensure the resolved path stays inside the upload directory.\n        if os.path.dirname(os.path.realpath(path)) != base_dir:\n            raise ValueError(\"invalid filename\")\n        try:\n            fd = os.open(path, flags, 0o600)\n            break\n        except FileExistsError:\n            attempt += 1\n            if attempt > 100:\n                candidate = f\"{stem}_{uuid.uuid4().hex}{ext}\"\n            else:\n                candidate = f\"{stem}_{attempt}{ext}\"\n\n    try:\n        with os.fdopen(fd, \"wb\") as f:\n            f.write(data)\n    except BaseException:\n        try:\n            os.unlink(path)\n        except OSError:\n            pass\n        raise\n\n    return path",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 172,
+    "output_tokens": 1167,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

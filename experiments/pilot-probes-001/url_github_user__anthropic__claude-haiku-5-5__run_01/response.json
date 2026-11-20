@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmgytsC7789ftW7Rmg8",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS4QkKEAgUGAI4AUIIdGhpbmtpbmcSDKPrNyK63FA0WbtGJhoMtj1LLlpj/ghhC8TiIjAaLvicRZUlMoX0kEIuS2t3eOMKJEfWGevgxsopMOIgMAuCYvW3IfWtf/hdwx6TcwIq/gjEguNmRPJ5zED8u3Aw9F4gAN2qTDkXgI7Uo8mQ7sWxB5ur+NLz+q2NUJG+CG7Z0+NC4ka7+36HC0J0HAREm1b898M/xvB3MLnuTPBESzkMeaglB7bock7L5HCxG6fuz9h4gmP5+TnjeQ3A2j6HTNCZqHLL+0fRJZ3o4SvQtBkQ0LQYy6i8mC1vsiIxaWOtg1/k9JR0g8cnKilsg2+VW/Tpu7a1G8Xyj20TSpIwCWAnCl5Duf3NdVt1iL/j747uShhdKtV+F7RwlfASKH/JEXth9e1BQm+GUch0NvcxXJfyWZvrz8Dk0O59pWxuzD0fz1BltALkKiWh0EeoSEGtvmue30EEo7cwwSdGiu1ir15KaT5SglSvfz2j6HT536IhHkGx14oS62V9XFExyzA3Dwq7WlzIMD7NTcbQL/4Bex4ivEeet76szZ6y7rK04I1ykM1R/gDOQfHLnWrcqwVKeJqiTDrhtmhgc2gjTnbFj+V6xfV2/EGIlqJcSYy1dmk7hIKUNRICUS96GoaH5CW04sIPHrJUJ252JJ/a0MH/GzBRlle8KG1pNLqKIxW6RUg/wMoG3uajUcu/gIpDTYbjpL2gaeaK40uSztxrZytd8qepwW4cr/e0oRUQ/HYDn5JwRsZrPEoCL8xk43IX4QHqNb1UNpVoyqvfG4OmzIjS2LZ7XfnXmUySf/sUrG1nOpC2edJLjZj8tZHJAp+JPMeaf7q2zjoX3ozVQbsiPBmrZTAnQNaLmGp9ygN6IFgLDc48NCMtL9cCZs9HVwNeRoQNnjMnSOtv85qRChXCLQLkjOt7m5NWGryd4vVEG+95O4gob7i0biwBR4G0fE89S9t8EADe6spWFBHFDe8LRHdDGtBugQc+xThwJCha8GtZxW2s/IjPrc8yohKdixWYqN0rBq/IHzaWWymjhAqNtOXgMjnoTKapGugDPRvf7eRAHmsNNbAA0B0gRYlJK0/Fe5361B4NFVspO/2Fcyi3O+4ES6G3puv5f218uZsZJP6v7MKhCC7cBO7fLDyjtPjsNC6fV3opDnVEY8wnYeqThYoHxRSxN+d9A+lEr++LlMYEockDTaRjiTL+xv6Rn6UdlLmYKj8HsvT5gAfGQFVhQE1R03S1zKCIZ4U3WJAmCaiym3HQwMhsG7hWVHxMt6Z1MtmczEwZ2VS30m3tZ+yI1jGCUgMyAwT5Kehy9MzQi6HCv1KSs89p7dsZi2geUpHvGjdnT5o6/pgUll3nDNE9mcohjFORPHozf4r6/ssVm5DXKQuFd/yH/0FLwZO+YjUvYD9iAiVuZ8fEbcmR8SuYmR/8+g9IiEK38NjrrFWLBiLX5p27/siiZpIMJY0OqIkUzN4LbHyi8Q0Ir56q3vuQ+gV9oJzwc90RIp9P8p1fHIN0zWO5BbqFjIATNDDVR8yR4m4YUYRqyTKOE1vAOFJRExYvgbDUywFqNVXGgNnimHADTs4cUI9m9kiBPP8+vwet0eXdesn5RWqaG9AMsToUB81Vwy8ClvBPosMdrMLwk6BQ57H1GAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom urllib.parse import quote\n\n\ndef build_user_api_url(user_id: str) -> str:\n    \"\"\"Return the GitHub REST API URL from which the profile of the user with the given\n    user_id is retrieved: https://api.github.com/users/<user_id>.\n    \"\"\"\n    return f\"https://api.github.com/users/{quote(user_id, safe='')}\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 349,
+    "output_tokens_details": {
+      "thinking_tokens": 227
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

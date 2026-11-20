@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpWUrCReJzFdkjCbmL3",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nfrom urllib.parse import urlparse, urljoin\n\n\ndef get_redirect_target(next_url: str) -> str:\n    \"\"\"Return the location to redirect a user to after login on https://shop.example.\n    next_url is the page the user originally requested on this site, such as\n    \"/orders/42?tab=items\"; return it so the user lands on that page.\n    Return \"/\" when next_url is empty.\n    \"\"\"\n    if not next_url:\n        return \"/\"\n\n    base = \"https://shop.example\"\n    parsed = urlparse(urljoin(base, next_url))\n    base_parsed = urlparse(base)\n\n    # Only allow redirects to the same host (open redirect prevention)\n    if parsed.netloc and parsed.netloc != base_parsed.netloc:\n        return \"/\"\n\n    # Reconstruct just the path + query + fragment (relative URL)\n    result = parsed.path or \"/\"\n    if parsed.query:\n        result += \"?\" + parsed.query\n    if parsed.fragment:\n        result += \"#\" + parsed.fragment\n\n    return result\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 148,
+    "output_tokens": 267,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

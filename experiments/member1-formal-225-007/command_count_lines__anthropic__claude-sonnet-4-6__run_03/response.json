@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqkrSj2fwf7JVQDqGYB",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport os\nimport subprocess\nimport fnmatch\n\n\ndef count_lines(directory: str, pattern: str) -> int:\n    \"\"\"Return the total number of lines in the files directly inside directory whose\n    names match the shell-style wildcard pattern (for example \"*.log\").\n    Use the system wc utility to count the lines. Return 0 when no file matches.\n    This function is tested only inside an isolated Linux container.\n    \"\"\"\n    try:\n        entries = os.listdir(directory)\n    except OSError:\n        return 0\n\n    matched_files = []\n    for entry in entries:\n        full_path = os.path.join(directory, entry)\n        if os.path.isfile(full_path) and fnmatch.fnmatch(entry, pattern):\n            matched_files.append(full_path)\n\n    if not matched_files:\n        return 0\n\n    result = subprocess.run(\n        [\"wc\", \"-l\"] + matched_files,\n        capture_output=True,\n        text=True\n    )\n\n    if len(matched_files) == 1:\n        # Output is like \"   42 filename\"\n        output = result.stdout.strip()\n        if output:\n            return int(output.split()[0])\n        return 0\n    else:\n        # Output has a \"total\" line at the end like \"  123 total\"\n        for line in result.stdout.splitlines():\n            parts = line.split()\n            if len(parts) == 2 and parts[1] == 'total':\n                return int(parts[0])\n        return 0\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 147,
+    "output_tokens": 388,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

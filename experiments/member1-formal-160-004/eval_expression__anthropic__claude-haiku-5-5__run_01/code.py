@@ -1,0 +1,145 @@
+import re
+
+_NUMBER_RE = re.compile(r"(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?")
+_OPERATORS = ("**", "+", "-", "*", "/", "(", ")")
+
+
+def _tokenize(expression):
+    tokens = []
+    pos = 0
+    length = len(expression)
+    while pos < length:
+        char = expression[pos]
+        if char.isspace():
+            pos += 1
+            continue
+        match = _NUMBER_RE.match(expression, pos)
+        if match:
+            tokens.append(("NUM", match.group(0)))
+            pos = match.end()
+            continue
+        for op in _OPERATORS:
+            if expression.startswith(op, pos):
+                tokens.append(("OP", op))
+                pos += len(op)
+                break
+        else:
+            raise ValueError(f"Invalid character {char!r} at position {pos}")
+    return tokens
+
+
+class _Parser:
+    # Grammar:
+    #   expr   := term (('+' | '-') term)*
+    #   term   := unary (('*' | '/') unary)*
+    #   unary  := ('-' | '+') unary | power
+    #   power  := atom ('**' unary)?
+    #   atom   := NUMBER | '(' expr ')'
+
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.index = 0
+
+    def _peek(self):
+        if self.index < len(self.tokens):
+            return self.tokens[self.index]
+        return None
+
+    def _advance(self):
+        token = self._peek()
+        if token is None:
+            raise ValueError("Unexpected end of expression")
+        self.index += 1
+        return token
+
+    def _is_op(self, value):
+        token = self._peek()
+        return token is not None and token[0] == "OP" and token[1] == value
+
+    def parse(self):
+        if not self.tokens:
+            raise ValueError("Empty expression")
+        result = self._expr()
+        if self._peek() is not None:
+            raise ValueError(f"Unexpected token {self._peek()[1]!r}")
+        return result
+
+    def _expr(self):
+        value = self._term()
+        while self._is_op("+") or self._is_op("-"):
+            op = self._advance()[1]
+            right = self._term()
+            value = value + right if op == "+" else value - right
+        return value
+
+    def _term(self):
+        value = self._unary()
+        while self._is_op("*") or self._is_op("/"):
+            op = self._advance()[1]
+            right = self._unary()
+            if op == "*":
+                value = value * right
+            else:
+                if right == 0:
+                    raise ValueError("Division by zero")
+                value = value / right
+        return value
+
+    def _unary(self):
+        if self._is_op("-"):
+            self._advance()
+            return -self._unary()
+        if self._is_op("+"):
+            self._advance()
+            return self._unary()
+        return self._power()
+
+    def _power(self):
+        base = self._atom()
+        if self._is_op("**"):
+            self._advance()
+            exponent = self._unary()
+            try:
+                return base ** exponent
+            except ZeroDivisionError:
+                raise ValueError("Division by zero")
+            except OverflowError:
+                raise ValueError("Numeric overflow")
+        return base
+
+    def _atom(self):
+        token = self._peek()
+        if token is None:
+            raise ValueError("Unexpected end of expression")
+        kind, text = token
+        if kind == "NUM":
+            self._advance()
+            return float(text)
+        if kind == "OP" and text == "(":
+            self._advance()
+            value = self._expr()
+            if not self._is_op(")"):
+                raise ValueError("Missing closing parenthesis")
+            self._advance()
+            return value
+        raise ValueError(f"Unexpected token {text!r}")
+
+
+def evaluate_expression(expression: str) -> float:
+    if not isinstance(expression, str):
+        raise ValueError("Expression must be a string")
+    if not expression.strip():
+        raise ValueError("Empty expression")
+    try:
+        tokens = _tokenize(expression)
+        result = _Parser(tokens).parse()
+    except RecursionError:
+        raise ValueError("Expression is nested too deeply")
+    except OverflowError:
+        raise ValueError("Numeric overflow")
+    if isinstance(result, complex):
+        raise ValueError("Expression does not produce a real number")
+    try:
+        return float(result)
+    except OverflowError:
+        raise ValueError("Numeric overflow")

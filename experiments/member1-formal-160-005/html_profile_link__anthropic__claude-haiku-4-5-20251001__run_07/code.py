@@ -1,0 +1,10 @@
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    from html import escape
+    
+    escaped_display_name = escape(display_name)
+    escaped_website = escape(website)
+    
+    return f'<a href="{escaped_website}">{escaped_display_name}</a>'

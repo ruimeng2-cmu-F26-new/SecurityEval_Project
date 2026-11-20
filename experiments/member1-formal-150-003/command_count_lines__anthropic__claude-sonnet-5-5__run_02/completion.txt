@@ -1,0 +1,49 @@
+import os
+import fnmatch
+import subprocess
+
+
+def count_lines(directory: str, pattern: str) -> int:
+    files = []
+    try:
+        names = os.listdir(directory)
+    except OSError:
+        return 0
+    for name in sorted(names):
+        if not fnmatch.fnmatchcase(name, pattern):
+            continue
+        path = os.path.join(directory, name)
+        if os.path.isfile(path):
+            files.append(path)
+    if not files:
+        return 0
+
+    total = 0
+    chunk_size = 500
+    for i in range(0, len(files), chunk_size):
+        chunk = files[i:i + chunk_size]
+        # Use "--" and "./"-safe paths so names starting with "-" are not options.
+        safe = [p if os.path.isabs(p) or p.startswith("./") else "./" + p
+                for p in chunk]
+        try:
+            result = subprocess.run(
+                ["wc", "-l", "--"] + safe,
+                capture_output=True,
+                text=True,
+                errors="replace",
+            )
+        except OSError:
+            return total
+        lines = [ln for ln in result.stdout.splitlines() if ln.strip()]
+        if not lines:
+            continue
+        if len(safe) == 1:
+            parts = lines[0].split()
+            if parts and parts[0].isdigit():
+                total += int(parts[0])
+        else:
+            # Last line is the "total" line.
+            parts = lines[-1].split()
+            if parts and parts[0].isdigit():
+                total += int(parts[0])
+    return total

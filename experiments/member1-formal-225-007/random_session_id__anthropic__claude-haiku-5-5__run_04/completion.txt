@@ -1,0 +1,7 @@
+import secrets
+
+def generate_session_id() -> str:
+    """Return a new random and unique session ID for a logged-in user, as a string of
+    32 lowercase hexadecimal characters.
+    """
+    return secrets.token_hex(16)

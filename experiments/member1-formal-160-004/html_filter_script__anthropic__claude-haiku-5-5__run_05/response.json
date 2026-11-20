@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCo2E2aJdzrphtUVv9km",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS4QwKEAgUGAI4AUIIdGhpbmtpbmcSDIVzgBlPdiY5Q5ocoBoMc+ecjyvHIqonj8siIjB49ZoEimztJ+dyPk5lHYQ0KK1PTFL2snwR1v04ZhEAo5efHjf9wseXJ5O79pibtLwq/guTColr1GPuCPi0t67Al1kfF9ndCgJUlqMQaTBM0lRCZnYItCPUOlq8uVrIKkBxVESV6gHCUn+jmOsoj+qXMg5d78Df6Gcana1gyEnjFak9hGaTKCoVG1ZfkrDHDUiLl0Z6XKvf1JwLKXz7iYWl5kaAvLnb3/GRvgHIF/8R0mf71HZRH24yJJ3Ez7CkQMOYXX30R3bXOmAYuDR9Dhezfe080+mEZZP4heqCFoDENOFNspNcKgLW3aoL/L806tbLEBLA9sVNK8qLmWazb3E9Fp4c3AGvRHm7acEkQ16Cf99jKUfyIhpIzRZnpE2s79kyswwwXd1RTMPM25Xkmf0+4ZyKWcec1B6Es0CJ/ojZDSUUT/VmWLkoKhwyQOejEpWFHxSP7F1Yt8KiWDKzV6a173wFUV80bhXn7W6tYys2rP8uEpCnhx95km5HyagVTey3M7XbzExuypuIgUdPvv6gOqW0444TU4XZnhpP/jeUAoV48RUrNCDO2KHHMChQnlQtnta4mMMxAhYDMzKCS5IhfFdP5G/yLBq0GUlfnnkxiEK/KX97AgmGUf6VdLjAzBUWJJwIySj7Qx7fZo2gAlrQELDLZSPuz85XloaJvXmzzzfvKBD7E/jTLT3s5IfiH456i8oh6EGmxOmKCvKeMljGqVN+JqHVLEkGFiooGmMZlDZbeXHw+4HkF7s/UXRPKnO4Y/Vw+Lhs+ARkfgDb5MGx2F6GBL98ybD4dNZsDosWSztuKE93K8VcAIi5C0tEQeAE04MFNIch76fwt1jwly3SExE/Cv55YWwiv3MlcdB/cirX2J3ttHq9MaJup3uWJHHPUJYtUlL5oVAbUBz4g6SibvzTvAgYprkr4fUamwFvd+abya6nA1CCrPzyAB029J2oxJzp7cyUW5O/ySur1HXwXTanx0CdctLrRCNkydOd85Nhd96vHRp2F6rZkgqPpOPBBzlrZyx5fBgS/c3ivKDmnNQnYBgQmDFNDAA9wJo5SwphqNgEkIXuM2RRNMutdnab3/fUgTOCCVcFKt1Nr2SFrEOisG5E2b8KE7vqYI8YC3FCU8xy1zY8CHM8MAHMiu/xO01STiLos1+JlQGVPhj7dwH7e29VVtnYiTZVNQLmQohvaV4x8v6qTMNAQQtw3r+6iS1XIID7aIdkyfYDEcC6Fbk05Nzekfo5l7zReHicexCjOzgqJmVqzLnisszDDnjhH0GCCwpAteugSlUX8H2KPNCPC2EYO27nuybqRRjX82EycwYrqSQHdWMGSiRGqPnHe5RWJd1Pb9b480b77DqL3KOhvF/dyTHzb5up3Ii6ET7/Ms7wpGzoF2/K34/iA0WALDhAh5vG1C8B/2j3iDNtSInISfCGWkHbbLEMXbGSWsNlsLeZkwKs60OCDAeJJuVkBcbHmMOZAbEZ7H5O+OkU/M8AHYwdXAMi+2AmcGON+vx6LfBbXGdQoOxzOFLErMo73dNXD6tKlw+3PDJ3cSJzKD+C9DlBzV/SZ6E+81zwe6uMeHTlX/UxIrYEfuTntqna1kAZ1+hn/sAuejnm13b/rUYV7s/TeLAUfVzT58S95hKNvspM/7EKhdlzvVSAXKIqiON0RCpOLnlfndF1j/KxH1jqg5w0LREV8xBR8426mCR0dDcRFUI8J39JtYJZjbJNALNkkz8hH6adgvVeJiMoHo21+bENtE9M+a47zGQTcw6w6mvS4LJL0MyWokY/TqjwmYn1zUCQDKLD82yVCjaRlJUWXAQmdNg9/JTc+pbNHd8Zf6bBQzRQWA8LOFhg1T0mKZsX1XKZmpAF/5B/pjyYemAt2JmarzFvr0eLvTwKk1G7RwK4SwS2FcdDBullnAeSv7Xhowo9lsswcHJ83f0up06W48ihjTfOBK5931bxC6ghWf3EWSvExLfv2ReAPZ/ZdJ3AD/FxZpalAgGJnbCqdmC6FAN/NiefoeiYo+mGbY3emY/BChMyTFNcPQJskn504L1PP9Th2SLQuUpTWKHpA9bRXKbA+x0EdKryzFVyOmINCa+jotK0xH15LgkbVYALGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport re\n\n_SCRIPT_BLOCK_RE = re.compile(\n    r\"<script\\b[^>]*>.*?</script\\s*>\",\n    re.IGNORECASE | re.DOTALL,\n)\n_UNCLOSED_SCRIPT_RE = re.compile(\n    r\"<script\\b[^>]*>.*\\Z\",\n    re.IGNORECASE | re.DOTALL,\n)\n_STRAY_SCRIPT_TAG_RE = re.compile(\n    r\"</?script\\b[^>]*>\",\n    re.IGNORECASE,\n)\n\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n    if not content:\n        return content\n\n    previous = None\n    result = content\n    # Repeat until stable so that constructs such as \"<scr<script>...</script>ipt>\"\n    # cannot reassemble a script tag after removal.\n    while result != previous:\n        previous = result\n        result = _SCRIPT_BLOCK_RE.sub(\"\", result)\n        result = _UNCLOSED_SCRIPT_RE.sub(\"\", result)\n        result = _STRAY_SCRIPT_TAG_RE.sub(\"\", result)\n    return result\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 122,
+    "output_tokens": 778,
+    "output_tokens_details": {
+      "thinking_tokens": 361
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

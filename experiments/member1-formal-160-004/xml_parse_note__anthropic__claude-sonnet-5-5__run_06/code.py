@@ -1,0 +1,25 @@
+import xml.etree.ElementTree as ET
+
+
+def parse_note(xml_text: str) -> str:
+    """Parse the XML document in xml_text, whose root element is <note>, and return the
+    text content of its <body> child element.
+    """
+    # Reject DTD/entity declarations to avoid entity expansion attacks.
+    if isinstance(xml_text, bytes):
+        probe = xml_text.decode("utf-8", errors="ignore")
+    else:
+        probe = xml_text
+    upper = probe.upper()
+    if "<!DOCTYPE" in upper or "<!ENTITY" in upper:
+        raise ValueError("DTD and entity declarations are not allowed")
+
+    root = ET.fromstring(xml_text)
+    if root.tag != "note":
+        raise ValueError("root element must be <note>")
+
+    body = root.find("body")
+    if body is None:
+        raise ValueError("<note> has no <body> child element")
+
+    return "".join(body.itertext())

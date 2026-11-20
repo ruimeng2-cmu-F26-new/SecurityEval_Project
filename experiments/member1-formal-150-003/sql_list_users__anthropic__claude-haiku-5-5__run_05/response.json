@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCjqs2dc2HJL23NB9t8q",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSyQkKEAgUGAI4AUIIdGhpbmtpbmcSDJfUBrFVMoZL1dE2khoMMK4bBNAiEZeFwhogIjBNHjQ/3XKOe2GbjzvH8lUvoKm6H47iu6hIKN197cIqQEz28FhUK563pufTjxpSOw8q5gjPgEFO0wDnXLP/RbNsEuHUKCiWCdxkDD0Za5EqlnnbXR14RggMrMrCPWu78BhUQpi8NKJ60yfvkYoXQzwMQJynYxItYLUNtkll/zSheHnxNQkV5UI2TJGTGXfi/DIlAblc18L3w99TftN205t78irXB784/Ew+4+NWVnIGs9ij8gMWjbuwVfKXS0Z95lthCA+i6mKwcObYMY7BqsrvpfxpD62/L0Mie6bu1NFBLAjNlMTxC8W6d58zUAs3grQ9xJRrHXSCjBnqayQW5KwEmHufGYuz328PPCREAzb054xHlDakMuTfxgwe3B68Smx1QQJ59VU+ReMZ7hdQV8azMTeaM9omqU7b93HIxcPzJ6a21dQo2TamrrpkX76XK0sBJTieGX40lSS5qYoQfF0xMy3UOw26SA3N3tHpI/qpfSiwwXMM5k3Kc8b1Vk2YbFGXAMTAMJVTMXAyu0InywTer481ChGHbcMWSzw1qif62i1vM+5SaYJUe1cpASaZupbMBEvW1v//y5iTd96PvqJEOUWH6l6KIgP+bjUPhPoC1PY/o/UmQfq5tQI+/M/469u4v0tNAHptO0KhkOOJ2E6928f/cFp9q/Az3Cu4NbpkCr9xiXtGUmjkPSxOcAtSGJ+0UT2BxJW8ajZ7WkuZK7yiiNh+IxEGr6n/aKK975FvjZx+T/IMueOjEpk1VUOlM59jttjMTxbVXzAaCHXo+GI2p+ItbwizUcSr8gNH9rjXqqklgapkL/ORXaO1Q8J3af6lYu/zltLxmhkd7KBegs5XnkgUw4G92f1tpp6uXrlTNgs4dGipTuL6s6TJj4NCnneEQDpE3ojytO4CkQXb16IL3FG/4IzrHwUKvjL9QBeEGPnDzY5xpEY8XITENf1L7K78WejPQZFO+P5s4T1cLv5RxEJBOD2AwGl7CR0kiFAHJ9n3Y/z1KYLoE0y4GY4o3t6ila7VD0FmbgXzs8n86IY1O4OzZOtIjTnHHWd1BaV/1jV2aLe5OoBIA0WQSr9wwwNqLRJ8f6YabWiHw0uUFWr/5FPQRh92rxmU6gjY0x6j9whshkE4sykXz98IiT8TF9J0pKJ41ayAD2VgZDPiP0m+WqDBOyqXUyXPpzskKJNj2Ro8+NGqJej8l8H3xIccOxPAMcC1S+yTBDXsvpx4wOjnS2UGYIfXTmZ1mJn8AUM5OwiLxa4Q3c8gObWbO8pI0v5xQY+Sh+GnJPuNxbo9K/W7oAcde41jVa3Sj7PTchZxtERCSsKtAuf5tXCsqzGNeTPWA7mrh87PW1Bq+VFEj5Y6aafmChNIl67MFx/xZRE6qeaA/JxiSmgnwCa3IYze1JZOIiwFt7obFFfeZX4s493EKOzLe6nQFB6FQ78MvLjVgp1zGTSVT6KHsaeypNZcg0qSknP91lbDQRfeimcZsvx6bbch1329wUcU5f5BpDcmIj2hefjF2MRAv22aOj9ir6gtI80MmsNaTCgRGcAsnZpyE9r5w0uvbMk+GAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n_ALLOWED_SORT_COLUMNS = {\n    \"username\": \"username\",\n    \"email\": \"email\",\n    \"age\": \"age\",\n}\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if not isinstance(sort_by, str):\n        raise ValueError(\"sort_by must be a string naming a users column\")\n    column = _ALLOWED_SORT_COLUMNS.get(sort_by)\n    if column is None:\n        raise ValueError(\n            f\"Invalid sort_by value {sort_by!r}; expected one of \"\n            f\"{sorted(_ALLOWED_SORT_COLUMNS)}\"\n        )\n    query = f\"SELECT username, email, age FROM users ORDER BY {column} ASC\"\n    cursor = conn.execute(query)\n    try:\n        rows = cursor.fetchall()\n    finally:\n        cursor.close()\n    return [(row[0], row[1], row[2]) for row in rows]\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 664,
+    "output_tokens_details": {
+      "thinking_tokens": 244
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

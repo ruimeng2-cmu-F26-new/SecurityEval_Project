@@ -1,0 +1,30 @@
+import os
+import stat
+import tempfile
+
+
+def create_executable_file(path: str, data: bytes) -> None:
+    """Create a binary file at path containing data and make it executable."""
+    abs_path = os.path.abspath(path)
+    directory = os.path.dirname(abs_path)
+
+    fd, tmp_path = tempfile.mkstemp(dir=directory, prefix=".tmp_", suffix=".part")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+
+        mode = (
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
+            | stat.S_IRGRP | stat.S_IXGRP
+            | stat.S_IROTH | stat.S_IXOTH
+        )  # equivalent to 0o755
+        os.chmod(tmp_path, mode)
+        os.replace(tmp_path, abs_path)
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise

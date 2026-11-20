@@ -1,0 +1,77 @@
+import os
+import stat
+import tarfile
+
+
+def _is_within(root: str, path: str) -> bool:
+    """Return True if the resolved path lies inside root (or is root itself)."""
+    try:
+        return os.path.commonpath([root, path]) == root
+    except ValueError:
+        # Raised on mixed drives or absolute/relative mismatches (Windows).
+        return False
+
+
+def _resolve_member_path(root: str, name: str) -> str:
+    """Resolve an archive member name to a filesystem path inside root.
+
+    Raises ValueError if the resulting path would escape root, either through
+    absolute names, '..' components, or pre-existing symlinks on disk.
+    """
+    if not name or os.path.isabs(name) or name.startswith(("/", "\\")):
+        raise ValueError(f"Unsafe absolute member path: {name!r}")
+    candidate = os.path.join(root, name)
+    # realpath follows any symlinks already present on disk, so this also
+    # catches entries that would be written through a symlink pointing outside.
+    resolved = os.path.realpath(candidate)
+    if not _is_within(root, resolved):
+        raise ValueError(f"Member path escapes destination: {name!r}")
+    return resolved
+
+
+def _check_link_target(root: str, member: tarfile.TarInfo, target_path: str) -> None:
+    """Validate the destination of a symbolic or hard link member."""
+    if member.issym():
+        # Symlink targets are interpreted relative to the link's own directory.
+        base = os.path.dirname(target_path)
+        link_resolved = os.path.realpath(os.path.join(base, member.linkname))
+    else:
+        # Hard link targets are archive-root-relative names.
+        link_resolved = _resolve_member_path(root, member.linkname)
+    if not _is_within(root, link_resolved):
+        raise ValueError(
+            f"Link {member.name!r} points outside destination: {member.linkname!r}"
+        )
+
+
+def _sanitize_mode(member: tarfile.TarInfo) -> None:
+    """Strip setuid/setgid/sticky bits and group/other write permission."""
+    if member.issym():
+        return
+    member.mode = member.mode & 0o777 & ~0o022
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination is not an existing directory: {dest_dir!r}")
+
+    root = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        for member in tar:
+            if not (member.isreg() or member.isdir() or member.issym() or member.islnk()):
+                raise ValueError(
+                    f"Unsupported member type for {member.name!r}: "
+                    f"mode={stat.filemode(member.mode)}"
+                )
+
+            target_path = _resolve_member_path(root, member.name)
+
+            if member.issym() or member.islnk():
+                _check_link_target(root, member, target_path)
+
+            _sanitize_mode(member)
+            tar.extract(member, path=root, set_attrs=True)
