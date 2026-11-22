@@ -232,6 +232,19 @@ def test_error_analysis_lists_static_false_positives_and_negatives(tmp_path):
     assert kinds["safe-1", "any"]["kind"] == "false_negative" and kinds["safe-1", "any"]["rule_ids"] == ""
 
 
+def test_error_analysis_lists_bandit_rules_counted_through_equivalence():
+    # Bandit reports B307 (eval) as CWE-078; it counts for the CWE-095 target and must be listed.
+    finding = {"rule_id": "B307", "cwe": "CWE-078", "severity": "medium", "evidence": "eval(expr)"}
+    bandit = {**analysis("bandit", [finding]), "sample_id": "eval_expression", "code_sha256": "x"}
+    synthetic = {**row("no", "no", "no", "not_vulnerable"), "sample_id": "eval_expression",
+                 "code_sha256": "x", "cwe": "CWE-095"}
+    for threshold in evaluation.THRESHOLDS:
+        synthetic[f"bandit_{threshold}"] = evaluation._static_decision(bandit, "CWE-095", threshold)
+    errors = evaluation.error_rows([synthetic], {("eval_expression", "x", "bandit"): bandit})
+    assert [(e["threshold"], e["kind"], e["rule_ids"]) for e in errors] == [
+        ("any", "false_positive", "B307"), ("medium", "false_positive", "B307")]
+
+
 def test_candidate_tampering_and_unknown_labels_are_rejected(tmp_path):
     root = experiment(tmp_path)
     labels = tmp_path / "labels.csv"

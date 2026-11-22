@@ -1,9 +1,11 @@
 # Evaluation protocol — DRAFT for team review
 
-Status: proposed by Member 2; extends `docs/EXPERIMENT_PLAN.md` (Member 1, branch
-`member1-experiment-60`, not yet merged) and uses its configuration names. Tooling for
-this protocol exists, but **no real experiment has run yet**. Fix every decision here
-before looking at results, and record later changes under "Change log".
+Status: proposed by Member 2; extends `docs/EXPERIMENT_PLAN.md` and uses its configuration
+names. Generated candidates are archived under `experiments/`. Member 3 has run the Docker
+tests on the primary batch locally; those results are not in the repository (`artifacts/`
+is Git-ignored). **No labels, static results on candidates or metrics exist yet.** Fix the
+remaining decisions before looking at further results, and record later changes under
+"Change log".
 
 ## 1. Why the comparison changes
 
@@ -25,25 +27,48 @@ other misses, and at what false-positive cost**, under two defined fusion rules.
 
 ## 3. Dataset
 
-The formal dataset follows the experiment plan: 3 adapted tasks × 2 models × 10 independent
-requests = 60 candidates, with no candidate removed because of its quality. Pilot calls
-are excluded. Dynamic tests exist per task, so extra candidates reuse the same tests. The
-pinned SecurityEval revision has only 8 prompts for these CWEs (CWE-089: 2, CWE-078: 2,
-CWE-022: 4).
+`data/samples.jsonl` defines 15 tasks, one target CWE each; the original 3 tasks and 8 pilot
+tasks are in `data/extra_samples.jsonl`. Model-facing prompts state only the functional
+contract; each task's `security_requirements` are withheld from the model and used for
+testing and labeling. No candidate is removed because of its quality.
 
-**Proposed addition, needs a team decision:** the adapted prompts state security
-requirements, so few candidates may be vulnerable. With few positives, recall is unstable or
-undefined. If so, add a separately reported group:
+Seven generation batches are archived, one directory each under `experiments/`:
 
-| Group | Source | Purpose |
-|---|---|---|
-| Formal | 60 candidates from the experiment plan | Primary results |
-| B (optional) | Same signatures, security requirements removed | More vulnerable candidates; the same tests apply |
-| C (optional) | SecurityEval `Insecure_code` adapted to our signatures | Known-positive anchors, not LLM output |
+| Batch | Tasks | Models | Effort | Candidates (generated) |
+|---|---|---|---|---|
+| `pilot-probes-001` | 11 pilot | Haiku 5.5, Sonnet 5.5 | medium | 66 (63) |
+| `member1-formal-60-002` | original 3 | Haiku 5.5, Sonnet 5.5 | medium | 60 (60) |
+| `member1-formal-150-003` | 15 | Haiku 5.5, Sonnet 5.5 | medium | 150 (148) |
+| `member1-formal-160-004` | 10 | Haiku 5.5, Sonnet 5.5 | medium | 160 (159) |
+| `member1-formal-160-005` | 10 | Haiku 4.5, Haiku 5.5 | none | 160 (160) |
+| `member1-sonnet46-80-006` | 10 | Sonnet 4.6 | none | 80 (80) |
+| `member1-formal-225-007` | 15 | Haiku 4.5, Sonnet 4.6, Haiku 5.5 | none | 225 (225) |
 
-Results for groups B and C are never pooled with the formal results. The `metrics` command
-records each input directory as `group`, so run it per group. Group B costs API budget
-and needs Member 1's agreement.
+**Primary experiment: `member1-formal-225-007`** (15 tasks × 3 models × 5 independent
+requests = 225 candidates, 138 distinct code files). Requests send no thinking or effort
+fields. Member 3 recorded this choice in the 2026-11-20 change summary; all detection
+results are computed on this batch. The other six batches are not part of the primary
+results; whether any is reported as supplementary is open decision 1. Pilot batches are
+always excluded.
+
+**How the dataset was chosen, which the report must disclose.** The design changed after
+early outputs had been observed. The first candidates from the planned models passed almost
+all security tests, so the task set was expanded to 15 tasks that are easier to get wrong.
+Further batches were generated with other models and without thinking, and 225-007 was
+adopted after Member 3 had seen dynamic test results. A dataset with no vulnerable
+candidates cannot compare detectors, so this was a reasonable step. However, it means that
+the task and batch selection was not blind to outcomes. From this point on, the dataset,
+rules and tests stay frozen: none of them may be changed because of detection results
+(section 8).
+
+Candidate IDs combine task, model and run number only, so the same ID appears in several
+batches (276 IDs repeat). `metrics`, `label-sheet` and `dynamic` reject duplicate IDs, so run
+them once per batch. This does not affect the primary batch on its own; pooling batches
+would first need the batch name in the ID or label key.
+
+Optional known-positive anchors: SecurityEval `Insecure_code` adapted to our signatures, if
+a task has too few vulnerable candidates. These are not LLM output and are always reported
+separately.
 
 ## 4. Unit of analysis
 
@@ -52,10 +77,14 @@ report outcomes, so both are reduced to a decision per pair. Decisions join by `
 and `code_sha256`.
 
 - **Static positive:** at least one finding with the target CWE at or above the threshold.
-  CWE comes from Bandit's `issue_cwe` or the AST rule. Both thresholds are always reported:
+  CWE comes from Bandit's `issue_cwe` or the AST rule. Bandit files some checks under a
+  broader CWE, so `EQUIVALENT_RULES` in `evaluation.py` also counts `B307`/`B102` for CWE-095
+  and the XML parser checks for CWE-776. Both thresholds are always reported:
   `any` (includes generic checks such as B404, which fires on importing `subprocess`) and
   `medium` (severity medium or high).
-- **Dynamic positive:** at least one `security` test failed. Functional failures do not count.
+- **Dynamic positive:** at least one `security` test failed. Security tests fail only on an
+  observed impact. Functional failures do not count, and `hardening` checks (rejections the
+  prompt does not ask for) are reported separately by `security-eval dynamic` and do not count.
 - **Inconclusive:** an analyzer that did not complete, or security tests that were all
   skipped. A candidate with no dynamic record is `no_test`, treated as inconclusive in
   metrics and shown separately under coverage. Neither counts as "not detected".
@@ -71,11 +100,14 @@ and `code_sha256`.
    Adjudicate them in writing; tool outputs may be consulted at this stage only.
 3. `uncertain` and blank pairs are excluded and counted.
 
-| CWE | Label `vulnerable` when |
-|---|---|
-| CWE-089 | An input value can change the structure of the executed SQL |
-| CWE-078 | An input value can run a program or shell syntax outside the allowed `pwd`/`echo` behavior |
-| CWE-022 | An input path can read a file outside `base_dir`, including through `..`, absolute paths or symlinks |
+Per-task pass counts from the dynamic run on 225-007 have already been shared within the team.
+Reviewers must not look at per-candidate detector or test output before their first-pass
+labels are complete. Record that the aggregate counts were known.
+
+The labeling criterion for each task is its `security_requirements` entry in
+`data/samples.jsonl`: label a pair `vulnerable` when an input can violate one of them. For
+example, `sql_list_users` is vulnerable when an input value can change the structure of the
+executed SQL.
 
 ## 6. Configurations
 
@@ -106,43 +138,57 @@ always shown; `n/a` means the denominator is zero.
 - **Error analysis:** B1 false positives and negatives, categorized manually.
 - **Repair (RQ4):** as defined in the experiment plan, evaluated after the detection results.
 
-With at most 60 pairs, results are descriptive; we make no claims of statistical significance.
+With at most a few hundred pairs per batch and 10 to 15 per task and model, results are
+descriptive; we make no claims of statistical significance.
 
 ## 8. Fixed before running
 
-Every result records Bandit version and flags (`bandit 1.9.4`, `--ignore-nosec`), AST rule set
-version (`0.2.0`), test and image identity, models and parameters. If rules or tests change
-after results are seen, re-run all candidates and add a change-log entry.
+Frozen from now on: the primary batch (`member1-formal-225-007`), Bandit version and flags
+(`bandit 1.9.4`, `--ignore-nosec`), AST rule set `0.4.0`, `EQUIVALENT_RULES`, the candidate and
+hardening tests, and the Docker image. Every result records these, plus models and parameters.
+If anything changes after results are seen, re-run all candidates, report both versions and
+add a change-log entry.
 
 ## 9. Responsibilities
 
 | Owner | Task |
 |---|---|
-| Member 1 | Merge the experiment branch; run pilots and the formal 60; share frozen artifacts |
+| Member 1 | Frozen generation batches and their manifests; explain each batch's purpose |
 | Member 2 | Metrics tooling; static results; error analysis; coordinate labeling |
-| Member 3 | Docker results for every candidate, stored as `pytest-docker.json` |
+| Member 3 | Docker results for every 225-007 candidate (`pytest-docker.json`), shared with the team |
 | All | Two independent labels per pair; adjudication |
 
 ## 10. Known limitations
 
-- Three tasks and two models do not generalize to LLM-generated code in general.
+- 15 tasks and a few Claude models do not generalize to LLM-generated code in general.
 - Ground truth is manual and can be wrong; agreement is reported.
-- Some security tests check the prompt's contract, not only exploitation: for example a
-  no-op `remove_user` or an implementation that safely handles input without raising
-  `ValueError` can fail them. These count as dynamic positives and appear as false
-  positives against the manual labels, so D's precision depends on the test design.
-- Static rules were designed with the same three tasks in mind, which may favor them
-  compared with Bandit. Their rule tests are hand-written and are not experiment results.
+- D is only as strong as each task's tests: a security test that never triggers the
+  vulnerable path makes D miss it.
+- The tasks and the primary batch were chosen after early test outcomes had been seen
+  (section 3), so the share of vulnerable candidates reflects that choice, not how often
+  these models write insecure code in general.
+- AST rules were designed for these tasks, which may favor them compared with Bandit. The
+  rule set 0.4.0 rules for the three tasks promoted from the pilot were written after pilot
+  candidates had been read (see `docs/STATIC_ANALYSIS.md`). Rule tests are hand-written and
+  are not experiment results.
+- Bandit has no check for several target CWEs (for example CWE-117, CWE-209, CWE-601), so B0
+  finds nothing on those tasks by construction.
 - Identical candidates are counted separately; `distinct_code` shows how many differ.
 
 ## 11. Open decisions
 
-1. Add group B and/or C if positives are too few, and how many formal positives is "too few".
-2. Whether a security failure caused only by a contract check should be excluded from D
-   (proposal: keep the definition above and analyze those cases as false positives).
-3. Who labels which candidates.
+1. Whether any batch other than 225-007 is reported as supplementary, and for what question;
+   pooling it with 225-007 would first need the batch name in the candidate ID or label key.
+2. Whether to add `Insecure_code` anchors for tasks with too few vulnerable candidates.
+3. Who labels which of the 225 candidates (138 distinct code files).
+4. `docs/EXPERIMENT_PLAN.md` and the README still describe the 3-task, 60-candidate design;
+   Members 1 and 3 should update them to match this section.
 
 ## Change log
 
 - Draft created by Member 2.
 - Aligned with `docs/EXPERIMENT_PLAN.md`: names, 60-candidate dataset and `uncertain` label.
+- Updated for the 15-task design: archived batches, dataset decision, equivalent Bandit rules,
+  hardening checks, rule set 0.4.0 and limitations.
+- Recorded `member1-formal-225-007` as the primary batch, how it was chosen, the shared
+  dynamic results and the frozen components.

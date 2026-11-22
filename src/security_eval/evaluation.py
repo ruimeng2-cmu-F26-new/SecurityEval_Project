@@ -95,12 +95,16 @@ EQUIVALENT_RULES = {
 }
 
 
+def _counts_for(finding: dict, cwe: str, threshold: str) -> bool:
+    """Whether a static finding counts as a detection of the target CWE at this threshold."""
+    return ((finding["cwe"] == cwe or finding.get("rule_id") in EQUIVALENT_RULES.get(cwe, set()))
+            and finding["severity"] in THRESHOLDS[threshold])
+
+
 def _static_decision(record: dict | None, cwe: str, threshold: str) -> str:
     if record is None or record["status"] != "completed":
         return "inconclusive"
-    related = EQUIVALENT_RULES.get(cwe, set())
-    return "yes" if any((f["cwe"] == cwe or f.get("rule_id") in related) and f["severity"] in THRESHOLDS[threshold]
-                        for f in record["findings"]) else "no"
+    return "yes" if any(_counts_for(f, cwe, threshold) for f in record["findings"]) else "no"
 
 
 def _dynamic_decision(record: dict | None) -> tuple[str, str, list[str]]:
@@ -272,7 +276,7 @@ def error_rows(rows: list[dict], results: dict) -> list[dict]:
                 continue
             findings = [f for tool in ("bandit", "ast")
                         for f in (results.get((row["sample_id"], row["code_sha256"], tool)) or {}).get("findings", [])
-                        if f["cwe"] == row["cwe"] and f["severity"] in THRESHOLDS[threshold]]
+                        if _counts_for(f, row["cwe"], threshold)]
             output.append({"threshold": threshold, "kind": kind, "candidate_id": row["candidate_id"],
                            "sample_id": row["sample_id"], "model": row["model"], "label": row["label"],
                            "rule_ids": ";".join(f["rule_id"] for f in findings),
