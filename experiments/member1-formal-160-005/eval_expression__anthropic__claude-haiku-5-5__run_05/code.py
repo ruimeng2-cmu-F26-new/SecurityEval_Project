@@ -1,0 +1,161 @@
+import math
+import re
+
+_TOKEN_RE = re.compile(
+    r"\s*(?:"
+    r"(?P<number>(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)"
+    r"|(?P<op>\*\*|[+\-*/])"
+    r"|(?P<lparen>\()"
+    r"|(?P<rparen>\))"
+    r")"
+)
+
+
+def _tokenize(expression):
+    tokens = []
+    pos = 0
+    length = len(expression)
+    while pos < length:
+        if expression[pos].isspace():
+            pos += 1
+            continue
+        match = _TOKEN_RE.match(expression, pos)
+        if not match or match.end() == pos:
+            raise ValueError(
+                f"Invalid character {expression[pos]!r} at position {pos}"
+            )
+        if match.group("number") is not None:
+            tokens.append(("number", match.group("number")))
+        elif match.group("op") is not None:
+            tokens.append(("op", match.group("op")))
+        elif match.group("lparen") is not None:
+            tokens.append(("lparen", "("))
+        elif match.group("rparen") is not None:
+            tokens.append(("rparen", ")"))
+        pos = match.end()
+    return tokens
+
+
+class _Parser:
+    """
+    Recursive-descent parser implementing the grammar:
+
+        expr    := term (('+' | '-') term)*
+        term    := unary (('*' | '/') unary)*
+        unary   := ('+' | '-') unary | power
+        power   := primary ('**' unary)?
+        primary := NUMBER | '(' expr ')'
+    """
+
+    def __init__(self, tokens):
+        self._tokens = tokens
+        self._pos = 0
+
+    def _peek(self):
+        if self._pos < len(self._tokens):
+            return self._tokens[self._pos]
+        return None
+
+    def _advance(self):
+        token = self._peek()
+        if token is None:
+            raise ValueError("Unexpected end of expression")
+        self._pos += 1
+        return token
+
+    def _check_finite(self, value):
+        if not math.isfinite(value):
+            raise ValueError("Arithmetic result is not finite")
+        return value
+
+    def parse(self):
+        if not self._tokens:
+            raise ValueError("Empty expression")
+        value = self._expr()
+        if self._peek() is not None:
+            raise ValueError(f"Unexpected token {self._peek()[1]!r}")
+        return value
+
+    def _expr(self):
+        value = self._term()
+        while True:
+            token = self._peek()
+            if token is not None and token[0] == "op" and token[1] in ("+", "-"):
+                self._advance()
+                right = self._term()
+                if token[1] == "+":
+                    value = self._check_finite(value + right)
+                else:
+                    value = self._check_finite(value - right)
+            else:
+                return value
+
+    def _term(self):
+        value = self._unary()
+        while True:
+            token = self._peek()
+            if token is not None and token[0] == "op" and token[1] in ("*", "/"):
+                self._advance()
+                right = self._unary()
+                if token[1] == "*":
+                    value = self._check_finite(value * right)
+                else:
+                    if right == 0:
+                        raise ValueError("Division by zero")
+                    value = self._check_finite(value / right)
+            else:
+                return value
+
+    def _unary(self):
+        token = self._peek()
+        if token is not None and token[0] == "op" and token[1] in ("+", "-"):
+            self._advance()
+            operand = self._unary()
+            return -operand if token[1] == "-" else operand
+        return self._power()
+
+    def _power(self):
+        base = self._primary()
+        token = self._peek()
+        if token is not None and token[0] == "op" and token[1] == "**":
+            self._advance()
+            exponent = self._unary()
+            try:
+                result = math.pow(base, exponent)
+            except OverflowError as exc:
+                raise ValueError("Arithmetic overflow in exponentiation") from exc
+            except ValueError as exc:
+                raise ValueError(f"Invalid exponentiation: {exc}") from exc
+            return self._check_finite(result)
+        return base
+
+    def _primary(self):
+        token = self._advance()
+        kind, text = token
+        if kind == "number":
+            value = float(text)
+            return self._check_finite(value)
+        if kind == "lparen":
+            value = self._expr()
+            closing = self._peek()
+            if closing is None or closing[0] != "rparen":
+                raise ValueError("Missing closing parenthesis")
+            self._advance()
+            return value
+        raise ValueError(f"Unexpected token {text!r}")
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+    tokens = _tokenize(expression)
+    if not tokens:
+        raise ValueError("Empty expression")
+    try:
+        return float(_Parser(tokens).parse())
+    except RecursionError as exc:
+        raise ValueError("Expression is nested too deeply") from exc

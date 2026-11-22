@@ -23,7 +23,7 @@ from security_eval.generation import (
 
 @pytest.fixture
 def sample():
-    return load_samples(Path(__file__).resolve().parents[2] / "data/samples.jsonl")[0]
+    return load_samples(Path(__file__).resolve().parents[2] / "data/extra_samples.jsonl")[0]
 
 
 class FixtureResponse:
@@ -74,9 +74,19 @@ def test_dry_run_prepares_exact_claude_request(tmp_path, sample):
         prepare(sample, out, "claude-haiku-5-5")
 
 
+def test_effort_none_sends_no_thinking_settings(tmp_path, sample):
+    record = prepare(sample, tmp_path / "prepared", "claude-haiku-4-5-20251001", effort="none")
+    request = json.loads((tmp_path / "prepared/request.json").read_text())
+    assert "thinking" not in request and "output_config" not in request
+    assert (record["effort"], record["thinking_type"]) == ("none", "disabled")
+    validate("generation", record)
+
+
 @pytest.mark.parametrize("text,expected", [
     ("def f():\n    pass", "def f():\n    pass\n"),
     ("```python\ndef f():\n    pass\n```", "def f():\n    pass\n"),
+    ("It rejects bad input.\n\n```python\ndef f():\n    pass\n```", "def f():\n    pass\n"),
+    ("def f():\n    pass\n```", "def f():\n    pass\n"),
 ])
 def test_code_extraction(text, expected):
     assert extract_code(text) == expected
@@ -180,11 +190,8 @@ def test_anthropic_sdk_serializes_fixed_request(tmp_path, sample):
 
 def test_batch_generation_records_one_candidate_per_sample(tmp_path):
     samples = load_samples(Path(__file__).resolve().parents[2] / "data/samples.jsonl")
-    code_by_entry = {
-        "remove_user": "def remove_user(conn, username):\n    return 0\n",
-        "execute_command": "def execute_command(command):\n    return ''\n",
-        "read_file": "def read_file(base_dir, filename):\n    return b''\n",
-    }
+    code_by_entry = {f"def {s['entry_point']}(": f"def {s['entry_point']}(*args):\n    return None\n"
+                     for s in samples}
     def create(**request):
         prompt = request["messages"][0]["content"]
         code = next(code for entry, code in code_by_entry.items() if entry in prompt)
@@ -216,14 +223,15 @@ def test_experiment_dry_run_prepares_every_model_sample_and_run(tmp_path):
     )
     assert manifest["status"] == "complete"
     assert manifest["provider"] == "anthropic"
-    assert manifest["expected_candidates"] == 12
-    assert manifest["status_counts"] == {"prepared": 12, "generated": 0, "error": 0}
-    assert len({item["candidate_id"] for item in manifest["results"]}) == 12
+    expected = len(samples) * 2 * 2  # samples x models x runs
+    assert manifest["expected_candidates"] == expected
+    assert manifest["status_counts"] == {"prepared": expected, "generated": 0, "error": 0}
+    assert len({item["candidate_id"] for item in manifest["results"]}) == expected
     assert not list(out.rglob("code.py"))
 
 
 def test_experiment_generation_records_cost_and_hashes(tmp_path):
-    samples = load_samples(Path(__file__).resolve().parents[2] / "data/samples.jsonl")[:1]
+    samples = load_samples(Path(__file__).resolve().parents[2] / "data/extra_samples.jsonl")[:1]
     usage = {"input_tokens": 1000, "output_tokens": 2000,
              "cache_creation_input_tokens": 0, "cache_read_input_tokens": 0}
     code = "def remove_user(conn, username):\n    return 0\n"

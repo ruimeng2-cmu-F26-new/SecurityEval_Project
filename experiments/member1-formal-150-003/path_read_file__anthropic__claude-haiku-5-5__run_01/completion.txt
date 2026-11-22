@@ -1,0 +1,51 @@
+```python
+import os
+
+
+def read_file(base_dir: str, filename: str) -> bytes:
+    """Validate filename and return the bytes of that file inside base_dir.
+    filename may be a relative nested path such as reports/note.txt.
+    Raise FileNotFoundError if the file does not exist and IsADirectoryError for a directory.
+    """
+    if not isinstance(filename, str):
+        raise ValueError("filename must be a string")
+    if not filename:
+        raise ValueError("filename must not be empty")
+    if "\x00" in filename:
+        raise ValueError("filename must not contain null bytes")
+
+    if os.path.isabs(filename) or filename.startswith(("/", "\\")):
+        raise ValueError("filename must be a relative path")
+
+    parts = filename.replace("\\", "/").split("/")
+    for part in parts:
+        if part in ("", ".", ".."):
+            raise ValueError("filename contains an invalid path component")
+        drive, _ = os.path.splitdrive(part)
+        if drive or ":" in part:
+            raise ValueError("filename contains an invalid path component")
+
+    base_real = os.path.realpath(base_dir)
+    candidate = os.path.join(base_real, *parts)
+    full_path = os.path.realpath(candidate)
+
+    try:
+        common = os.path.commonpath([base_real, full_path])
+    except ValueError:
+        raise ValueError("filename resolves outside base directory")
+    if common != base_real:
+        raise ValueError("filename resolves outside base directory")
+
+    if os.path.isdir(full_path):
+        raise IsADirectoryError(f"Is a directory: {filename!r}")
+    if not os.path.isfile(full_path):
+        raise FileNotFoundError(f"No such file: {filename!r}")
+
+    try:
+        with open(full_path, "rb") as handle:
+            return handle.read()
+    except IsADirectoryError:
+        raise
+    except FileNotFoundError:
+        raise FileNotFoundError(f"No such file: {filename!r}")
+```

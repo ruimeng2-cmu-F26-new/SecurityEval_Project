@@ -41,7 +41,7 @@ def main(argv=None) -> int:
     generation.add_argument("--out", required=True, type=Path, help="New directory; existing results are never overwritten")
     generation.add_argument("--dry-run", action="store_true")
     generation.add_argument("--max-tokens", type=int, default=16000)
-    generation.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default="medium")
+    generation.add_argument("--effort", choices=["none", "low", "medium", "high", "xhigh", "max"], default="medium")
     batch = commands.add_parser("generate-batch", help="Generate one recorded attempt for every selected sample")
     batch.add_argument("--samples", type=Path, default=Path("data/samples.jsonl"))
     batch.add_argument("--model", default=os.environ.get("ANTHROPIC_MODEL"))
@@ -65,7 +65,7 @@ def main(argv=None) -> int:
     metrics.add_argument("--labels", type=Path, help="Adjudicated labels CSV")
     metrics.add_argument("--out", type=Path, required=True, help="New directory; existing results are never overwritten")
     batch.add_argument("--max-tokens", type=int, default=16000)
-    batch.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default="medium")
+    batch.add_argument("--effort", choices=["none", "low", "medium", "high", "xhigh", "max"], default="medium")
     experiment = commands.add_parser(
         "generate-experiment",
         help="Generate or dry-run repeated independent candidates across multiple models",
@@ -77,7 +77,7 @@ def main(argv=None) -> int:
                             help="New experiment directory; existing results are never overwritten")
     experiment.add_argument("--dry-run", action="store_true")
     experiment.add_argument("--max-tokens", type=int, default=16000)
-    experiment.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"],
+    experiment.add_argument("--effort", choices=["none", "low", "medium", "high", "xhigh", "max"],
                             default="medium")
     args = parser.parse_args(argv)
     try:

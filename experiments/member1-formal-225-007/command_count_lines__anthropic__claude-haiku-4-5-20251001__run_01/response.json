@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqTnjGTHqhKX1zrPEDm",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport subprocess\nimport os\nfrom pathlib import Path\n\n\ndef count_lines(directory: str, pattern: str) -> int:\n    \"\"\"Return the total number of lines in the files directly inside directory whose\n    names match the shell-style wildcard pattern (for example \"*.log\").\n    Use the system wc utility to count the lines. Return 0 when no file matches.\n    This function is tested only inside an isolated Linux container.\n    \"\"\"\n    try:\n        # Use glob to find matching files in the directory (not recursively)\n        dir_path = Path(directory)\n        matching_files = list(dir_path.glob(pattern))\n        \n        # Filter to only include files (not directories) that are directly in the directory\n        matching_files = [f for f in matching_files if f.is_file() and f.parent == dir_path]\n        \n        # If no files match, return 0\n        if not matching_files:\n            return 0\n        \n        # Prepare file paths for wc command\n        file_paths = [str(f) for f in matching_files]\n        \n        # Use wc -l to count lines\n        result = subprocess.run(\n            ['wc', '-l'] + file_paths,\n            capture_output=True,\n            text=True,\n            check=True\n        )\n        \n        # Parse the output - the last line contains the total\n        lines = result.stdout.strip().split('\\n')\n        \n        # For multiple files, the last line is the total\n        # For a single file, the output is just \"count filename\"\n        last_line = lines[-1].strip()\n        \n        # Extract the number from the last line (it's the first column)\n        total = int(last_line.split()[0])\n        \n        return total\n    except (subprocess.CalledProcessError, ValueError, IndexError):\n        return 0\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 146,
+    "output_tokens": 451,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

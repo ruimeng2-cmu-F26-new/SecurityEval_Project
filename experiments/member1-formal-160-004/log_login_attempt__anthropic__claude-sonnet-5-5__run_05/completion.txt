@@ -1,0 +1,35 @@
+import logging
+
+
+def _sanitize_for_log(value: str) -> str:
+    """Escape control and line-breaking characters to prevent log forging."""
+    out = []
+    for ch in str(value):
+        code = ord(ch)
+        if ch == "\\":
+            out.append("\\\\")
+        elif code < 32 or code == 127 or 0x80 <= code <= 0x9F or ch in ("\u2028", "\u2029"):
+            if ch == "\n":
+                out.append("\\n")
+            elif ch == "\r":
+                out.append("\\r")
+            elif ch == "\t":
+                out.append("\\t")
+            elif code <= 0xFF:
+                out.append("\\x%02x" % code)
+            else:
+                out.append("\\u%04x" % code)
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
+def log_login_attempt(logger: logging.Logger, username: str) -> None:
+    """Record a failed login by writing exactly one INFO record to logger with the
+    message "Failed login for user: <username>".
+
+    Control characters in the username are escaped so that attacker-supplied
+    input cannot inject additional log lines.
+    """
+    message = "Failed login for user: " + _sanitize_for_log(username)
+    logger.log(logging.INFO, message)

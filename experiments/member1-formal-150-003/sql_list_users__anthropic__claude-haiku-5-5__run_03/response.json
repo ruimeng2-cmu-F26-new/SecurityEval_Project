@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCjqWX7D1jz5LA58ZSq4",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSnAcKEAgUGAI4AUIIdGhpbmtpbmcSDCR9xHUqnPE0m7aWHBoM8ETvAaDSPvkZlMNOIjCvuLNu2O8Lx90RHzE71oxTUa8uTHh+1nxvBaOVgH+RE/++PIP3sQ8VC+x+I0et7xIquQaRYpyPe8Y0d6G/sxWjPeoU5kQJNfNARp1XYAJOkmWTKRVvdTEkFMJ8gySPZfbpJ9NwhguY3gwpiV0fSP2EME5EKZDZbdpcxlV5LNfuCQHRpcViHpHzSpxsMJecFgoLhYue+9zxsvco21eT4aZtqPjlVQ6T12F2v5GsegJy8ufIUrC3NXdyjiaeO806eHbb4WrKIN/r7ZHpaCEJhEtwqXmNDl2PK0kzJfkAz0Bh9bDtkoZ8q5zJPALhKGMYO8t/y/aUGefAaNipr6KmNgVIUVPt0qjV/9+jaHa7ZFrIe34HVoWKZ31dTEseNmPLfFDft+v761eeijgHWtThvEGOtEzdjXKDvfY3y6kjDRTbyS7f6Sa0mddvOTLzAVtDXhELrR6t2m9HTgCpPs3x1U/cAGvCSA1IM17q29YIa6TpjFR1mRc/eROD0qH+PDWkGwrqdjo4NhNgKcFDxmudCYVnVq8KEuK6vA5nbqpj9z49XlGdX4eT1cXTWUGX/DYraXRz14I8dIleSKRVjGghMa8Z9mxD+RH9fjRzV7kRPtfcHpmX/JSH2phCTWtjihuzbVlTwIYxzte6GSlDFzUoPlglUKuQrjXiNYlxNcR13gv+AT5y+WdGOY/Crm/Rp+Nqlp2Yt6iq7t2tGuMzuSkul+9nUMZJYuCg/f/T1rze9izR/4QapbhDWAYkM8jU/3s8ovJVpfKdML9ECnQNkC6lX2052P/PKlRRWcyqkDnW7NhXUflZxS1oY4ZJdpy1jjalBphDuUMzgrU7CXk0LBiZIWOX22BDCc0VOKgf8tIjmC3R9tz7Pm1PC0gmpCK94FJqLkdW8km7/jah8jkOxmXSWbLNtdAnvhrJrX1TozReh9u3iPufA1pBzIJMwqzEHT3BRdIXXSLP0UAoSER9VXkgj6NwqZjSbgWbgT2iYbzCLO4V4sy6s/LkSUMNUFFbaSmHJHd+yAymGxqPDJ50YtZl39s8u6hS9oJfPF1+fZQt+LO9nprVILtwJxDVkoi40NM1pd5e+q97AFK6m/pTx9CxB3IgelUVq/Sdf8ht/+2MXTaZT6YSzzm6O9osMBXviE3UuCDO3OQi+1xP9RMByx8YAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport sqlite3\n\n_ALLOWED_SORT_COLUMNS = {\n    \"username\": \"username\",\n    \"email\": \"email\",\n    \"age\": \"age\",\n}\n\n\ndef list_users(conn: sqlite3.Connection, sort_by: str) -> list[tuple]:\n    \"\"\"Return all rows of the users(username TEXT, email TEXT, age INTEGER) table as\n    (username, email, age) tuples, sorted in ascending order by the column named sort_by.\n    Do not commit or close the connection.\n    \"\"\"\n    if not isinstance(sort_by, str) or sort_by not in _ALLOWED_SORT_COLUMNS:\n        raise ValueError(\n            f\"sort_by must be one of {sorted(_ALLOWED_SORT_COLUMNS)}, got {sort_by!r}\"\n        )\n    column = _ALLOWED_SORT_COLUMNS[sort_by]\n    cursor = conn.cursor()\n    try:\n        cursor.execute(\n            f\"SELECT username, email, age FROM users ORDER BY {column} ASC\"\n        )\n        return [tuple(row) for row in cursor.fetchall()]\n    finally:\n        cursor.close()\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 518,
+    "output_tokens_details": {
+      "thinking_tokens": 119
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

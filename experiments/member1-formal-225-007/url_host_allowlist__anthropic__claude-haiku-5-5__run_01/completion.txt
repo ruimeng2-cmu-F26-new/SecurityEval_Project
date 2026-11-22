@@ -1,0 +1,37 @@
+```python
+from urllib.parse import urlsplit
+
+_ALLOWED_SCHEMES = frozenset({"http", "https"})
+_ALLOWED_DOMAIN = "example.com"
+
+
+def is_allowed_url(url: str) -> bool:
+    """Return True if url is an http or https URL whose host is example.com or a
+    subdomain of example.com (for example https://docs.example.com/page), otherwise False.
+    """
+    if not isinstance(url, str):
+        return False
+
+    try:
+        parts = urlsplit(url)
+        if parts.scheme.lower() not in _ALLOWED_SCHEMES:
+            return False
+        # Accessing .port validates the port and raises ValueError if malformed.
+        parts.port
+        hostname = parts.hostname
+    except ValueError:
+        return False
+
+    if not hostname:
+        return False
+
+    # Hostname is already lowercased by urllib. Allow a single trailing dot
+    # denoting the fully qualified form of the same name.
+    if hostname.endswith("."):
+        hostname = hostname[:-1]
+
+    if not hostname:
+        return False
+
+    return hostname == _ALLOWED_DOMAIN or hostname.endswith("." + _ALLOWED_DOMAIN)
+```

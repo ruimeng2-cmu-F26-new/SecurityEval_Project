@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmedpKFqw5NeXDwpx5n",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS1wwKEAgUGAI4AUIIdGhpbmtpbmcSDPBLu2LmfAXxKibE5xoM+4k588j3Fu8DBf9bIjAeHnmhsBH2fdhiiWKKDJxrh11DTss55tJ8SWZxWZR7gQ3d/iuRC9FWc1I7zPFO7Dwq9AtpZLMsHm5pbHqeXi9Nj+V8VMngM0EwsAV+uHBy+MQiOE28K6n7wGznd7YEQ4uPGuz4ae9iw8IgPlCXS/aIHahS9vC3LUEGT+gVLRoOAQ/GYTl73qwEsxnAG2NASJcggsliu8r/5RsEXTalsQ5gwg8057PtIezHh05enoMGW2Z6HjeXrEOz/AGtAn9Oo+MTlMbuu5RGra9XP4uN4zpMBd7gg8hJlmeNU24NrC+8iv3UJSkAQKS3/nbIId3G1h14Fy7vptHHg+AWB8pq2+cRRvinyR7C8Hu6ktVxTFzmPBc+jDo6Rtj4RBCAIMaFXlXfuMKg9oB38zHLGMMDXkdB4lQf5k5f7pEex/j0Zywn7KgmoSOWrrsEz3v5S66J8LhmceGip1ToM5HchWtEOP/FQJx/1SHA5XsVdpoJJX5/zYLw610131RY4M4z3h7tfUnTvqcs07QEBa6522kUDokwPsaZyhAwt2rMo9WsD71rEeYnvHHksejjw654d1TiAKqUiaC1EZ7jgGC5+GuAiEbN+OEeQvnwoUEKFpYeXGn8Tz3zKVozCqltz5ll98k230QS05VOZ1pU6FNv+Mrgw+iAKFHW0malQ0CvNx1tpUy6PJ5Az2j1rXUVvRuaNDzSxZmfRhpETPyo0RmLoIVF9PreJmtgmm9XMV6WB+49WA4Bub38N2rJPsZrEzI1QELHqnPY86ibsf/yXfpTc956gsE7bRRkFlFPYwHzhEPqui08Gk2I20FJKcGELUxJjUqLMVGRfurUGbarXkNdefLNNWmWKRpXRFz5AQxmw30XnWngFsz2T5FIQIJjuI/sCeKVUgtYgHYCbeEfn4GqxkEFZvPGB4MLGGNwiUN+ozZpISuFilN159iAVTBf1zXcHJ0kjhcXK0MDFmR7l+8C/oe5xx1hEDSAG/pkeXxJ7Nx+riphssJ2lySpcsgrUJwt8jPx1SE109+VpeVOSlq8xx2eDnsBb/+5WsUbGwbkM/PBgldolhs94wat6daRQ0PfW/nU8DLsah1CG7RrhuM+bcWyO8Y0kbsM6bQqUOzPI7Ig8htcTyx2Gu1rVX9+THPV/hox3vAQrTy5U2RA1IlDxatFzNefN6EKFkLtxWJ5kLmctD7zg6uUFto520bZ4RthDZJn41CmP/wqdIGXAlPW3IkhU1nHvrF3UqjbWShKNCS0pPrpdgQorL8E+solRxaCdm98U8rF+a24X9q13VVjkHarcCRSJtqaV2lHRqUrFSLSRAK4neQ1g5LS157VVeL/QipCnr4/u0nIgyoXrYYRva99RcTNkRR+P0ITqeMUpFOjgiKRoHJnIhVs/VDNngSfBaiv69B7/9Q+OH7smMm613RFXMthylpsx/VBuRvhXNOhIBsE1FaPi6vb+qeh/wz7JKCmi4U91Ccr4WQIMcaex3xa8iA9fxBmnebFziT3ZFoeIENvwFmu5zE20bQBDo3wbUQGKyZs4z0GC1//iAZ9xA+IvBA3v/iSAOxIzTAy8HFqFNBPCZtrJ+0DZclMcg1LBm6m2nwglKwkgZ+u3027PAJuZaK7CvaQtHe6wu9+TCifYvTtFu3NfNL/K5ZwARjdlr9KHR6x08LKX1qu1XGRbQRMfCE+2uN9vJLMJSDLVSJcE3JT5GGZMemx2J0n1PO1T4XpZEWH/02T9sau8rbEdYBTGXrHCIX4AgUJa37FLoSayjJjN2YP8zByQmWAaDaIPBk7Ti/tbHhPHFysjw7Ccnpgprkinh5YrwXaiN/psDh3bRWegckdmDlfxsVVJ8caBmlWtE5QS2+c0Y0cm8/Ux/8ilTudJ+tYzGqsTg8crvGx6BAHTPDYscfcaiSkZV3W/7TI+dKcb482mFlfr2dSDPydz4PcTSTf8OhGPQodOsAms8Q3RBobN6MOe4CIdoC81nsEIwMcDhjY5HEdsSzmTApjO9D7aiiMh0C+dSUfOI6rz0l48NUu1d+qC4dSGdsCo1TsQbisX3RhxQHXB6BU5A7C0oCjVXGuhZ8IasLEJvGlCUMlwr6bwNyG+MIYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport re\n\n_COOKIE_VALUE_RE = re.compile(r'[\\x21\\x23-\\x2B\\x2D-\\x3A\\x3C-\\x5B\\x5D-\\x7E]+')\n\n\ndef build_session_cookie(session_id: str) -> str:\n    \"\"\"Return the value of the Set-Cookie response header that stores session_id in a\n    cookie named \"session\" for the site https://shop.example, valid for the whole site.\n    \"\"\"\n    if not isinstance(session_id, str):\n        raise TypeError(\"session_id must be a str\")\n    if not _COOKIE_VALUE_RE.fullmatch(session_id):\n        raise ValueError(\"session_id contains characters not allowed in a cookie value\")\n\n    attributes = [\n        f\"session={session_id}\",\n        \"Path=/\",\n        \"Secure\",\n        \"HttpOnly\",\n        \"SameSite=Lax\",\n    ]\n    return \"; \".join(attributes)\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 719,
+    "output_tokens_details": {
+      "thinking_tokens": 409
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

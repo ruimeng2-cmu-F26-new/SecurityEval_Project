@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCpNWUTkarH9FahmE6F5",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport re\nfrom typing import Union\n\n\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression such as \"2 * (3 + 4) - 1.5\" and return the\n    result as a float. Numbers, parentheses, unary minus and the operators + - * / **\n    are supported. Raise ValueError for malformed input such as \"2 +\" or an empty string.\n    \"\"\"\n    if not expression or not expression.strip():\n        raise ValueError(\"Empty expression\")\n    \n    expression = expression.strip()\n    \n    class Parser:\n        def __init__(self, expr: str):\n            self.expr = expr\n            self.pos = 0\n            self.tokens = self._tokenize()\n            self.token_pos = 0\n        \n        def _tokenize(self) -> list:\n            tokens = []\n            pattern = r'(\\d+\\.?\\d*|\\.\\d+|[+\\-*/()]|\\*\\*)'\n            matches = re.finditer(pattern, self.expr)\n            last_end = 0\n            \n            for match in matches:\n                if match.start() > last_end:\n                    between = self.expr[last_end:match.start()]\n                    if between.strip():\n                        raise ValueError(f\"Invalid character in expression: '{between}'\")\n                tokens.append(match.group())\n                last_end = match.end()\n            \n            if last_end < len(self.expr):\n                between = self.expr[last_end:]\n                if between.strip():\n                    raise ValueError(f\"Invalid character in expression: '{between}'\")\n            \n            return tokens\n        \n        def _current_token(self) -> Union[str, None]:\n            if self.token_pos < len(self.tokens):\n                return self.tokens[self.token_pos]\n            return None\n        \n        def _consume(self, expected: str = None) -> str:\n            token = self._current_token()\n            if token is None:\n                raise ValueError(\"Unexpected end of expression\")\n            if expected and token != expected:\n                raise ValueError(f\"Expected '{expected}' but got '{token}'\")\n            self.token_pos += 1\n            return token\n        \n        def parse(self) -> float:\n            if not self.tokens:\n                raise ValueError(\"Empty expression\")\n            result = self._parse_expression()\n            if self._current_token() is not None:\n                raise ValueError(f\"Unexpected token: '{self._current_token()}'\")\n            return result\n        \n        def _parse_expression(self) -> float:\n            result = self._parse_term()\n            \n            while self._current_token() in ('+', '-'):\n                op = self._consume()\n                right = self._parse_term()\n                if op == '+':\n                    result = result + right\n                else:\n                    result = result - right\n            \n            return result\n        \n        def _parse_term(self) -> float:\n            result = self._parse_factor()\n            \n            while self._current_token() in ('*', '/'):\n                op = self._consume()\n                right = self._parse_factor()\n                if op == '*':\n                    result = result * right\n                else:\n                    if right == 0:\n                        raise ValueError(\"Division by zero\")\n                    result = result / right\n            \n            return result\n        \n        def _parse_factor(self) -> float:\n            result = self._parse_power()\n            return result\n        \n        def _parse_power(self) -> float:\n            result = self._parse_unary()\n            \n            if self._current_token() == '**':\n                self._consume('**')\n                right = self._parse_power()\n                result = result ** right\n            \n            return result\n        \n        def _parse_unary(self) -> float:\n            token = self._current_token()\n            \n            if token == '-':\n                self._consume('-')\n                return -self._parse_unary()\n            elif token == '+':\n                self._consume('+')\n                return self._parse_unary()\n            else:\n                return self._parse_primary()\n        \n        def _parse_primary(self) -> float:\n            token = self._current_token()\n            \n            if token is None:\n                raise ValueError(\"Unexpected end of expression\")\n            \n            if token == '(':\n                self._consume('(')\n                result = self._parse_expression()\n                self._consume(')')\n                return result\n            \n            try:\n                float_val = float(token)\n                self._consume()\n                return float_val\n            except (ValueError, TypeError):\n                raise ValueError(f\"Expected number or '(' but got '{token}'\")\n    \n    parser = Parser(expression)\n    return parser.parse()\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 151,
+    "output_tokens": 1169,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

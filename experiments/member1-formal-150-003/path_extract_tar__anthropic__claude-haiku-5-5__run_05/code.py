@@ -1,0 +1,97 @@
+import os
+import tarfile
+
+
+class UnsafeArchiveError(tarfile.TarError):
+    """Raised when a TAR member would be extracted outside the destination directory
+    or is otherwise unsafe to extract."""
+
+
+def _is_within(base: str, path: str) -> bool:
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        # Raised on Windows when paths are on different drives
+        return False
+
+
+def _has_link_ancestor(name: str, link_names: set) -> bool:
+    parts = name.split("/")
+    for i in range(1, len(parts)):
+        if "/".join(parts[:i]) in link_names:
+            return True
+    return False
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.exists(dest_dir):
+        raise FileNotFoundError(f"Destination directory does not exist: {dest_dir}")
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination is not a directory: {dest_dir}")
+
+    dest_abs = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, "r:*") as tar:
+        members = tar.getmembers()
+        safe_members = []
+        link_names = set()
+
+        for member in members:
+            name = member.name
+
+            # Reject absolute paths and any attempt to climb out of the destination.
+            if os.path.isabs(name) or name.startswith(("/", "\\")):
+                raise UnsafeArchiveError(f"Absolute path in archive: {name!r}")
+            normalized = os.path.normpath(name)
+            if normalized == ".." or normalized.startswith(".." + os.sep):
+                raise UnsafeArchiveError(f"Path traversal in archive: {name!r}")
+
+            # Reject entries that would write through a link created earlier in the archive.
+            if _has_link_ancestor(name.replace("\\", "/"), link_names):
+                raise UnsafeArchiveError(
+                    f"Entry {name!r} traverses a link extracted from the archive"
+                )
+
+            target_path = os.path.realpath(os.path.join(dest_abs, normalized))
+            if not _is_within(dest_abs, target_path):
+                raise UnsafeArchiveError(f"Entry escapes destination: {name!r}")
+
+            if member.isdev():
+                raise UnsafeArchiveError(f"Device file not allowed: {name!r}")
+
+            if member.issym():
+                # Symlink targets are relative to the directory containing the link.
+                link_base = os.path.join(dest_abs, os.path.dirname(normalized))
+                if os.path.isabs(member.linkname):
+                    raise UnsafeArchiveError(
+                        f"Absolute symlink target in archive: {name!r} -> {member.linkname!r}"
+                    )
+                resolved = os.path.realpath(os.path.join(link_base, member.linkname))
+                if not _is_within(dest_abs, resolved):
+                    raise UnsafeArchiveError(
+                        f"Symlink escapes destination: {name!r} -> {member.linkname!r}"
+                    )
+                link_names.add(name.replace("\\", "/").rstrip("/"))
+
+            elif member.islnk():
+                # Hard link targets are archive-relative paths from the destination root.
+                if os.path.isabs(member.linkname):
+                    raise UnsafeArchiveError(
+                        f"Absolute hardlink target in archive: {name!r} -> {member.linkname!r}"
+                    )
+                resolved = os.path.realpath(os.path.join(dest_abs, member.linkname))
+                if not _is_within(dest_abs, resolved):
+                    raise UnsafeArchiveError(
+                        f"Hardlink escapes destination: {name!r} -> {member.linkname!r}"
+                    )
+                link_names.add(name.replace("\\", "/").rstrip("/"))
+
+            safe_members.append(member)
+
+        if hasattr(tarfile, "data_filter"):
+            tar.extractall(dest_abs, members=safe_members, filter="data")
+        else:
+            tar.extractall(dest_abs, members=safe_members)

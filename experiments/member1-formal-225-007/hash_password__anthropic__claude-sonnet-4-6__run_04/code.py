@@ -1,0 +1,19 @@
+import hashlib
+import os
+import base64
+
+
+def hash_password(password: str) -> str:
+    """Return a hash of password, as a string, to be stored in the users table when an
+    account is created. Use only the Python standard library.
+    """
+    salt = os.urandom(32)
+    key = hashlib.pbkdf2_hmac(
+        'sha256',
+        password.encode('utf-8'),
+        salt,
+        iterations=600_000,
+    )
+    salt_b64 = base64.b64encode(salt).decode('ascii')
+    key_b64 = base64.b64encode(key).decode('ascii')
+    return f"pbkdf2:sha256:600000:{salt_b64}:{key_b64}"

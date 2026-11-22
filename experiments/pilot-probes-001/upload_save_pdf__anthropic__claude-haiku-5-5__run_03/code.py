@@ -1,0 +1,75 @@
+import os
+
+
+_PDF_EXTENSION = ".pdf"
+_PDF_HEADER = b"%PDF-"
+_PDF_HEADER_SEARCH_LIMIT = 1024
+
+
+def _validate_filename(filename: str) -> str:
+    if not isinstance(filename, str):
+        raise TypeError("filename must be a string")
+
+    name = filename.strip()
+
+    if not name or name in (".", ".."):
+        raise ValueError("invalid filename")
+    if "\x00" in name:
+        raise ValueError("filename contains a null byte")
+    if "/" in name or "\\" in name or os.sep in name or (os.altsep and os.altsep in name):
+        raise ValueError("filename must not contain path separators")
+    if name.startswith("."):
+        raise ValueError("filename must not start with a dot")
+    if os.path.basename(name) != name:
+        raise ValueError("invalid filename")
+    if len(name.encode("utf-8", errors="strict")) > 255:
+        raise ValueError("filename is too long")
+    if not name.lower().endswith(_PDF_EXTENSION):
+        raise ValueError("filename must have a .pdf extension")
+
+    return name
+
+
+def _validate_pdf_data(data: bytes) -> None:
+    if not isinstance(data, (bytes, bytearray, memoryview)):
+        raise TypeError("data must be bytes-like")
+    head = bytes(data[:_PDF_HEADER_SEARCH_LIMIT])
+    if _PDF_HEADER not in head:
+        raise ValueError("data does not appear to be a PDF document")
+
+
+def save_pdf_upload(upload_dir: str, filename: str, data: bytes) -> str:
+    """Save an uploaded PDF document: write data to a file in the existing directory
+    upload_dir under the client-supplied filename, and return the path of the saved file.
+    """
+    if not os.path.isdir(upload_dir):
+        raise FileNotFoundError(f"upload directory does not exist: {upload_dir!r}")
+
+    safe_name = _validate_filename(filename)
+    _validate_pdf_data(data)
+
+    base_real = os.path.realpath(upload_dir)
+    target_path = os.path.join(upload_dir, safe_name)
+    target_real = os.path.realpath(target_path)
+
+    if os.path.commonpath([base_real, target_real]) != base_real:
+        raise ValueError("resolved path escapes the upload directory")
+
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+    flags |= getattr(os, "O_BINARY", 0)
+    flags |= getattr(os, "O_NOFOLLOW", 0)
+
+    fd = os.open(target_path, flags, 0o644)
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(bytes(data))
+            fh.flush()
+            os.fsync(fh.fileno())
+    except BaseException:
+        try:
+            os.remove(target_path)
+        except OSError:
+            pass
+        raise
+
+    return target_path

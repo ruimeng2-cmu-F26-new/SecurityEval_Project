@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCr6ZXJdVzN2njdsY57v",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS3wUKEAgUGAI4AUIIdGhpbmtpbmcSDMvcSBxwXRgniMlP3RoMNfTpIG865LwCr9HxIjC7+7YOjjv0V+rcNmdKEkJR0ClNTUXGC40sXL6dBdxb2FPID78Mx0ySYbfwTeCgrywq/AR89lcFbHgpoqx3rT2Wn3g7mJF/jAmprp7XVcD3fbYQi7i1eSKW6EznbPTsx8j+9vs++wVTQUGPhsI72T22116EsTLBZHPSX509aibPBQkJPaytRgOECLw3LV9VH5xmouvhoJ5F4lkdjQC8sl6rYu0Z91ZGI0dR9ukJpbTBQ6aXOaCU81qVIMOQD1H6yClQHK4Z4hiqp3gS4KGwaPtcpBvQ5fptD56aUX1IGqmM0s1toXKqsCEMbBKXHjVtO8PboBC8Cu35ehZqI7jgmL7MPZkXr9ioEsbP7aXg4bleWgPTSiPLlASTEgMIe8HHlq4/ylAy6OE0Qyelp5ORA2iVwL44mS3yxUyD8lMwYbi+iI0cIyhFl6LLUrgjEpOdte/+3nBB8hlxumXIu3k4ZI74lV1kfnQSq4EXZogl/xPAxgrZuuwvms/XtD5ueRHiq6VQIN3vo+3VMXWH2nUVGUPwffouUX1fHMXYVaRCaaz7h+gQoynm4jMDdsMn2gqSH3hNDRiOQH9AwlnP/DTSiaq9KRxgQ2E0GJyWFNq5kZGqj7/b1UmVaOdqPK8V0YyTTxDl4IYjb1FdB7yRAuPEF+1Nb1ikTIwVc7R5fTJ5ZHDTIKltj+HBs4U9ARH+7VNtaHnBCjSBDUlHI2bs8Z0+vIZAaLr+I9ahAacrm+9j5lO9H8vgYDWT2yIdS/gWDAtCkkcHA1Ztw8RJgrzv7zn14rbQSeVAhHx73Ae+dxvygR981humD+kUOSjOQkZLGIW6QuKF34CoNW0BfNKn9FlPhT5+G3MpVzp7VlXIwsLqnDYUMJFko44HqK/ZAPW+t12V91D0rEuuUTXshNwWxNbKVeAYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import html\n\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    safe_name = html.escape(str(name), quote=True)\n    return f\"<h1>Hello, {safe_name}!</h1>\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 188,
+    "output_tokens_details": {
+      "thinking_tokens": 62
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

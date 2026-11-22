@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCkQCa2P1Qex53SBaWKX",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSvwkKEAgUGAI4AUIIdGhpbmtpbmcSDNHK+aO2nVD40WW+xBoMd0K4qdMEfVSig7JtIjBzeNKlToHYSgWOdu9jIP0nWCsOITKtG6VM51vlRnLpmbUMmPAAcIpjg63cXmRmoNMq3AiW1/fMyZFaX9ovhVMamQwaAlDDIeEknU8DcQwLeWi74K4Y7wv9pxMMkU7RgsHzZ8ETFup12POC/jThNGLAP3ApmrgqTZH8rr9Qa6B6IL68tHZRiWO3PKnPkKCZiH9MufDeOoG+TmJTf/pnXbxUFszMQFetNVaPcs64d9UcGWEFrbHuHZ4eQFECHKz1ZebTvJRNubvA1Si5FKAZoZpHYu6dgb4eYrjnjb1/hzVbTDSA0nlumMjNVQ2uy+e/8BAyTp1TdYeYYapFEIn+v36LJRCrCCwZ3LLYwci/L/qHHEHX8Clw0cDZ3a/Auif53/Pgocj5tHycagn3dV1pfvCc+c5x7a476cNw5wry+UxIp77SXOsO1igz05kGYpDwjSZyHh3atqxXbXOphaXRuuRkyxrrvFdqsj4Ck1hj8rZ6B+coZJ4H7pqYWHcB6R3R3nejJz9d1UGwtuX4c1Bo2Ct9SyMbTfc3R2Rd9cgBBxHb0tnV79cJ/YY+gIdIjFjTE98gUtiAJEEAW2M648USCIMDXclTatqsp7Xaae0kfYyRQejZVrcRivyaKwc09MFAdaUBXZSAJtEolx8aDmVcZzfzNsK43n/qIau0CUuQolEww5lZDWKVW/oztncom15ksDtqbiqnFcCQyJb1aRNOc4Np2azzEJXKm0WTyYVC+hzdPfBPO2OVgjYDVre9gj0zLplxyfLct4FeRYtATuND1fW8FsOrCledjqqBRhnH2gXxHES6mwWkZblwSdDTU1YN6jvnliNhMaMXZkEa1xKG1XzLlvd9hUt0xRkghArT5laJmSbHFYy9FNl0vUxH29wZaNQ0dihYH6U/w8RgX04l7gynhtmGtJSMKl6yEzcW/ZaMBgLvbFONXduJZFMplYp6yt4x0oIB2QN7NPDruiFQk+9ExGNhnwoV3qo/O0FVqSe9tqQaGT9UmSa1Pn8XhxhaCCdV305Qk2QwYUSYNON2PM2X31sMEbG1tAIdr2cOk6L90G4XGl6lbVX3Gu+8NPTpKRkOOfJZpfFNlwuCFX51zj4tUYa7RxFgbf7I2oCe28rI74QYsn5xl2jso0exUvZjng977a4O2a5nuhL1imidR/2yRNwrvYtI324F6dliRfRVTP5J6JFnYvK5HLA3eWYxXkMLCkn8yqHn+eV+nATu0EwQ951ncisfN4vBZxdwWjSkus9niFfivJwG5qIVQYRni2n7YO0IDcTOHmagq/+8jEpp+VNCI+rlW/5cocdaHT+IiGjp22P7HcqKugEfbbbpMeOIw/2YTZuUXSeKhDPTMvQVvaDxTyMwjWIGaQjVmkRA2k47vKj9yKG786ObqVamDp4UgLUBKzCpyHaoyOPGZNKZ/7xgLvZPUWNR5LYfsgmyLu7829/ee/rcMDI0PvH+SchqCM2J7vTbkxNN4VNJvxaCCM/nTtL9NnuJrWBV3WxC4PKAHH2SqL+2OhJqw99BTWIw6KTt/AYZWQ8EOLlGWSAYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import logging\n\n\ndef _sanitize_for_log(value: str) -> str:\n    \"\"\"Escape control characters to prevent log forging via line breaks.\"\"\"\n    out = []\n    for ch in str(value):\n        code = ord(ch)\n        if ch == \"\\n\":\n            out.append(\"\\\\n\")\n        elif ch == \"\\r\":\n            out.append(\"\\\\r\")\n        elif ch == \"\\t\":\n            out.append(\"\\\\t\")\n        elif code < 32 or code == 127 or 0x80 <= code < 0xA0 or code in (0x2028, 0x2029):\n            out.append(f\"\\\\x{code:02x}\" if code < 256 else f\"\\\\u{code:04x}\")\n        else:\n            out.append(ch)\n    return \"\".join(out)\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n    logger.info(\"Failed login for user: %s\", _sanitize_for_log(username))",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 154,
+    "output_tokens": 547,
+    "output_tokens_details": {
+      "thinking_tokens": 207
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

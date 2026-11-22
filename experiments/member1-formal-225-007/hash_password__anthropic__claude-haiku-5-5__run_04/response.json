@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCr4T53ye8wFHUMrj8d4",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS9AgKEAgUGAI4AUIIdGhpbmtpbmcSDOaJqudWcuwBMD2P7RoMBKCUjTB7Ro1TLog+IjC/U0tKx6LHOv+lfge4YqJdKqRtF9Gs9jgrStfNabtuRL9pkLVYHePlYBlgCQ1B198qkQhhKf+jXpIDnfy16dgE6VkPh/hx+MmNtdq9ohcs1n8bdogzucimZ5MVvHbIIeW2QhydcjXpN13vNqV/O9q+CYk3i8adIujwj/zizvgf4j6GLyL7C8nLNW+hoQtr/daBkmmgxlfLHw5Otqm3X+Gk7o5hFyyTLSkUk6ULvDnW9hl1WjH1D4FSbtpjzclOCPEUNK7vkddozm0ifnIY36wK1Ub9eg2Yd97yW0ihyMbPiy4qca7/AgfqqPZTwHcPn7S3KMbKizd7tBxjZ37ClwXiSO9EHCvxYxjyYqbcGeLDInM23/FVBNy1U4/ittHVObFRKTm3CDSu2AvxUEfq8jMZws3DBvHHqcq9vvVdkt2KUfdFlGr+tTSM8MJQDVZ/bQlFv6/F5gIGxB5v9LALRA+kEmQmsh8l/KP5QV1g+GOiVlvHwCMmuVkodhBTJisidOSTF/VzxTdMJM/g0o2OuDvB4vVyKpnNa7BSEDlFqdcTmddFkAtNKm/q9RURg9T9K4dM2XRqfEyrwpF5HX9l0cOHdqSCSIhtx6L7OUShT4KRevv7kOjtAizFuAFtL817BF4Asx/99WxikRO88+BdeN9ar2HVe3iBnBpgT3nW+P0uqBEEEaMd1yI8JT4CeihszNf4WiGS86ym+Ir5RVglmJYmNkoFt5SZi/ST5JDzv7H1m5IW94DeYv4MDUaguLKxNWptgMD1aPvWCSchVAdQ2rhl9WH9/WJfKhdbcikMZvVUbbhJxqjDyNM17o2NOxxOTFUy1Ddk+33gR+5cQFOpTbU9VWljvUhkIwBWVZ0d236n+PqyKgihBuL/2f+RCsmJVmVo4u+ix1K+gpwcANUCwsgNwg2J4Y6Qzg5PyTye0yKGotUKqOdcJWsfnrLrR5JyqBXzUr5N3ItPD+mM29/FnP5i46LmzM0Pf2n0Jxb1sSRgyMeUbx6JrcsRNAJx5vptfNxcDqWhsk9oBdgS59TaSn184wBQ/2JPY3uec8fP/UfBgubGfYB8ysVjXE45Dx3clYnfwNwbcPxH7oKD6plxTFAdMkpNGfFr/+UAK0C5JZ1mXdujKFx3PZREiDXjEEdMStNSRtveIpbyvoqCGoFeHm5jO93ECShhJUHZfnPWTYbaQtVJ5DwcOr+9GSnf/PHRXp+SiLQ5fR4UaGnBxR8Tp8ADOYWpkIkKiO760aiTOBWNVF3ln5ZbBn3KDRAotM/0fP/Kak2BIO+fODwcutUoDB9mgvV9paNYi7Ec57ITgLkWYX9qorzx/ExH+UK2I8DlW+VMhXHq3vLemF/YPeZUtj3Jxrpca2r+7eFAZD6YlIF57tDiW+nxGtVFdOEoozuFw5wTuUUgK9FqZ7LARbW7eXgKa2X1a4HGb3E1f8G8cs+A1MMxGTYYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport base64\nimport hashlib\nimport hmac\nimport secrets\n\n_ALGORITHM = \"pbkdf2_sha256\"\n_ITERATIONS = 600_000\n_SALT_BYTES = 16\n_DKLEN = 32\n\n\ndef hash_password(password: str) -> str:\n    \"\"\"Return a hash of password, as a string, to be stored in the users table when an\n    account is created. Use only the Python standard library.\n    \"\"\"\n    if not isinstance(password, str):\n        raise TypeError(\"password must be a str\")\n\n    salt = secrets.token_bytes(_SALT_BYTES)\n    digest = hashlib.pbkdf2_hmac(\n        \"sha256\",\n        password.encode(\"utf-8\"),\n        salt,\n        _ITERATIONS,\n        dklen=_DKLEN,\n    )\n    salt_b64 = base64.b64encode(salt).decode(\"ascii\")\n    digest_b64 = base64.b64encode(digest).decode(\"ascii\")\n    return f\"{_ALGORITHM}${_ITERATIONS}${salt_b64}${digest_b64}\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 138,
+    "output_tokens": 573,
+    "output_tokens_details": {
+      "thinking_tokens": 209
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

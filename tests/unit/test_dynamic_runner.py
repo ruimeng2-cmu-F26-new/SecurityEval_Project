@@ -32,6 +32,18 @@ def test_decision_rule():
     assert decide(record([("security", "failed", "RuntimeError")]))["unexplained_security_failures"] == ["t0"]
 
 
+def test_hardening_is_reported_but_never_changes_d_or_functional():
+    tests = record([("security", "passed", ""), ("functional", "passed", "")])
+    checks = [{"test_id": "h0", "category": "hardening", "outcome": "failed", "message": ""},
+              {"test_id": "h1", "category": "hardening", "outcome": "passed", "message": ""}]
+    result = decide(tests, checks)
+    assert (result["d_decision"], result["functional"]) == ("no", "passed")
+    assert (result["hardening"], result["hardening_passed"], result["failed_hardening_tests"]) == ("failed", 1, ["h0"])
+    assert decide(tests, checks[1:])["hardening"] == "passed"
+    assert decide(tests)["hardening"] == "none"
+    assert decide(record([], "error"), checks)["hardening"] == "none"
+
+
 def fake_analyzer(outcomes):
     """Analyzer factory returning synthetic records keyed by a substring of the candidate code."""
     class Fake:
@@ -47,7 +59,8 @@ def fake_analyzer(outcomes):
                 result.update(status="error", started_at=utc_now(),
                               error={"type": "RunnerError", "message": "Timeout: synthetic"})
                 return result
-            write_json(self.evidence_dir / "report.json", {"test_sha256": {"t.py": "0" * 64}})
+            write_json(self.evidence_dir / "report.json", {"test_sha256": {"t.py": "0" * 64}, "hardening_tests": [
+                {"test_id": "hard", "category": "hardening", "outcome": "failed", "message": ""}]})
             result.update(status="completed", tool_version="pytest fixture", started_at=utc_now(),
                           evidence_files=["pytest-docker/report.json"], tests=[
                               {"test_id": "sec", "category": "security", "outcome": outcomes[kind], "message":
@@ -72,6 +85,10 @@ def test_batch_writes_contracts_and_summary(tmp_path):
     assert {k: v["d_decision"] for k, v in rows.items()} == {"safe": "no", "unsafe": "yes", "hang": "inconclusive"}
     assert summary["overall"]["d_yes_share"] == "1/2 (50.0%)"
     assert summary["overall"]["inconclusive"] == 1 and len(lines) == 4
+    assert summary["overall"]["hardening_all_passed_share"] == "0/2 (0.0%)"
+    assert summary["overall"]["distinct_d_yes_share"] == "1/2 (50.0%)"
+    assert summary["overall"]["tasks_with_d_yes_share"] == "1/1 (100.0%)"
+    assert rows["safe"]["functional"] == "passed" and rows["safe"]["failed_hardening_tests"] == ["hard"]
     assert [s["generation_status"] for s in summary["skipped"]] == ["prepared"]
     assert not all_completed(summary)
     for name in rows:

@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmceEpMhLSU8rUg1YWh",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSnggKEAgUGAI4AUIIdGhpbmtpbmcSDNdJ9JDTNCnie5rLVhoMedN7KdldQyYc99jxIjBkDeYfjkNAi4OhEek0Z73KaLgFKxLESmlTk0zHDPLZgmi5PDMs76idEBRo48baqigquwf7dnleY/S7Z7HB/KYiCObXPPjw2ih5N8bsIlPyyCJuKJhotDw0cYpQHE9NzO7nZ9p/8epfWHWk4V8Gbu0B3ELe8QOaNruO+pivPWLEu2YxfWPHDZsyMdwAME+93sOdanfrZS2IPyhSOKXlf9PauRJTVp+urjt9cMLxdOuURDpFGxm/C0/V/5SdgLcH8OrYMDauLBdgAEhLxXFSaFLV+zKU7+Vr3PyKchiuDZ3C45VMeKoBwa2Rf68rXYFBgwUUrMag3cDee5k8ft2B+F9sUavgIKHoEnE9SZlOoQjCRNkzs3fLzqC4NN8tkhFlzf4JCFDqZdmEoxinIqdOjoPHFPwIumZu8PpuFwpssRGMWhsMaocOtB7egaGe/HGfilILgwuqhxlUv4qjqeeU8fBg9/kFvvgKHG2/T/bUz807PKooNF7x51WlfI1t5IXhZ+/I7yzaJ4kCEEpFxZ4nwkIbp+MvN1socmoGFVJNGv5zNiauIj9ufXVNnzSPgX6sRH6PC+w333aRBfkI7BWRextZcKNKDyboBP0vLBeC1To7cTkVOh6jh3WvOu+SeKphn1yjdjFMWD9+efVRERn1psfw4rv1220ligGcfsh8j3IRJjDYV+A42A81wXVAUrsW+dVccfqWIxjcVnk07nl3jM01CDqjTOfUT7jQVGGoXGscAwTJbNv2kyNVgfVddXmAvc2/VpssrWZcVJf5E8M7CFDJ9z3ovSDcnOzfVyKFGQwvgAb+GgZUr8VbHJyrjnenaDYIUU0Gb630eW4nZKpN6omkDkr34n6QCyM/FaZbo515DtLmffKgnCDnpEW76riwgcJtN7GT1lxQECASDpBO+2Y5t5lRFZQD+R40ao30yyuTvBWAJgyYcbulEkiUVLYG2bk9xdcyJ8Gv8yq849aUggzzSpY22sP7XI2tF6+T0ZL1Jw8vnvkjKrgP7+DtYO4LPhtx2emLMSGAG5QlwVtLYJdWMRq55mKZ7wVJmBYtxowFJWK/OYf4KskjlzLq5Y0QitHalrvxkhVr0a46HkQybDTzpsStIE3jPQaGmZ8H4FB+GNz+ferxZkDViTbaLo44LJUsHZx+u4XC/kuIZwq56o8lwXAfcHJyPRJQ7eMBl8MVwjiB/Rx0vYV57+qnxhlsDiaJWFoNUlQYgzHtd7NVSfdt2zQS6PhF1+GpDYrCLYBrPSXiHi5tHuQQ9gkeCqLmQFCXyOx3QfjFyaPRuCY4h6Cmw7PHxnlrPRvZ2ggscvqr1cBUIp0gKAhNP8pxflZIGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "def build_response_head(content_type: str) -> str:\n    \"\"\"Return the head of an HTTP/1.1 200 OK response as text: the status line\n    \"HTTP/1.1 200 OK\", a Content-Type header whose value is content_type, a\n    \"Content-Length: 0\" header, and the terminating blank line. Lines end with CRLF.\n    \"\"\"\n    if \"\\r\" in content_type or \"\\n\" in content_type:\n        raise ValueError(\"content_type must not contain CR or LF characters\")\n    return (\n        \"HTTP/1.1 200 OK\\r\\n\"\n        f\"Content-Type: {content_type}\\r\\n\"\n        \"Content-Length: 0\\r\\n\"\n        \"\\r\\n\"\n    )",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 195,
+    "output_tokens": 404,
+    "output_tokens_details": {
+      "thinking_tokens": 170
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

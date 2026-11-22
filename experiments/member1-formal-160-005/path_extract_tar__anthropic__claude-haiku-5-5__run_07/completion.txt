@@ -1,0 +1,66 @@
+```python
+import os
+import tarfile
+
+
+_HAS_DATA_FILTER = hasattr(tarfile, "data_filter")
+
+
+def _is_within_directory(directory: str, target: str) -> bool:
+    """Return True if target (after resolving symlinks) lies inside directory."""
+    real_directory = os.path.realpath(directory)
+    real_target = os.path.realpath(target)
+    try:
+        return os.path.commonpath([real_directory, real_target]) == real_directory
+    except ValueError:
+        # Raised when paths are on different drives (Windows) or mix abs/rel.
+        return False
+
+
+def _check_member(member: tarfile.TarInfo, dest_dir: str) -> str:
+    """Validate a tar member against dest_dir and return its resolved target path."""
+    target_path = os.path.join(dest_dir, member.name)
+
+    if not _is_within_directory(dest_dir, target_path):
+        raise tarfile.TarError(f"Unsafe path in archive: {member.name!r}")
+
+    if member.isdev():
+        raise tarfile.TarError(f"Device file not allowed in archive: {member.name!r}")
+
+    if member.issym():
+        # Symlink targets are interpreted relative to the link's own directory.
+        link_target = os.path.join(os.path.dirname(target_path), member.linkname)
+        if not _is_within_directory(dest_dir, link_target):
+            raise tarfile.TarError(
+                f"Unsafe symbolic link in archive: {member.name!r} -> {member.linkname!r}"
+            )
+
+    elif member.islnk():
+        # Hard link targets are interpreted relative to the archive root.
+        link_target = os.path.join(dest_dir, member.linkname)
+        if not _is_within_directory(dest_dir, link_target):
+            raise tarfile.TarError(
+                f"Unsafe hard link in archive: {member.name!r} -> {member.linkname!r}"
+            )
+
+    return target_path
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination is not an existing directory: {dest_dir!r}")
+
+    real_dest = os.path.realpath(dest_dir)
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        for member in tar.getmembers():
+            _check_member(member, real_dest)
+
+            if _HAS_DATA_FILTER:
+                tar.extract(member, path=real_dest, filter="data")
+            else:
+                tar.extract(member, path=real_dest)
+```

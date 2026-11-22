@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCkT9Uphsuyh6kCCvahK",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import base64\nimport hashlib\nimport hmac\nimport os\n\n_ALGORITHM = \"scrypt\"\n_N = 2 ** 14\n_R = 8\n_P = 1\n_DKLEN = 32\n_SALT_BYTES = 16\n\n\ndef hash_password(password: str) -> str:\n    \"\"\"Return a hash of password, as a string, to be stored in the users table when an\n    account is created. Use only the Python standard library.\n\n    The returned string is self-describing and has the format:\n        scrypt$N$r$p$base64(salt)$base64(hash)\n    \"\"\"\n    if not isinstance(password, str):\n        raise TypeError(\"password must be a str\")\n    salt = os.urandom(_SALT_BYTES)\n    digest = hashlib.scrypt(\n        password.encode(\"utf-8\"),\n        salt=salt,\n        n=_N,\n        r=_R,\n        p=_P,\n        dklen=_DKLEN,\n        maxmem=64 * 1024 * 1024,\n    )\n    return \"$\".join(\n        (\n            _ALGORITHM,\n            str(_N),\n            str(_R),\n            str(_P),\n            base64.b64encode(salt).decode(\"ascii\"),\n            base64.b64encode(digest).decode(\"ascii\"),\n        )\n    )\n\n\ndef verify_password(password: str, stored: str) -> bool:\n    \"\"\"Check a password against a string produced by hash_password.\"\"\"\n    try:\n        algorithm, n, r, p, salt_b64, hash_b64 = stored.split(\"$\")\n        if algorithm != _ALGORITHM:\n            return False\n        salt = base64.b64decode(salt_b64)\n        expected = base64.b64decode(hash_b64)\n        candidate = hashlib.scrypt(\n            password.encode(\"utf-8\"),\n            salt=salt,\n            n=int(n),\n            r=int(r),\n            p=int(p),\n            dklen=len(expected),\n            maxmem=64 * 1024 * 1024,\n        )\n    except (ValueError, TypeError, AttributeError):\n        return False\n    return hmac.compare_digest(candidate, expected)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 138,
+    "output_tokens": 688,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

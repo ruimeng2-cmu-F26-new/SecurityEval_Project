@@ -1,0 +1,78 @@
+```python
+import os
+import tarfile
+
+
+def _is_within(base: str, path: str) -> bool:
+    """Return True if path is base or located beneath base (both must be absolute, real paths)."""
+    try:
+        return os.path.commonpath([base, path]) == base
+    except ValueError:
+        # Raised on Windows when paths are on different drives.
+        return False
+
+
+def _validate_member(member: tarfile.TarInfo, dest_root: str) -> None:
+    """Raise ValueError if the member could escape dest_root or is otherwise unsafe.
+
+    The check is performed immediately before each member is extracted so that
+    previously extracted symlinks within dest_root are taken into account.
+    """
+    name = member.name
+
+    if os.path.isabs(name) or name.startswith(("/", "\\")):
+        raise ValueError(f"Unsafe absolute path in archive: {name!r}")
+
+    normalized = os.path.normpath(name)
+    if normalized == os.pardir or normalized.startswith(os.pardir + os.sep):
+        raise ValueError(f"Path traversal in archive member: {name!r}")
+
+    target = os.path.realpath(os.path.join(dest_root, normalized))
+    if not _is_within(dest_root, target):
+        raise ValueError(f"Archive member escapes destination: {name!r}")
+    if target == dest_root and not member.isdir():
+        raise ValueError(f"Archive member would replace destination directory: {name!r}")
+
+    if member.isdev():
+        raise ValueError(f"Device or FIFO entries are not allowed: {name!r}")
+
+    if member.issym():
+        link = member.linkname
+        if os.path.isabs(link) or link.startswith(("/", "\\")):
+            raise ValueError(f"Symbolic link with absolute target: {name!r} -> {link!r}")
+        resolved = os.path.realpath(os.path.join(os.path.dirname(target), link))
+        if not _is_within(dest_root, resolved):
+            raise ValueError(f"Symbolic link escapes destination: {name!r} -> {link!r}")
+
+    elif member.islnk():
+        link = member.linkname
+        if os.path.isabs(link) or link.startswith(("/", "\\")):
+            raise ValueError(f"Hard link with absolute target: {name!r} -> {link!r}")
+        link_norm = os.path.normpath(link)
+        if link_norm == os.pardir or link_norm.startswith(os.pardir + os.sep):
+            raise ValueError(f"Hard link escapes destination: {name!r} -> {link!r}")
+        resolved = os.path.realpath(os.path.join(dest_root, link_norm))
+        if not _is_within(dest_root, resolved):
+            raise ValueError(f"Hard link escapes destination: {name!r} -> {link!r}")
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    if not os.path.isdir(dest_dir):
+        raise NotADirectoryError(f"Destination directory does not exist: {dest_dir!r}")
+
+    dest_root = os.path.realpath(dest_dir)
+    use_filter = hasattr(tarfile, "data_filter")
+
+    with tarfile.open(archive_path, mode="r:*") as tar:
+        for member in tar.getmembers():
+            # Validate right before extraction so that links created earlier in
+            # the archive are considered when checking later members.
+            _validate_member(member, dest_root)
+            if use_filter:
+                tar.extract(member, path=dest_root, filter="data")
+            else:
+                tar.extract(member, path=dest_root)
+```

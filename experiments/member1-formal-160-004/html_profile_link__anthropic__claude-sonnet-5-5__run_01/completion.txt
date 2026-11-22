@@ -1,0 +1,27 @@
+import html
+from urllib.parse import urlsplit
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    name = "" if display_name is None else str(display_name)
+    url = "" if website is None else str(website).strip()
+
+    safe_text = html.escape(name, quote=True)
+
+    # Only allow safe URL schemes; otherwise neutralize the link.
+    allowed_schemes = {"http", "https"}
+    href_value = "#"
+    try:
+        # Remove control characters/whitespace that browsers may ignore in schemes.
+        cleaned = "".join(ch for ch in url if ch.isprintable() and not ch.isspace())
+        parts = urlsplit(cleaned)
+        if parts.scheme.lower() in allowed_schemes and parts.netloc:
+            href_value = cleaned
+    except ValueError:
+        href_value = "#"
+
+    safe_href = html.escape(href_value, quote=True)
+    return f'<a href="{safe_href}">{safe_text}</a>'

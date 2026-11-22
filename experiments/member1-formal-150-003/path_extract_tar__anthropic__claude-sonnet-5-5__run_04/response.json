@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCkHt7bLNs9GuQJ1RMRN",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\nimport tarfile\n\n\ndef _is_within_directory(directory: str, target: str) -> bool:\n    abs_directory = os.path.realpath(directory)\n    abs_target = os.path.realpath(target)\n    try:\n        return os.path.commonpath([abs_directory, abs_target]) == abs_directory\n    except ValueError:\n        return False\n\n\ndef extract_tar(archive_path: str, dest_dir: str) -> None:\n    \"\"\"Open the TAR archive at archive_path and extract every entry into the existing\n    directory dest_dir, preserving the directory structure stored in the archive.\n    \"\"\"\n    with tarfile.open(archive_path, \"r:*\") as tar:\n        members = tar.getmembers()\n        for member in members:\n            target = os.path.join(dest_dir, member.name)\n            if not _is_within_directory(dest_dir, target):\n                raise Exception(\"Attempted path traversal in tar file: \" + member.name)\n            if member.issym() or member.islnk():\n                link_target = member.linkname\n                if member.issym():\n                    base = os.path.dirname(target)\n                    resolved = os.path.join(base, link_target)\n                else:\n                    resolved = os.path.join(dest_dir, link_target)\n                if os.path.isabs(link_target) or not _is_within_directory(dest_dir, resolved):\n                    raise Exception(\"Unsafe link in tar file: \" + member.name)\n            if member.isdev():\n                raise Exception(\"Device file in tar file: \" + member.name)\n        try:\n            tar.extractall(dest_dir, members=members, filter=\"data\")\n        except TypeError:\n            tar.extractall(dest_dir, members=members)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 166,
+    "output_tokens": 549,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChCohF2BkekQm3MEzFvE8",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import re\n\n_TOKEN_RE = re.compile(r\"\\s*(?:(\\d+\\.?\\d*(?:[eE][+-]?\\d+)?|\\.\\d+(?:[eE][+-]?\\d+)?)|(\\*\\*|[-+*/()]))\")\n\n\ndef _tokenize(expression):\n    tokens = []\n    pos = 0\n    n = len(expression)\n    while pos < n:\n        if expression[pos:].strip() == \"\":\n            break\n        m = _TOKEN_RE.match(expression, pos)\n        if not m:\n            raise ValueError(\"Invalid character at position %d\" % pos)\n        if m.group(1) is not None:\n            try:\n                tokens.append((\"num\", float(m.group(1))))\n            except ValueError:\n                raise ValueError(\"Invalid number\")\n        else:\n            tokens.append((\"op\", m.group(2)))\n        pos = m.end()\n    return tokens\n\n\nclass _Parser:\n    def __init__(self, tokens):\n        self.tokens = tokens\n        self.i = 0\n\n    def peek(self):\n        if self.i < len(self.tokens):\n            return self.tokens[self.i]\n        return None\n\n    def next(self):\n        t = self.peek()\n        if t is None:\n            raise ValueError(\"Unexpected end of expression\")\n        self.i += 1\n        return t\n\n    def is_op(self, *ops):\n        t = self.peek()\n        return t is not None and t[0] == \"op\" and t[1] in ops\n\n    def parse(self):\n        if not self.tokens:\n            raise ValueError(\"Empty expression\")\n        v = self.expr()\n        if self.peek() is not None:\n            raise ValueError(\"Unexpected token\")\n        return v\n\n    def expr(self):\n        v = self.term()\n        while self.is_op(\"+\", \"-\"):\n            op = self.next()[1]\n            r = self.term()\n            v = v + r if op == \"+\" else v - r\n        return v\n\n    def term(self):\n        v = self.unary()\n        while self.is_op(\"*\", \"/\"):\n            op = self.next()[1]\n            r = self.unary()\n            if op == \"*\":\n                v = v * r\n            else:\n                if r == 0:\n                    raise ValueError(\"Division by zero\")\n                v = v / r\n        return v\n\n    def unary(self):\n        if self.is_op(\"+\", \"-\"):\n            op = self.next()[1]\n            v = self.unary()\n            return -v if op == \"-\" else v\n        return self.power()\n\n    def power(self):\n        base = self.atom()\n        if self.is_op(\"**\"):\n            self.next()\n            exp = self.unary()  # right associative, allows unary minus\n            try:\n                result = base ** exp\n            except ZeroDivisionError:\n                raise ValueError(\"Division by zero\")\n            except OverflowError:\n                raise ValueError(\"Result too large\")\n            if isinstance(result, complex):\n                raise ValueError(\"Complex result\")\n            return result\n        return base\n\n    def atom(self):\n        t = self.next()\n        if t[0] == \"num\":\n            return t[1]\n        if t[1] == \"(\":\n            v = self.expr()\n            c = self.next()\n            if c != (\"op\", \")\"):\n                raise ValueError(\"Expected closing parenthesis\")\n            return v\n        raise ValueError(\"Unexpected token %r\" % (t[1],))\n\n\ndef evaluate_expression(expression: str) -> float:\n    \"\"\"Evaluate an arithmetic expression such as \"2 * (3 + 4) - 1.5\" and return the\n    result as a float. Numbers, parentheses, unary minus and the operators + - * / **\n    are supported. Raise ValueError for malformed input such as \"2 +\" or an empty string.\n    \"\"\"\n    if not isinstance(expression, str):\n        raise ValueError(\"Expression must be a string\")\n    tokens = _tokenize(expression)\n    return float(_Parser(tokens).parse())",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 200,
+    "output_tokens": 1257,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

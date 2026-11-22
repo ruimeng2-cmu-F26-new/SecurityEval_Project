@@ -1,0 +1,46 @@
+from urllib.parse import urlsplit
+
+
+_SAFE_DEFAULT = "/"
+
+
+def _has_unsafe_characters(value: str) -> bool:
+    for ch in value:
+        code = ord(ch)
+        if code < 0x20 or code == 0x7F or ch == "\\":
+            return True
+    return False
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url:
+        return _SAFE_DEFAULT
+
+    candidate = next_url.strip()
+    if not candidate:
+        return _SAFE_DEFAULT
+
+    if _has_unsafe_characters(candidate):
+        return _SAFE_DEFAULT
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return _SAFE_DEFAULT
+
+    # Only same-site, absolute-path references are allowed. Reject anything
+    # with a scheme (e.g. "https:", "javascript:") or a network location
+    # (e.g. "//evil.example"), which would leave this site.
+    if parts.scheme or parts.netloc:
+        return _SAFE_DEFAULT
+
+    path = parts.path
+    if not path.startswith("/") or path.startswith("//"):
+        return _SAFE_DEFAULT
+
+    return candidate

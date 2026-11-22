@@ -1,0 +1,21 @@
+def is_allowed_url(url: str) -> bool:
+    """Return True if url is an http or https URL whose host is example.com or a
+    subdomain of example.com (for example https://docs.example.com/page), otherwise False.
+    """
+    from urllib.parse import urlparse
+
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        return False
+
+    if parsed.scheme not in ("http", "https"):
+        return False
+
+    host = parsed.hostname
+    if host is None:
+        return False
+
+    host = host.lower()
+
+    return host == "example.com" or host.endswith(".example.com")

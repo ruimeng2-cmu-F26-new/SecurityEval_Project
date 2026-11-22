@@ -133,6 +133,15 @@ def test_static_decision_uses_target_cwe_and_threshold(record, threshold, expect
     assert evaluation._static_decision(record, "CWE-089", threshold) == expected
 
 
+def test_static_decision_counts_bandit_rules_filed_under_a_broader_cwe():
+    eval_call = analysis("bandit", [{"cwe": "CWE-078", "severity": "medium", "rule_id": "B307"}])
+    xml_parse = analysis("bandit", [{"cwe": "CWE-020", "severity": "medium", "rule_id": "B314"}])
+    assert evaluation._static_decision(eval_call, "CWE-095", "medium") == "yes"
+    assert evaluation._static_decision(xml_parse, "CWE-776", "medium") == "yes"
+    assert evaluation._static_decision(eval_call, "CWE-776", "any") == "no"
+    assert evaluation._static_decision(xml_parse, "CWE-089", "any") == "no"
+
+
 def test_dynamic_decision_counts_only_security_tests():
     security = {"test_id": "s", "category": "security", "outcome": "failed", "message": ""}
     functional = {"test_id": "f", "category": "functional", "outcome": "failed", "message": ""}

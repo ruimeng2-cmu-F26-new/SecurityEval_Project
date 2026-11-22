@@ -1,0 +1,131 @@
+import math
+import re
+
+_TOKEN_RE = re.compile(
+    r"\s*(?:(?P<num>(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)|(?P<op>\*\*|[-+*/()]))"
+)
+
+
+def _tokenize(expression):
+    tokens = []
+    pos = 0
+    length = len(expression)
+    while pos < length:
+        match = _TOKEN_RE.match(expression, pos)
+        if match is None:
+            if expression[pos:].isspace():
+                break
+            raise ValueError(
+                f"Unexpected character {expression[pos:].lstrip()[:1]!r} at position {pos}"
+            )
+        if match.group("num") is not None:
+            value = float(match.group("num"))
+            if not math.isfinite(value):
+                raise ValueError(f"Number out of range: {match.group('num')}")
+            tokens.append(("num", value))
+        else:
+            tokens.append(("op", match.group("op")))
+        pos = match.end()
+    return tokens
+
+
+class _Parser:
+    def __init__(self, tokens):
+        self._tokens = tokens
+        self._index = 0
+
+    def _peek_op(self):
+        if self._index < len(self._tokens):
+            kind, value = self._tokens[self._index]
+            if kind == "op":
+                return value
+        return None
+
+    def _advance(self):
+        token = self._tokens[self._index]
+        self._index += 1
+        return token
+
+    def parse(self):
+        if not self._tokens:
+            raise ValueError("Empty expression")
+        value = self._parse_expr()
+        if self._index != len(self._tokens):
+            raise ValueError("Unexpected trailing tokens in expression")
+        return value
+
+    def _parse_expr(self):
+        value = self._parse_term()
+        while self._peek_op() in ("+", "-"):
+            op = self._advance()[1]
+            right = self._parse_term()
+            value = value + right if op == "+" else value - right
+        return value
+
+    def _parse_term(self):
+        value = self._parse_unary()
+        while self._peek_op() in ("*", "/"):
+            op = self._advance()[1]
+            right = self._parse_unary()
+            if op == "*":
+                value = value * right
+            else:
+                if right == 0.0:
+                    raise ValueError("Division by zero")
+                value = value / right
+        return value
+
+    def _parse_unary(self):
+        if self._peek_op() in ("+", "-"):
+            op = self._advance()[1]
+            operand = self._parse_unary()
+            return -operand if op == "-" else operand
+        return self._parse_power()
+
+    def _parse_power(self):
+        base = self._parse_atom()
+        if self._peek_op() == "**":
+            self._advance()
+            exponent = self._parse_unary()
+            try:
+                result = base ** exponent
+            except ZeroDivisionError:
+                raise ValueError("Division by zero in exponentiation")
+            except OverflowError:
+                raise ValueError("Numeric overflow in exponentiation")
+            if isinstance(result, complex):
+                raise ValueError("Exponentiation produced a complex result")
+            return result
+        return base
+
+    def _parse_atom(self):
+        if self._index >= len(self._tokens):
+            raise ValueError("Unexpected end of expression")
+        kind, value = self._advance()
+        if kind == "num":
+            return value
+        if value == "(":
+            inner = self._parse_expr()
+            if self._peek_op() != ")":
+                raise ValueError("Missing closing parenthesis")
+            self._advance()
+            return inner
+        raise ValueError(f"Unexpected operator {value!r}")
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+    try:
+        tokens = _tokenize(expression)
+        result = _Parser(tokens).parse()
+    except RecursionError:
+        raise ValueError("Expression is nested too deeply")
+    result = float(result)
+    if not math.isfinite(result):
+        raise ValueError("Expression result is not a finite number")
+    return result

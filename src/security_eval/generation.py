@@ -16,7 +16,7 @@ INSTRUCTIONS = (
 )
 PRICING_AS_OF = "2026-11-01"
 PRICING_SOURCE = "https://platform.claude.com/docs/en/about-claude/pricing"
-MODEL_PRICES_USD_PER_MILLION = {
+MODEL_PRICES_USD_PER_MILLION = {  # models absent from this table get no cost estimate
     "claude-haiku-5-5": {"input": 0.10, "cache_write": 0.125, "cache_read": 0.01, "output": 0.50},
     "claude-sonnet-5-5": {"input": 2.00, "cache_write": 2.50, "cache_read": 0.10, "output": 10.00},
 }
@@ -60,8 +60,15 @@ def estimate_cost_usd(usage: dict | None, model: str) -> float | None:
 def extract_code(text: str) -> str:
     text = text.strip()
     match = re.fullmatch(r"```(?:python|py)?\s*\n(.*?)\n```", text, flags=re.DOTALL)
+    blocks = re.findall(r"^```(?:python|py)?[ \t]*\n(.*?)\n```[ \t]*$", text, flags=re.DOTALL | re.MULTILINE)
     if match:
         text = match.group(1).strip()
+    elif len(blocks) == 1:
+        # One fenced block surrounded by a sentence of explanation: keep the code only.
+        text = blocks[0].strip()
+    elif text.endswith("\n```") and text.count("```") == 1:
+        # Bare code followed by a stray closing fence.
+        text = text[:-3].strip()
     if not text:
         raise GenerationFailure("empty_response", "The response did not contain Python source.")
     return text + "\n"
@@ -101,8 +108,8 @@ def prepare(sample: dict, out: Path, model: str, *, effort: str = "medium",
     validate("sample", sample)
     if not model.strip():
         raise ValueError("An explicit model ID is required")
-    if effort not in {"low", "medium", "high", "xhigh", "max"}:
-        raise ValueError("effort must be low, medium, high, xhigh, or max")
+    if effort not in {"none", "low", "medium", "high", "xhigh", "max"}:
+        raise ValueError("effort must be none, low, medium, high, xhigh, or max")
     if max_tokens < 1:
         raise ValueError("max_tokens must be positive")
     if run_index < 1:
@@ -114,16 +121,19 @@ def prepare(sample: dict, out: Path, model: str, *, effort: str = "medium",
         "max_tokens": max_tokens,
         "system": INSTRUCTIONS,
         "messages": [{"role": "user", "content": sample["adapted_prompt"]}],
-        "thinking": {"type": "adaptive"},
-        "output_config": {"effort": effort},
     }
+    # effort "none" sends neither field: no extended thinking, for models without adaptive thinking
+    # and for comparing models under one configuration.
+    thinking_type = "disabled" if effort == "none" else "adaptive"
+    if effort != "none":
+        request.update(thinking={"type": "adaptive"}, output_config={"effort": effort})
     write_json(out / "sample.json", sample)
     write_json(out / "request.json", request)
     record = {
         "schema_version": "1.0", "candidate_id": candidate,
         "sample_id": sample["sample_id"], "run_index": run_index,
         "status": "prepared", "provider": "anthropic", "requested_model": model,
-        "returned_model": None, "effort": effort, "thinking_type": "adaptive",
+        "returned_model": None, "effort": effort, "thinking_type": thinking_type,
         "max_tokens": max_tokens, "stop_reason": None, "failure_kind": None,
         "created_at": utc_now(), "completed_at": None,
         "request_file": "request.json", "sample_file": "sample.json",

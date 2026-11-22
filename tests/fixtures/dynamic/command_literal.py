@@ -1,4 +1,4 @@
-"""Handwritten control, not LLM output. Not vulnerable, but violates the contract: metacharacters are echoed literally."""
+"""Handwritten control, not LLM output. Not vulnerable and functionally correct, but not hardened: metacharacters are echoed literally."""
 import subprocess
 
 

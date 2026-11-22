@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCr6HZ6y8YPR7TH2x4ED",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSxQcKEAgUGAI4AUIIdGhpbmtpbmcSDA90j9h1lMyGJjPc/BoM3VT7ja4eW32o4OP4IjC2YnMxXwv9ebLIqQek9kqjBZZYw+wigV9MNl74eBSPYWGGRbr36i/ayNk02QzIhYYq4ga5pcp1IHSGGwRJ5DbObM8Dybw4vEqlD+RTGHn75VRJ/RA6OZFWFX2hqi2NYgqbTP/ysCFprNWcX/az4nvHWA4feVKGBgLs9b7Knx04/lbENNy52TXVAvuEKEb/e/vSe4Ua385zMjvwo0++mVg21sRtTtTh1E9vdMqtDJlH2gs5EnyUokZFUi2nCy5JCqxqXFJ0SSL4vkv1iiQDN2LSLacYN2nS9mUIF+quvA7JPLEBeqREHyzuqi+bNEh91r1CKwChaz+JwLgad1IY6aLDXBHYPhWdhHGN9VyOq1U+dQOgr93fLDohlFRpy12crbdSeYYz1RNn78K36RUaQkfC9z5xJ89frToDSlZ/nN1F7xsDThP7JTnQvK93KkuCPbnO7e19kkrR2hGNo3z1VqPLdHYMpvFwzSOqU2VPE9/1xzAl3HLygkIcvTYXV5tgrgEua+wnH3CZs0h1krTOMWn1HiNABmYugTS8p4yCRr1p00QfM6BKWqBJ94AoUulXe5TwLJYZtRnyq7qXQm/fOXwMcm9IpyFtXVFFU9M5ZE6qMocyV9mTRziXfZAmsXoDXagg/fZq/4RLfxKXu/xPwY//w350cCiUFROOMsvSaidEqOyHDJnrAmLHxpv00Fzo2NtwxUe2yQ2bwOiKRWQJ7BEjfjVQwhmFTl3rLEAfkcc8Z2fyl/8a6PRVui/Ig/S0WDZl8UXHJ0le9+JgU7gZ80eynCzEbMeZYCJi6Xty9J+vZKkAymb7YJRhLWifNno4Yy/W/euPwU+83QNGMFUtbTOk+58Q5vml/JQVPhBkCQhBMjewz4Rt9RXzYQdQ1knkcpo979rDd3jTaZ8K/hd843k+m37Gn8a15lr+qIq73JU+ESG/LmD5PXQNEVlq+IVduMiZaIlW7RTIVI6atlB1kOgUXMqv625HjjrBE4jIkgHduD+RXHuoo0O34XwaYhTQG4T1lAUDNrONLPfNbR6ZEyA5x0ci+a8Z4fsqYVStYyU0i4DRAAP2TPVp3XOsjV4+ISftLLLpEpGhB7XkFoZxbo4jWJxiFHdUCWIRIdmEUZoU3ihXY1QFsRfiE28uKPPxgipG8J7NzR9EpGMHbRtg/ihMMeWScDRSZwmz5GmJ4GJXyv6wdiQq7YfInlPcJs/TU0dsp+McjBgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "import html\n\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    safe_name = html.escape(name, quote=True)\n    return f\"<h1>Hello, {safe_name}!</h1>\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 155,
+    "output_tokens": 265,
+    "output_tokens_details": {
+      "thinking_tokens": 141
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

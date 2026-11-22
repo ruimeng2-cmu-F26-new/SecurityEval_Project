@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnygnZSpeRMY4R3MR9U",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSsgoKEAgUGAI4AUIIdGhpbmtpbmcSDHSE3F5/dx8y0UFkAhoMtEfu+mZpd5YrubBbIjBdbBVlJ5Bk0DwCbgLlfHxL1Uv75PHjPqmZ7dOJaCcBB2BVmBHiQspajDR/t5UVK7kqzwkT3RUsTBvP+S+jA1vpEl5RwbCkaJqNNxTWyZiv3dq5VSSu8GzjJAfBZN0mAz5nC343NEWP72c+LU49z8i25diUm9gnOaTdPGJlI8qKNSLmafmjg745R/rMr3s9f9F501fAb3W0hFqccpRVglZMtPQL/M4ASzCfVGbbFm0A+Mke6BRtqiiIOIWeACcStyXQS6HCKK3pVekitzLB6D63ubZAdcFT1G2soZSRLB7VxgJREj4pkIfGnGNVK71A4E2H82m+eZIqPaDUp4izXW+IiE4eQrEoo3a1D5onGPWMgS6MfLQhrLD+AQsAU5OXFUUbHKJPyKP00MdtuAGoTBz3RV/bLjLL1VHbqV12yqt0pVWl6u4c0ZTP7pvD1B/jnGuwTFMhBrjLWsd21wfU9z0af6DP4PDrSXJRS/P5saIyXF0wbujnBO0/hlnR7He83dXxisvsiP7IVjahlIh+7WfIGfEl81tnqcIPiLLb+iGFqsImBDhlZdrFEVRSu2h1HX3FvvdYXF18hC9vSJJcREwWZsflzAua3SmjnGsOll1/qpOEA/AJ9pBXh2yxBIHnXFkvrlr4pjrcpCk5v9ysRJP4Xy4pEJRAntm/ZgBTzRbVgjrHM4F4hwiBzZvp8PXCi5oRB5F43m3QRaU2JitIt0eWu7jBoD4pGwzw+77m1cfB3vpX5kjHoD66MdTemE1FWAImvCVn0V6BShxIZ3sfwGsf7+rXPIiY4Vh2gcCvCfVqOwm43qjuVTbdA6dEpWqGLQEE1/h0Zpoaj1vgB19sId9i0mj4Cuy/3sDZPS6g5xq3mG80bHjnGCufPdeFf7svbHhUHQFOafyNni6UckDIUE6mdXzE8xrsDeR7LIehnooi4NEqzVhYElvWqmw+OKFjoRdfdPa3dZsGxj3RZwa1TXxXLSOpeBI+YtavudJsm2MYhQdGE+QzKxiEUnAjXt0nXo5HuFsuyVGgAVJg+X8MTWxrpE4Y0/+sp2y7jU0nPAhSSY3Q6p04By0Iph6oiqVLvQi+FvwNcBk+U3Pw34gDAISB3bBhZ/fZ0q7UzpP/sMUyi3reIOS0HEWX1Gn7DnEAAKr3daKd54APLlmz+ee66PdzNEmr6nkNakUz1GEysa4x+7mWuExifRqIKmhOUs3VL0jnZeB4SasCsSzNMI+2Dy41PGPw7L8+YBptP7HXPojFe7HR1UrlWFaTdQXh/3346LFS8lTwl5LKcR2F+OGHSpKC/wS9FnchwHZntWhTpz/gXvVDzb6h4geGE3ZfPz4LMcon9j0SQIXxGd5EjAzzLztOZrmpcVOVLCoGno0SdJ+3RskhOCn8/pX1wvJn4x1wjHBsf7UKgaRXG5jMBS4omu6lA0tTw83ktTIUrKsMinFV+tYSvoqPwApI5ij4jip5AgqbC/yW1IZmhO8A5cLezcN7jpRcZiWN4myLlp7zO+o9gwGsRlM272sCAau4HqYPGwSyO6eT/yKD3hioubgL9tNuXPOasDi6Sk6UUwA0tlDzEOTJv4J6dMC0rs8wotrj4uFfDN70caA7DplSUdNGceC/9ihs2cc7yzTcRdusqlhKdLWqUuH87mNa3/w6ZbKmgVAHt0gQEZicE6guCvJMO4v08YXOOURyPtXpT3w0aWnCCLuhGAE=",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\nfrom urllib.parse import urlsplit\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    url = website.strip()\n    parts = urlsplit(url)\n    if not parts.scheme:\n        url = \"https://\" + url\n        parts = urlsplit(url)\n    if parts.scheme.lower() not in (\"http\", \"https\") or not parts.netloc:\n        raise ValueError(\"website must be an absolute http or https URL\")\n\n    href = html.escape(url, quote=True)\n    text = html.escape(display_name, quote=False)\n    return f'<a href=\"{href}\">{text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 519,
+    "output_tokens_details": {
+      "thinking_tokens": 262
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

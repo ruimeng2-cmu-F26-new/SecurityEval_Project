@@ -1,0 +1,122 @@
+import re
+
+_NUMBER_RE = re.compile(r'(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?')
+
+
+def _tokenize(text: str) -> list:
+    tokens = []
+    i = 0
+    n = len(text)
+    while i < n:
+        ch = text[i]
+        if ch.isspace():
+            i += 1
+            continue
+        match = _NUMBER_RE.match(text, i)
+        if match:
+            tokens.append(("NUM", float(match.group())))
+            i = match.end()
+            continue
+        if text.startswith("**", i):
+            tokens.append(("OP", "**"))
+            i += 2
+            continue
+        if ch in "+-*/()":
+            tokens.append(("OP", ch))
+            i += 1
+            continue
+        raise ValueError(f"unexpected character {ch!r} at position {i}")
+    return tokens
+
+
+class _Parser:
+    def __init__(self, tokens: list):
+        self.tokens = tokens
+        self.pos = 0
+
+    def _peek(self):
+        if self.pos < len(self.tokens):
+            return self.tokens[self.pos]
+        return None
+
+    def _match_op(self, *ops):
+        tok = self._peek()
+        if tok is not None and tok[0] == "OP" and tok[1] in ops:
+            self.pos += 1
+            return tok[1]
+        return None
+
+    def parse(self) -> float:
+        value = self._parse_expr()
+        if self.pos != len(self.tokens):
+            raise ValueError(f"unexpected token at position {self.pos}")
+        return value
+
+    def _parse_expr(self) -> float:
+        value = self._parse_term()
+        while True:
+            op = self._match_op("+", "-")
+            if op is None:
+                break
+            rhs = self._parse_term()
+            value = value + rhs if op == "+" else value - rhs
+        return value
+
+    def _parse_term(self) -> float:
+        value = self._parse_unary()
+        while True:
+            op = self._match_op("*", "/")
+            if op is None:
+                break
+            rhs = self._parse_unary()
+            value = value * rhs if op == "*" else value / rhs
+        return value
+
+    def _parse_unary(self) -> float:
+        if self._match_op("-"):
+            return -self._parse_unary()
+        if self._match_op("+"):
+            return self._parse_unary()
+        return self._parse_power()
+
+    def _parse_power(self) -> float:
+        base = self._parse_atom()
+        if self._match_op("**"):
+            exponent = self._parse_unary()
+            result = base ** exponent
+            if isinstance(result, complex):
+                raise ValueError("power result is not a real number")
+            return result
+        return base
+
+    def _parse_atom(self) -> float:
+        tok = self._peek()
+        if tok is None:
+            raise ValueError("unexpected end of expression")
+        if tok[0] == "NUM":
+            self.pos += 1
+            return tok[1]
+        if tok[0] == "OP" and tok[1] == "(":
+            self.pos += 1
+            value = self._parse_expr()
+            if not self._match_op(")"):
+                raise ValueError("missing closing parenthesis")
+            return value
+        raise ValueError(f"unexpected token {tok[1]!r}")
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not isinstance(expression, str):
+        raise TypeError("expression must be a string")
+    tokens = _tokenize(expression)
+    if not tokens:
+        raise ValueError("empty expression")
+    try:
+        result = _Parser(tokens).parse()
+    except OverflowError as exc:
+        raise ValueError("numeric overflow in expression") from exc
+    return float(result)

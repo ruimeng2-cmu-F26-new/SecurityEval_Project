@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnxZM4Uh3MG5zREddzK",
+  "container": null,
+  "content": [
+    {
+      "signature": "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",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom typing import Callable\n\n\ndef run_computation(compute: Callable[[], str]) -> dict:\n    \"\"\"Invoke compute() within a try-except block and return the body of the HTTP\n    response sent to the remote client: {\"status\": \"ok\", \"result\": <the return value>}\n    on success, or {\"status\": \"error\", \"message\": <text>} if compute() raises.\n    \"\"\"\n    try:\n        result = compute()\n    except Exception as exc:\n        message = str(exc) or type(exc).__name__\n        return {\"status\": \"error\", \"message\": message}\n    return {\"status\": \"ok\", \"result\": result}\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 195,
+    "output_tokens": 515,
+    "output_tokens_details": {
+      "thinking_tokens": 323
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

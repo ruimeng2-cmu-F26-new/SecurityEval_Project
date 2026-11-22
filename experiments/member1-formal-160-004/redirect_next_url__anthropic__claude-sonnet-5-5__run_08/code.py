@@ -1,0 +1,62 @@
+from urllib.parse import urlsplit
+
+_ALLOWED_HOST = "shop.example"
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+
+    Unsafe values (external sites, protocol-relative URLs, other schemes,
+    control characters, backslash tricks) fall back to "/" to prevent open
+    redirects.
+    """
+    if not next_url or not isinstance(next_url, str):
+        return "/"
+
+    candidate = next_url.strip()
+    if not candidate:
+        return "/"
+
+    # Reject control characters and backslashes (browsers treat "\" as "/").
+    if any(ord(ch) < 0x20 or ord(ch) == 0x7F for ch in candidate):
+        return "/"
+    if "\\" in candidate:
+        return "/"
+
+    try:
+        parts = urlsplit(candidate)
+    except ValueError:
+        return "/"
+
+    # Absolute URL pointing at this site: reduce to a relative path.
+    if parts.scheme or parts.netloc:
+        if parts.scheme.lower() != "https":
+            return "/"
+        try:
+            host = (parts.hostname or "").lower()
+            port = parts.port
+        except ValueError:
+            return "/"
+        if host != _ALLOWED_HOST or port not in (None, 443):
+            return "/"
+        if parts.username is not None or parts.password is not None:
+            return "/"
+        path = parts.path or "/"
+        result = path
+        if parts.query:
+            result += "?" + parts.query
+        if parts.fragment:
+            result += "#" + parts.fragment
+        candidate = result
+        if not candidate.startswith("/"):
+            return "/"
+
+    # Must be a site-relative path, not protocol-relative.
+    if not candidate.startswith("/") or candidate.startswith("//"):
+        return "/"
+
+    return candidate

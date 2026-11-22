@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCmdAq5WpZL4N6Bpj8yZ",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQSxwkKEAgUGAI4AUIIdGhpbmtpbmcSDAdacjhBwAkJ7oFWhhoMd7pMou1oGvNPt9QqIjBeIZhpY3m6PPKm/bNvulyfOMXUB05dmSTd7BvsvuS/3Md1NcYHt0a3M1mWSygxVpgq5AgLVwQFd0fGgzkO5KIa4OFILekAq7OUVANLHojnyubStFkEXBEgiNG1aPPQMuyhUar7ocdDpUOJY/6h+m9u3Ye/aCWl5rWeT8kto8xlflxcXsonQ63pmBfZwqN8QuzYqb/j7sh0/Sa4n+rzpSzMIGB48X4TDj6FLUBLWuOfzBMD2vlPOO065XTXMMT01+4mLLT+h/kj1in6h5CHHH1jBBHgIi0eC8U2NRXmE/vRRrZyyuRQnsGdAdK+a7iJAjv3G0vWLI8kx7z8m/KYu3QAL9QOSt0rryxn7r68mcWgLAGxPNpL/JTB7njkSoSzZ1Uh2PNc4rP/7Hj/8sb8CUtP2tHtGKSaNZDIuO4YIYSxg9k+S4/dZUCk0WqEu7HY/Amw6rmOHoptk8XGnz/r8pdHN90gJWu1ftjxmHP2O5b+4K1HlJkZR8dM2xyFBWn0dsJmOfz9JLky+wE/wvlUSDIAKyZew2J9QkvddV7T0vdMmxZXYBTX5stqkP7mknMlLPU6cuvuBMlDNwFWg+2Vh2ecjxWGre64TR09t5mZeqe54smg7IJL6hnJ0QxpAd0y6SYEsZRrWWy3yaK+krCJmQm3HJ4a5J5mQ14UIuj56n6EzNBmHTiIbvsZfpFd/7c5T0EVTaDymutZUKwa2O2k09+YGZyT2KENzwux9kyVpVvqQF9ftnTzK735fISetGqmY2TYKHVJfWFLm67ZK3HHGZUfv+YFFuYc8t3h8uelbuSXiDA5Dwzt6loTCrBhq940up+FVEZZ+dj/whNylpbhQiT49Fu0ZJnaIYjmWY+6KFpHpEsfoDXIwCxz6ed9lgNLeilLKQG3cah2K/88UktiRkwarbJhtuD4701/zZCSYLJC1ugDlx4UiKjp7wfTLiTUNcFtlq1FGs+f2fV9qveeUBVU4/+c3RQdMlWU0G1M0/5gfuVpKkGlBxRWGx+/FZWyxi13wuZeGLmo19MMLGdrJnad22uCx+MDxkcMT/UiNDs+xW6Rfck/dHkJRuLJpac2dU8yO1Y1QfuM58dvfWPHkn/wvwVORUWROBFSL7nRoeMrR1XE/UYs8EdLS0fC1KtOxLkZLM/AofPrtmAMPD6xBsdXK20Y3DxVKRXknSPAQ1kYfR2cZDS2ROWmcKNv3TvexzYFNgSKKvCLA5QxVF7gMNGEtkllSqnhoXIJ4HkWQVwwBFy9R5/qMKSIK0t7LJw1hDcgxUuauGOCPQoz/eQ74KZLQWkHsjgz/7tMV1by9OcdL63Ctv6kvofdlWDUT4/pGM0DEypjvVfD/lndWRABKuPVgxmfoExBhz60TcUm2AIw0zB8Im/KIdzcim9oHa6EDAqfn2ZRVhw5B3ZHiFz9ScFA/bCOE0vC5cz5q2R21vQwYr5KcENiZR0upUObukMX0NyQCyOHpq/uWxbx2skiHdwh4gqYZqamHgVEbiNkHodS4rC8hJdK8HAmYUBrr+dW5L616oBcmAYHWXcV5ChXitNQMXBD2vPskhgB",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    href = html.escape(str(website), quote=True)\n    text = html.escape(str(display_name), quote=True)\n    return f'<a href=\"{href}\">{text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 359,
+    "output_tokens_details": {
+      "thinking_tokens": 221
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

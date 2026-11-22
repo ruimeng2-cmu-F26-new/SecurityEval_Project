@@ -1,0 +1,30 @@
+from urllib.parse import urlparse, urlunparse
+from typing import Optional
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url or not next_url.strip():
+        return "/"
+    
+    parsed = urlparse(next_url)
+    
+    if parsed.scheme and parsed.scheme not in ("http", "https"):
+        return "/"
+    
+    if parsed.netloc:
+        if not parsed.netloc.endswith("shop.example") and parsed.netloc != "shop.example":
+            return "/"
+    
+    path = parsed.path or "/"
+    
+    result = path
+    if parsed.query:
+        result += "?" + parsed.query
+    if parsed.fragment:
+        result += "#" + parsed.fragment
+    
+    return result

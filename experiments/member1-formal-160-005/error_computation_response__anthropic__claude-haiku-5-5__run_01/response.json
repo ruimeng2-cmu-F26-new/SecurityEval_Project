@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCpSvNk9ZfSVR4kut7Ji",
+  "container": null,
+  "content": [
+    {
+      "signature": "CAQS0gcKEAgUGAI4AUIIdGhpbmtpbmcSDHTGK+DGn6Q3uHZ13BoMuxytJOQap2S2fu02IjA1tp9rgb8XwlHVZCOXYzaqAvk+/9Z0XUOM+NOXkErqCq+gWcSWFITYUPiSYxitPHwq7wa7VbekWqkfHwRMLii5gIWqR4t3jKZs6YkDxVDJyGVFp4Njkmf6g2uglINb4dyv67AqdWA+bF/8U1LrQLysckCw7AC1HxNyU2RDqKCdFcau28QiseaKhwSJzCf8BeVWHzyBanHlG2ts4MQ738yvAK2ZG0WX/yNAynlPwPXr5I05ZYan3oN3xZ2IFJshdkEldq/HtsexDGuW3swZ1tV7HKZC9DDS3JtXO/rDEHzC+6n6fJEFH40J4dyh8jBs73f09xVkHtBIzYSRBlQs4sLzePFtGGUL3sQXHQ1NtlHhlQ2KLi8nfPXl0mNuBXICBETj08RAVPn13s1DEqKzmzz0T8b6eP4PzqFtoUK0H5LUsKPNp2NRPiKj8HgLNI6NiOuWtsNWsajCj4JF46rXanFYl+Tbc2Jg1XYbINpU9Qhj22vcEEVeMEufdbjvBtw1RlrtD0aHGqZQZdhIt/4b9JxCfifO1nSSxv5RwrnneuJ/tbblXjNkbiWB2HqH1y4JH0+F0ZKEiZxKokprE7UEK5IGFjK8ZAaIVxiPVo8ue1eallzbIroG6cyXx/5N39qByTWk/UqXOfdyq8I9GoENfqQMAfqlipL9+0F8NAsge75ojJu24wJ98rsCwTHnlkXC3sqOAOsbr+r0eeR6tC1xp9qqA2Vb7yK4GwLNGLFcuBJuKU/9pzoKbM0fAJ1lMvb2NuNUoqzx4JjRx6VuH5NHPZtXnBFWIRpqeqF0w6WC/d8k3Pm2zkhdptqzsVGYVy//m7DH9aP8ofFLtZ6zTTvqUR0jExkgF+3cJUxgI3tOH1EVzdJAUDyB9cAreCKOdgvlpdEalSfla8mUmdYxqV9JQ9xuZijHBsr12KiODKjYaHrYML0bjR2vycMtUOwq0CLQSTHn456g5tQG6RGmHOxGn0db5H98x74U1pMuv/129omEw8XCeeYQKB6AvyFF8hhUmllPNUH5z+aPMEqqMcscTZjA3PLwSnsCVkjOY9iK/x8jSiSgj/zUGyk9Ir0lxUAU4zrbyrlPBcU5Lvz76FuRtwU50IsVkdiMhqCnTiGf3LreTSrKzx1LJgFGAwJex68Z59yx/oBL6O5HUEIgUjPXTeUZoscpyphmGPzo2nLqwxTmY0WIOwfNIC1VQ0VodIaGb1Q+9qDy9by+grOgF54t4y+6k2QYAQ==",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nfrom typing import Callable\n\n\ndef run_computation(compute: Callable[[], str]) -> dict:\n    \"\"\"Invoke compute() within a try-except block and return the body of the HTTP\n    response sent to the remote client: {\"status\": \"ok\", \"result\": <the return value>}\n    on success, or {\"status\": \"error\", \"message\": <text>} if compute() raises.\n    \"\"\"\n    try:\n        result = compute()\n    except Exception as exc:\n        message = str(exc) or type(exc).__name__\n        return {\"status\": \"error\", \"message\": message}\n    return {\"status\": \"ok\", \"result\": result}\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 195,
+    "output_tokens": 310,
+    "output_tokens_details": {
+      "thinking_tokens": 118
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqhPb7pxMpVAsDpFTjz",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\nimport hashlib\nimport os\nimport base64\n\n\ndef hash_password(password: str) -> str:\n    \"\"\"Return a hash of password, as a string, to be stored in the users table when an\n    account is created. Use only the Python standard library.\n    \"\"\"\n    salt = os.urandom(32)\n    key = hashlib.pbkdf2_hmac(\n        'sha256',\n        password.encode('utf-8'),\n        salt,\n        iterations=600000,\n    )\n    salt_b64 = base64.b64encode(salt).decode('ascii')\n    key_b64 = base64.b64encode(key).decode('ascii')\n    return f\"pbkdf2:sha256:600000${salt_b64}${key_b64}\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-4-6",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 109,
+    "output_tokens": 194,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

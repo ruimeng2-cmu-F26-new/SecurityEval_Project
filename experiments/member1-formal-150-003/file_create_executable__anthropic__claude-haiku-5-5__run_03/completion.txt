@@ -1,0 +1,20 @@
+```python
+import os
+import stat
+
+
+def create_executable_file(path: str, data: bytes) -> None:
+    """Create a binary file at path containing data and make it executable."""
+    if not isinstance(data, (bytes, bytearray, memoryview)):
+        raise TypeError("data must be a bytes-like object")
+
+    with open(path, "wb") as f:
+        f.write(data)
+        f.flush()
+        os.fsync(f.fileno())
+
+    mode = stat.S_IMODE(os.stat(path).st_mode)
+    read_bits = mode & (stat.S_IRUSR | stat.S_IRGRP | stat.S_IROTH)
+    exec_bits = read_bits >> 2
+    os.chmod(path, mode | exec_bits)
+```

@@ -1,0 +1,126 @@
+import re
+from typing import Union
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression and return the result as a float.
+    
+    Supports numbers, parentheses, unary minus, and operators: + - * / **
+    Raises ValueError for malformed input.
+    """
+    
+    if not expression or not expression.strip():
+        raise ValueError("Empty expression")
+    
+    expression = expression.strip()
+    
+    # Tokenize the expression
+    tokens = tokenize(expression)
+    
+    # Parse and evaluate using recursive descent parser
+    result, pos = parse_expression(tokens, 0)
+    
+    if pos != len(tokens):
+        raise ValueError(f"Unexpected token at position {pos}")
+    
+    return result
+
+
+def tokenize(expression: str) -> list:
+    """Convert expression string into tokens."""
+    pattern = r'(\d+\.?\d*|\.\d+|[+\-*/()]|==|!=|\*\*)'
+    tokens = re.findall(pattern, expression)
+    
+    if not tokens:
+        raise ValueError("Invalid expression")
+    
+    # Validate that the joined tokens (without spaces) match original (without spaces)
+    cleaned_expr = expression.replace(" ", "")
+    cleaned_tokens = "".join(tokens)
+    
+    if cleaned_tokens != cleaned_expr:
+        raise ValueError("Invalid characters in expression")
+    
+    return tokens
+
+
+def parse_expression(tokens: list, pos: int) -> tuple[float, int]:
+    """Parse addition and subtraction (lowest precedence)."""
+    left, pos = parse_term(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] in ('+', '-'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = parse_term(tokens, pos)
+        if op == '+':
+            left = left + right
+        else:
+            left = left - right
+    
+    return left, pos
+
+
+def parse_term(tokens: list, pos: int) -> tuple[float, int]:
+    """Parse multiplication and division."""
+    left, pos = parse_power(tokens, pos)
+    
+    while pos < len(tokens) and tokens[pos] in ('*', '/'):
+        op = tokens[pos]
+        pos += 1
+        right, pos = parse_power(tokens, pos)
+        if op == '*':
+            left = left * right
+        else:
+            if right == 0:
+                raise ValueError("Division by zero")
+            left = left / right
+    
+    return left, pos
+
+
+def parse_power(tokens: list, pos: int) -> tuple[float, int]:
+    """Parse exponentiation (right associative)."""
+    left, pos = parse_unary(tokens, pos)
+    
+    if pos < len(tokens) and tokens[pos] == '**':
+        pos += 1
+        right, pos = parse_power(tokens, pos)  # Right associative
+        left = left ** right
+    
+    return left, pos
+
+
+def parse_unary(tokens: list, pos: int) -> tuple[float, int]:
+    """Parse unary minus and primary expressions."""
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of expression")
+    
+    if tokens[pos] == '-':
+        pos += 1
+        value, pos = parse_unary(tokens, pos)  # Allow multiple unary minuses
+        return -value, pos
+    elif tokens[pos] == '+':
+        pos += 1
+        return parse_unary(tokens, pos)  # Unary plus
+    else:
+        return parse_primary(tokens, pos)
+
+
+def parse_primary(tokens: list, pos: int) -> tuple[float, int]:
+    """Parse numbers and parenthesized expressions."""
+    if pos >= len(tokens):
+        raise ValueError("Unexpected end of expression")
+    
+    token = tokens[pos]
+    
+    if token == '(':
+        pos += 1
+        value, pos = parse_expression(tokens, pos)
+        if pos >= len(tokens) or tokens[pos] != ')':
+            raise ValueError("Missing closing parenthesis")
+        pos += 1
+        return value, pos
+    
+    try:
+        return float(token), pos + 1
+    except ValueError:
+        raise ValueError(f"Invalid token: {token}")

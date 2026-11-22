@@ -1,0 +1,17 @@
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "import re\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n"
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

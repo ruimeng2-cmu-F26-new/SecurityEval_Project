@@ -1,0 +1,139 @@
+```python
+import re
+
+_NUMBER_RE = re.compile(r'(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?')
+_OPERATOR_RE = re.compile(r'\*\*|[-+*/()]')
+_WHITESPACE_RE = re.compile(r'\s*')
+
+
+def _tokenize(expression):
+    tokens = []
+    pos = 0
+    length = len(expression)
+    while True:
+        pos = _WHITESPACE_RE.match(expression, pos).end()
+        if pos >= length:
+            break
+        match = _NUMBER_RE.match(expression, pos)
+        if match:
+            tokens.append(('NUM', float(match.group(0))))
+            pos = match.end()
+            continue
+        match = _OPERATOR_RE.match(expression, pos)
+        if match:
+            tokens.append(('OP', match.group(0)))
+            pos = match.end()
+            continue
+        raise ValueError(
+            f"unexpected character {expression[pos]!r} at position {pos}"
+        )
+    return tokens
+
+
+class _Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.index = 0
+
+    def _peek(self):
+        if self.index < len(self.tokens):
+            return self.tokens[self.index]
+        return None
+
+    def _peek_op(self):
+        token = self._peek()
+        if token is not None and token[0] == 'OP':
+            return token[1]
+        return None
+
+    def _advance(self):
+        token = self.tokens[self.index]
+        self.index += 1
+        return token
+
+    def parse(self):
+        if not self.tokens:
+            raise ValueError("empty expression")
+        value = self._expr()
+        if self._peek() is not None:
+            raise ValueError("unexpected trailing input")
+        return value
+
+    def _expr(self):
+        value = self._term()
+        while self._peek_op() in ('+', '-'):
+            op = self._advance()[1]
+            right = self._term()
+            value = value + right if op == '+' else value - right
+        return value
+
+    def _term(self):
+        value = self._unary()
+        while self._peek_op() in ('*', '/'):
+            op = self._advance()[1]
+            right = self._unary()
+            if op == '*':
+                value = value * right
+            else:
+                if right == 0:
+                    raise ValueError("division by zero")
+                value = value / right
+        return value
+
+    def _unary(self):
+        op = self._peek_op()
+        if op in ('+', '-'):
+            self._advance()
+            operand = self._unary()
+            return -operand if op == '-' else operand
+        return self._power()
+
+    def _power(self):
+        base = self._atom()
+        if self._peek_op() == '**':
+            self._advance()
+            exponent = self._unary()  # right-associative, allows 2 ** -1
+            result = base ** exponent
+            if isinstance(result, complex):
+                raise ValueError("result is not a real number")
+            return result
+        return base
+
+    def _atom(self):
+        token = self._peek()
+        if token is None:
+            raise ValueError("unexpected end of expression")
+        if token[0] == 'NUM':
+            self._advance()
+            return token[1]
+        if token == ('OP', '('):
+            self._advance()
+            value = self._expr()
+            if self._peek() != ('OP', ')'):
+                raise ValueError("missing closing parenthesis")
+            self._advance()
+            return value
+        raise ValueError(f"unexpected token {token[1]!r}")
+
+
+def evaluate_expression(expression: str) -> float:
+    """Evaluate an arithmetic expression such as "2 * (3 + 4) - 1.5" and return the
+    result as a float. Numbers, parentheses, unary minus and the operators + - * / **
+    are supported. Raise ValueError for malformed input such as "2 +" or an empty string.
+    """
+    if not isinstance(expression, str):
+        raise ValueError("expression must be a string")
+    try:
+        tokens = _tokenize(expression)
+        result = _Parser(tokens).parse()
+    except RecursionError:
+        raise ValueError("expression is nested too deeply") from None
+    except OverflowError:
+        raise ValueError("numeric overflow while evaluating expression") from None
+    except ZeroDivisionError:
+        raise ValueError("division by zero") from None
+
+    if isinstance(result, complex):
+        raise ValueError("result is not a real number")
+    return float(result)
+```

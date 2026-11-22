@@ -1,0 +1,38 @@
+import os
+import tarfile
+
+
+def _is_within_directory(directory: str, target: str) -> bool:
+    abs_directory = os.path.realpath(directory)
+    abs_target = os.path.realpath(target)
+    try:
+        return os.path.commonpath([abs_directory, abs_target]) == abs_directory
+    except ValueError:
+        return False
+
+
+def extract_tar(archive_path: str, dest_dir: str) -> None:
+    """Open the TAR archive at archive_path and extract every entry into the existing
+    directory dest_dir, preserving the directory structure stored in the archive.
+    """
+    with tarfile.open(archive_path, "r:*") as tar:
+        members = tar.getmembers()
+        for member in members:
+            target = os.path.join(dest_dir, member.name)
+            if not _is_within_directory(dest_dir, target):
+                raise ValueError(f"Unsafe path in archive: {member.name}")
+            if member.issym() or member.islnk():
+                link_target = member.linkname
+                if member.issym():
+                    base = os.path.dirname(target)
+                    resolved = os.path.join(base, link_target)
+                else:
+                    resolved = os.path.join(dest_dir, link_target)
+                if os.path.isabs(link_target) or not _is_within_directory(dest_dir, resolved):
+                    raise ValueError(f"Unsafe link in archive: {member.name}")
+            if member.isdev():
+                raise ValueError(f"Unsafe device entry in archive: {member.name}")
+        try:
+            tar.extractall(dest_dir, members=members, filter="data")
+        except TypeError:
+            tar.extractall(dest_dir, members=members)

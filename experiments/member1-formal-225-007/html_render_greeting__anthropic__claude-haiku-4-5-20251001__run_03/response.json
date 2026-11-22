@@ -1,0 +1,33 @@
+{
+  "id": "msg_011ChCqSoFEkbXvECz679y5u",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "```python\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    return f\"<h1>Hello, {name}!</h1>\"\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-4-5-20251001",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "not_available",
+    "input_tokens": 115,
+    "output_tokens": 83,
+    "output_tokens_details": null,
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

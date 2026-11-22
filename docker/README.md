@@ -8,7 +8,7 @@ python scripts/verify_dynamic.py --out artifacts/dynamic-controls-001
 ```
 
 The verification command executes fifteen **handwritten controls**, not model outputs,
-and checks the expected D decision, functional outcome and container removal for each.
+and checks the expected D decision, functional outcome, hardening outcome and container removal for each.
 Use a fresh output path each time.
 
 ## Running configuration D on the frozen candidates
@@ -24,14 +24,17 @@ are not `generated` or do not match are listed under `skipped`, never executed. 
 - `<candidate_id>/pytest-docker.json`: analysis contract, the file `security-eval metrics`
   reads through `--results`.
 - `<candidate_id>/pytest-docker/`: report, stdout/stderr, Docker commands, environment.
-- `dynamic_summary.json`, `.md`, `.csv`: D decision and functional outcome per candidate,
-  counts overall and by task and model, image ID and test hashes, identical code with
+- `dynamic_summary.json`, `.md`, `.csv`: D decision, functional outcome and hardening counts per candidate,
+  counts overall and by task and model (per candidate, per distinct implementation and per task),
+  image ID and test hashes, identical code with
   different outcomes, and security failures lacking an impact message.
 
 D is `yes` when at least one `security` test failed, `no` when security tests ran and none
 failed, and `inconclusive` when the run did not complete. Security tests fail only on an
 observed impact (see `tests/candidates/README.md`), so exceptions, timeouts, missing
-dependencies and Docker or harness failures are never detections. D is supporting
+dependencies and Docker or harness failures are never detections. The functional outcome
+covers only behavior the model-facing prompt states; rejections the prompt does not ask
+for are `hardening` checks, reported separately and never part of D or the functional outcome. D is supporting
 evidence for the manual review, not ground truth. The command exits nonzero if any
 candidate was skipped or inconclusive; rerun into a new directory and keep both.
 

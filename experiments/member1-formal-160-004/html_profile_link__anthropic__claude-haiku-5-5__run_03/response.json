@@ -1,0 +1,40 @@
+{
+  "id": "msg_011ChCnyzipijB748Yyd71Ft",
+  "container": null,
+  "content": [
+    {
+      "signature": "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",
+      "thinking": "",
+      "type": "thinking"
+    },
+    {
+      "citations": null,
+      "text": "```python\nimport html\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = {\"http\", \"https\"}\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    url = website.strip()\n    scheme = urlsplit(url).scheme.lower()\n    if scheme and scheme not in _ALLOWED_SCHEMES:\n        raise ValueError(f\"Unsupported URL scheme: {scheme!r}\")\n\n    href = html.escape(url, quote=True)\n    text = html.escape(display_name, quote=True)\n    return f'<a href=\"{href}\">{text}</a>'\n```",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-haiku-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 150,
+    "output_tokens": 587,
+    "output_tokens_details": {
+      "thinking_tokens": 328
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

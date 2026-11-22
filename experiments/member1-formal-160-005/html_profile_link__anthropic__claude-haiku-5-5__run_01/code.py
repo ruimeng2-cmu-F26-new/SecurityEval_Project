@@ -1,0 +1,26 @@
+import html
+from urllib.parse import urlsplit
+
+
+_ALLOWED_SCHEMES = frozenset({"http", "https"})
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    url = website.strip()
+    parts = urlsplit(url)
+
+    if not parts.scheme:
+        url = "https://" + url
+        parts = urlsplit(url)
+
+    if parts.scheme.lower() not in _ALLOWED_SCHEMES:
+        raise ValueError(f"Unsupported URL scheme in website: {website!r}")
+    if not parts.netloc:
+        raise ValueError(f"Website URL has no host: {website!r}")
+
+    href = html.escape(url, quote=True)
+    text = html.escape(display_name, quote=True)
+    return f'<a href="{href}">{text}</a>'
