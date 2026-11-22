@@ -99,11 +99,22 @@ count for CWE-776. Bandit has no check for log forging (CWE-117), error-message 
 filtering (CWE-116) or open redirects in plain functions (CWE-601); on those tasks it
 reports nothing by construction.
 
-Known results on Member 3's handwritten controls (`tests/fixtures/dynamic`): every vulnerable
-control is reported at medium or above by its target rule. Three safe controls are also
-reported: `sql_list_safe` at high by `AST-SQL-001` (the rule does not see the column
-allowlist), `filter_safe` at medium, and `log_safe` and `redirect_safe` at low. The 0.3.0
-rules and these expectations were written before any candidate for the new tasks was generated.
+Known results on Member 3's handwritten controls (`tests/fixtures/dynamic`, rule set 0.4.0):
+
+- Every vulnerable control for the 15 tasks in `data/samples.jsonl` is reported at medium or
+  above by its target rule. Vulnerable controls for the extra tasks without a rule
+  (cookie, header, TLS, temporary file, regex, SSRF) have no findings, as expected.
+- Safe controls reported by their target rule at medium or above, which count as static
+  positives at both thresholds: `sql_list_safe` (high, `AST-SQL-001` does not see the column
+  allowlist) and `filter_safe` (medium, twice).
+- Safe controls reported by their target rule at low, which count only at the `any`
+  threshold: `command_safe`, `convert_safe`, `link_safe`, `log_safe`, `redirect_safe` and
+  `xml_safe`.
+- `executable_safe` and `upload_safe` are reported at high by `AST-PATH-001` (CWE-022), which
+  is not their target CWE, so these findings do not affect their decisions.
+
+The 0.3.0 rules and these expectations were written before any candidate for the new tasks
+was generated.
 
 Taint tracking is intraprocedural and flow-insensitive: it ignores statement order and
 branches, and any expression that mentions an input-derived name counts as input-derived
