@@ -156,3 +156,20 @@ No functional correctness, security, detection, benchmark, or repair claim is ma
   `security-eval metrics` read the output with the same decision for all 24 rows.
 - At the time of this Member 3 validation, the replacement function-only formal candidates
   had not yet been generated, so this section contains no experiment result for D.
+
+## Metrics without manual labels (Member 2) — 2026-11-22
+
+The team decided not to label candidates manually. `label-sheet`, `merge-labels` and
+`metrics --labels` were removed (the 2026-11-04 entry above describes the earlier tooling).
+`security-eval metrics` now uses the dynamic result as the reference and reports reported
+pairs per configuration, static vs. dynamic agreement, confirmation rate, coverage of
+confirmed vulnerabilities and `disagreements.csv`.
+
+| Check | Observed result |
+|---|---|
+| `python -m pytest -q` | **181 passed** |
+| Metric code | Counts, agreement splits, rates and inconclusive handling match hand-calculated values on a synthetic table |
+| 7 deliberate breakages of the new metric code | Each makes a test fail |
+
+These checks use synthetic data only. No static result on a real candidate and no
+detection metric from the experiment exists yet.
