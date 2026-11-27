@@ -11,36 +11,43 @@ predeclared subset of confirmed-vulnerable candidates.
 
 ## Candidate generation
 
-The first experiment uses the Anthropic Messages API with two Claude models at the
-same effort setting and adaptive thinking:
-
-| Model | Role |
-|---|---|
-| `claude-haiku-5-5` | Cost-sensitive baseline model |
-| `claude-sonnet-5-5` | Higher-capability comparison model |
-
-Each of the three adapted tasks is requested independently ten times from each
-model:
+The primary experiment is the archived batch `experiments/member1-formal-225-007`:
 
 ```text
-3 tasks x 2 models x 10 independent requests = 60 candidates
+15 tasks x 3 models x 5 independent requests = 225 candidates (138 distinct code files)
 ```
+
+| Model | Requested ID |
+|---|---|
+| Claude Haiku 4.5 | `claude-haiku-4-5-20251001` |
+| Claude Sonnet 4.6 | `claude-sonnet-4-6` |
+| Claude Haiku 5.5 | `claude-haiku-5-5` |
 
 The fixed request settings are:
 
 | Setting | Value |
 |---|---|
-| Effort | `medium` |
-| Thinking | `adaptive` |
+| Thinking and effort fields | Not sent (`--effort none`); each model's default applies |
 | Maximum output tokens | `16000` |
 | Temperature / top-p / top-k | Omitted |
 | Automatic SDK retries | Disabled |
 | Conversation state | None; every request is independent |
 
-The 16,000-token ceiling provides room for adaptive thinking and a complete Python
-module while bounding individual requests. Billing is based on tokens actually used,
-not the ceiling. Use a dated model snapshot when available. Otherwise retain the
-requested model, returned model, response ID, UTC timestamp, and raw response metadata.
+All 225 records have status `generated`; the manifest's estimated cost is USD 0.0364. The 15
+tasks and their target CWEs are in `data/samples.jsonl`; the original 3 tasks and the pilot
+tasks are in `data/extra_samples.jsonl`.
+
+**How this design was reached.** The plan started with 3 tasks, `claude-haiku-5-5` and
+`claude-sonnet-5-5`, adaptive thinking and medium effort (`member1-formal-60-002`). Those
+candidates passed almost all security tests, so a dataset without vulnerable candidates
+could not compare detectors. The task set was expanded to 15 tasks that are easier to get
+wrong, further batches were generated with other models and without thinking, and 225-007
+was adopted after its dynamic test results had been seen. The report must disclose that the
+task and batch selection was not blind to outcomes. The other batches under `experiments/`
+are not part of the primary results; `docs/EVALUATION_PROTOCOL.md` lists them.
+
+Use a dated model snapshot when available. Otherwise retain the requested model, returned
+model, response ID, UTC timestamp, and raw response metadata.
 
 No candidate may be removed because of its quality. Provider failures, incomplete
 responses, refusals, empty output, parse failures, and missing entry points remain
@@ -51,8 +58,8 @@ an initial attempt.
 
 The frozen model-facing prompts describe the function signature and functional boundary
 only. They do not reveal security requirements, attack strings, or defensive implementation
-instructions. The separate `security_requirements` fields remain available to the test
-harness and human reviewers but are never included in a generation request. Prompt hashes
+instructions. The separate `security_requirements` fields are used by the test harness and never
+included in a generation request. Prompt hashes
 are frozen in the harness tests before pilot or formal generation begins.
 
 ## Detection configurations
@@ -61,49 +68,52 @@ are frozen in the harness tests before pilot or formal generation begins.
 |---|---|---|
 | B0 | Bandit only | Off-the-shelf static baseline |
 | B1 | Bandit plus custom AST rules | Primary static-only baseline |
-| D | Docker security tests only | Dynamic-only ablation |
-| P | B1 plus D | Proposed static-and-dynamic method |
+| D | Docker security tests only | Dynamic-only ablation and reference |
+| P-union | B1 OR D | Every pair either approach reports |
+| P-confirmed | B1 AND D | Static findings confirmed by a dynamic test |
 
-For the primary union result, P reports the target vulnerability when B1 maps a
-finding to the target CWE or D demonstrates the target vulnerability. The report
-also presents the intersection as dynamically confirmed static findings.
-Functional tests measure candidate correctness and repair preservation; they do
-not independently establish the target vulnerability.
+Functional tests measure candidate correctness and repair preservation; they do not
+establish the target vulnerability. Hardening checks are reported separately and affect
+neither D nor the functional outcome.
 
-## Ground truth
+## Reference: no manual labels
 
-The evaluation unit is one candidate paired with its target CWE. Ground truth is
-determined through manual review against the task's predefined security
-requirements. Static findings and dynamic tests are supporting evidence rather
-than ground truth themselves.
+The evaluation unit is one candidate paired with its target CWE. There is no manual
+ground-truth review. A security test fails only when it observes an impact that violates
+the task's `security_requirements`, so a D positive is treated as a confirmed vulnerability.
+A D negative is not proof of security, and a generic exception, timeout, container failure,
+dependency failure, or test-harness error is inconclusive, not a vulnerability.
 
-Reviewers label each candidate `vulnerable`, `not_vulnerable`, or `uncertain`.
-Disagreements are adjudicated and documented. A generic exception, timeout,
-container failure, dependency failure, or test-harness error is not automatically
-a vulnerability.
+Because D is the reference, D's own misses and false alarms cannot be measured, a static
+finding without a D positive is unconfirmed rather than a proven false positive, and
+vulnerabilities that neither approach reports are not counted.
 
 ## Metrics
 
-Detection reports raw counts and percentages by task, model, configuration, and
-overall:
+Detection reports raw counts and percentages per static threshold (`any`, `medium`), by
+task, model, and configuration, and overall (definitions in `docs/EVALUATION_PROTOCOL.md`):
 
-- TP, FP, FN, and TN
-- precision, recall, and F1
+- pairs reported, not reported, and undecided by each configuration
+- static vs. dynamic: both, static only (unconfirmed), dynamic only, and neither
+- confirmation rate: share of static alerts that D confirms
+- coverage of confirmed vulnerabilities: share of D positives that static analysis reports
+- Bandit vs. AST agreement
 - analysis time
-- static only, dynamic only, both, and neither
 
 Candidate quality is reported separately:
 
-- vulnerability rate
+- share of candidates with a confirmed vulnerability (D positive)
 - functional-test pass rate
-- security-test pass rate
+- hardening-check pass rate
 - generation, parsing, and truncation failure rates
 
 ## Repair experiment
 
-Repair uses at most two confirmed-vulnerable candidates from each task-model
-stratum, for at most 12 source candidates. A reproducible selection rule and the
-selected IDs must be frozen before observing repair outcomes.
+Repair uses confirmed-vulnerable candidates (D positive) from 225-007. With 45 task-model
+strata, the per-stratum limit and the total number of source candidates must be fixed
+again before repair starts (the earlier limit of 12 was for 3 tasks and 2 models). A
+reproducible selection rule and the selected IDs must be frozen before observing repair
+outcomes.
 
 | ID | Feedback |
 |---|---|
@@ -121,14 +131,12 @@ pass rate, residual static findings, and regressions.
 
 ## Execution order
 
-1. Freeze provider, models, prompts, parameters, metrics, and review rules.
-2. Prepare all 60 records with a dry run and inspect the manifest.
-3. Make six pilot calls, one per task-model pair, in a clearly labeled pilot directory.
-4. Exclude all pilot calls from the formal 60-candidate dataset, even if no settings change.
-5. Make 60 fresh formal requests and freeze all artifacts and hashes.
-6. Run B0, B1, and D on the same frozen code bytes; derive P from B1 and D.
-7. Complete manual ground-truth review and calculate detection metrics.
-8. Freeze the repair subset, run R1/R2, and compare before and after results.
+1. Done: freeze provider, models, prompts, and parameters; generate and archive 225-007.
+2. Done by Member 3 (results local, not in the repository): run D on 225-007.
+3. Run B0 and B1 on the same frozen code bytes (`security-eval static`).
+4. Join static and dynamic results and calculate detection metrics (`security-eval metrics`).
+5. Describe typical static-only and dynamic-only cases from the recorded evidence.
+6. Freeze the repair subset, run R1/R2, and compare before and after results.
 
 ## Reproducibility and cost controls
 
@@ -138,8 +146,8 @@ estimated cost, timestamps, response ID, and artifact paths. Pricing estimates u
 the standard text-token prices recorded in the manifest with an as-of date and
 source URL.
 
-The team-approved project spending limit is USD 10. The manifest records actual token
-usage and estimated cost for every formal request. API keys remain in local environment variables and are
+The team-approved project spending limit is USD 10. Each manifest records actual token
+usage and estimated cost for every request. API keys remain in local environment variables and are
 never written to artifacts, chat, or Git.
 
 Official references:

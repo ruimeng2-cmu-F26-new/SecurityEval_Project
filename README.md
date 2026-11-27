@@ -8,22 +8,22 @@ before exploring LLM-based repair. Automated repair is outside the first-week sc
 
 ## Current Status
 
-- Implemented: a Python 3.11 project scaffold, three traceable samples adapted from
-  SecurityEval, shared JSON schemas, Member 1's Anthropic Messages API generation and
-  artifact recording, offline harness tests, and integration points for all three members.
-- Implemented (Member 2): Bandit integration, three custom AST rules validated on hand-written
-  fixtures, `security-eval static`, and labeling and metrics tooling (`label-sheet`,
-  `merge-labels`, `metrics`). See [Static Analysis](docs/STATIC_ANALYSIS.md).
-- Completed: the frozen 60-candidate Claude generation run is archived under
-  `experiments/member1-formal-60-002/` with requests, responses, source, hashes,
-  usage, and estimated cost records.
-- Implemented (Member 3): a bounded Docker runner and functional/security tests
-  for the three adapted samples. See [Docker execution](docker/README.md).
-- Selected for the first experiment: `claude-haiku-5-5` and `claude-sonnet-5-5`, ten
-  independent requests per task-model pair with adaptive thinking and medium effort
-  (60 candidates total) using the frozen function-only prompts.
-  The formal 60-candidate generation run is complete; detector evaluation and manual
-  ground-truth review remain pending.
+- Implemented: a Python 3.11 project scaffold, 15 experiment tasks adapted from SecurityEval
+  (`data/samples.jsonl`; the original 3 and the pilot tasks are in `data/extra_samples.jsonl`),
+  shared JSON schemas, Member 1's Anthropic Messages API generation and artifact recording,
+  offline harness tests, and integration points for all three members.
+- Implemented (Member 2): Bandit integration, sixteen custom AST rules (rule set 0.4.0)
+  validated on hand-written fixtures, `security-eval static`, and `security-eval metrics`,
+  which compares static results with the dynamic results. See
+  [Static Analysis](docs/STATIC_ANALYSIS.md).
+- Implemented (Member 3): a bounded Docker runner, `security-eval dynamic`, and functional,
+  security and hardening tests for the experiment tasks. See [Docker execution](docker/README.md).
+- Primary experiment: `experiments/member1-formal-225-007/`, 15 tasks × 3 models × 5
+  independent requests (225 candidates). See [Experiment Plan](docs/EXPERIMENT_PLAN.md) and
+  [Evaluation Protocol](docs/EVALUATION_PROTOCOL.md). There is no manual labeling: the
+  dynamic test result is the reference.
+- Status: dynamic tests have been run on 225-007 by Member 3 (results kept locally, not in the
+  repository). Static analysis on the candidates and the detection metrics remain pending.
 - By default, `pytest` tests the harness only. **Passing harness tests does not establish
   the functionality or security of generated code.** The `generated` status indicates
   a complete response containing parseable Python and the expected entry point;
@@ -60,13 +60,16 @@ VS Code Command Palette, then open a new terminal.
 
 ## Selected Samples and Function Interfaces
 
+The experiment uses the 15 tasks in `data/samples.jsonl`, one target CWE each. The table
+below lists the original three tasks, now kept in `data/extra_samples.jsonl`:
+
 | Sample ID | Upstream record ID | Adapted entry point | Main adaptation |
 |---|---|---|---|
 | `sql_delete_user` | `CWE-089_author_1.py` | `remove_user(conn, username) -> int` | Replace MySQL with SQLite and accept a caller-owned connection |
 | `command_allowlist` | `CWE-078_author_1.py` | `execute_command(command) -> str` | Replace interactive input with an argument and define allowed commands and errors |
 | `path_read_file` | `CWE-022_codeql_1.py` | `read_file(base_dir, filename) -> bytes` | Replace Flask with a function and define directory boundaries and exceptions |
 
-`data/samples.jsonl` records each original prompt, adapted prompt, modification,
+Each task record in `data/samples.jsonl` and `data/extra_samples.jsonl` records the original prompt, adapted prompt, modification,
 selection rationale, functional requirement, security requirement, upstream commit,
 and SHA-256 hash. Original prompts were extracted from the upstream dataset; locally
 written code is not represented as upstream data.
@@ -96,7 +99,7 @@ MSR4P&S 2022. [DOI](https://doi.org/10.1145/3549035.3561184).
 
 ## Member 1: Code Generation and Artifact Recording
 
-Prepare the complete 60-candidate experiment without making an API call or producing
+Prepare an experiment (here the original 60-candidate setup) without making an API call or producing
 `code.py`:
 
 ```bash
@@ -106,12 +109,13 @@ security-eval generate-experiment \
   --dry-run --out artifacts/member1-claude-dry-run-001
 ```
 
-The first experiment makes ten independent requests for each of three tasks and two
-models: 60 candidates total. Use a dated model snapshot when available; otherwise retain
+These commands show the original 60-candidate setup. The primary experiment,
+`member1-formal-225-007`, used three models, five runs, and `--effort none` (no thinking or
+effort fields). Use a dated model snapshot when available; otherwise retain
 the requested and returned model IDs, response ID, timestamp, metadata, and hashes.
 Preserve every initial output rather than selecting only favorable candidates. The
 model receives only `adapted_prompt`; `security_requirements` remain hidden evaluation
-criteria for testing and manual ground-truth review.
+criteria used by the tests.
 
 Live generation requires `ANTHROPIC_API_KEY` in the local environment. The following zsh
 commands read the key without displaying it or placing its value in shell history:
@@ -145,7 +149,8 @@ not marked successful.
 
 Candidate code is parsed but **never imported or executed** during generation.
 Experiment artifacts are ignored by Git by default; review them before archiving or sharing.
-The reviewed formal dataset is tracked at
+Archived generation batches are tracked under `experiments/`; the primary experiment is
+`experiments/member1-formal-225-007/`. The original 60-candidate batch is documented in
 [`experiments/member1-formal-60-002/`](experiments/member1-formal-60-002/README.md).
 
 API reference: [Claude API primer](https://platform.claude.com/docs/en/claude_api_primer).

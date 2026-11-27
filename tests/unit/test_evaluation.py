@@ -1,4 +1,4 @@
-"""Evaluation tooling tests. All rows, labels and dynamic records here are SYNTHETIC.
+"""Evaluation tooling tests. All rows and dynamic records here are SYNTHETIC.
 
 Expected values below were calculated by hand; they say nothing about real candidates.
 """
@@ -11,7 +11,7 @@ import pytest
 
 from security_eval import evaluation
 from security_eval.contracts import load_samples, write_json
-from security_eval.evaluation import compare, compute_metrics, decide, overlap, score
+from security_eval.evaluation import agreement, compute_metrics, decide, reported, versus_dynamic
 from security_eval.generation import generate
 from security_eval.static_runner import run_static
 from test_contracts import SAMPLES
@@ -20,54 +20,59 @@ from test_generation import fixture_client
 CONTROLS = Path(__file__).resolve().parents[1] / "fixtures/dynamic"
 
 
-def row(bandit, custom, dynamic, label, number=[0]):
+def row(bandit, custom, dynamic, number=[0]):
     number[0] += 1
     return {"group": "synthetic", "candidate_id": f"c{number[0]}", "sample_id": "sql_delete_user",
             "model": "m", "run_index": 1, "cwe": "CWE-089", "code_sha256": str(number[0]),
             "bandit_any": bandit, "bandit_medium": "no", "ast_any": custom, "ast_medium": "no",
-            "dynamic": dynamic, "functional": "passed", "security_failed_tests": "", "label": label,
+            "dynamic": dynamic, "functional": "passed", "security_failed_tests": "",
             "bandit_seconds": "1.000", "ast_seconds": "", "dynamic_seconds": ""}
 
 
 ROWS = [
-    row("yes", "yes", "yes", "vulnerable"),            # both find it
-    row("no", "yes", "no", "vulnerable"),              # only AST
-    row("no", "no", "yes", "vulnerable"),              # only dynamic
-    row("no", "no", "no", "vulnerable"),               # nobody
-    row("yes", "no", "no", "not_vulnerable"),          # static false positive
-    row("no", "no", "yes", "not_vulnerable"),          # dynamic false positive
-    row("no", "no", "no", "not_vulnerable"),           # clean
-    row("yes", "no", "inconclusive", "vulnerable"),    # dynamic unavailable, static reported
-    row("no", "no", "inconclusive", "not_vulnerable"),  # dynamic unavailable, static silent
-    row("yes", "yes", "yes", "uncertain"),
-    row("yes", "yes", "yes", "unlabeled"),
+    row("yes", "yes", "yes"),                    # 1 both report, confirmed
+    row("no", "yes", "no"),                      # 2 only AST, unconfirmed
+    row("no", "no", "yes"),                      # 3 only dynamic
+    row("no", "no", "no"),                       # 4 nobody
+    row("yes", "no", "no"),                      # 5 only Bandit, unconfirmed
+    row("no", "no", "yes"),                      # 6 only dynamic
+    row("no", "no", "no"),                       # 7 nobody
+    row("yes", "no", "inconclusive"),            # 8 dynamic unavailable, static reported
+    row("no", "no", "inconclusive"),             # 9 dynamic unavailable, static silent
+    row("inconclusive", "inconclusive", "yes"),  # 10 static failed, dynamic reported
 ]
 
 
-@pytest.mark.parametrize("config,tp,fp,fn,tn,inconclusive,precision,recall", [
-    ("B0", 2, 1, 3, 3, 0, 0.6667, 0.4),
-    ("AST", 2, 0, 3, 4, 0, 1.0, 0.4),
-    ("B1", 3, 1, 2, 3, 0, 0.75, 0.6),
-    ("D", 2, 1, 2, 2, 2, 0.6667, 0.5),
-    ("P_union", 4, 2, 1, 1, 1, 0.6667, 0.8),
-    ("P_confirmed", 1, 0, 3, 4, 1, 1.0, 0.25),
+@pytest.mark.parametrize("config,yes,no,undecided", [
+    ("B0", 3, 6, 1),
+    ("AST", 2, 7, 1),
+    ("B1", 4, 5, 1),
+    ("D", 4, 4, 2),
+    ("P_union", 7, 2, 1),
+    ("P_confirmed", 1, 7, 2),
 ])
-def test_scores_match_hand_calculation(config, tp, fp, fn, tn, inconclusive, precision, recall):
-    result = score(ROWS, "any", config)
-    assert (result["tp"], result["fp"], result["fn"], result["tn"]) == (tp, fp, fn, tn)
-    assert result["inconclusive"] == inconclusive and result["unlabeled_or_uncertain"] == 2
-    assert result["precision"] == precision and result["recall"] == recall
+def test_reported_counts_match_hand_calculation(config, yes, no, undecided):
+    assert reported(ROWS, "any", config) == {"yes": yes, "no": no, "inconclusive": undecided}
 
 
-def test_f1_and_false_positive_rate():
-    result = score(ROWS, "any", "B1")
-    assert result["f1"] == 0.6667 and result["false_positive_rate"] == 0.25
+@pytest.mark.parametrize("config,both,static_only,dynamic_only,neither,confirmation,coverage", [
+    ("B0", 1, 1, 2, 3, 0.5, 0.3333),
+    ("AST", 1, 1, 2, 3, 0.5, 0.3333),
+    ("B1", 1, 2, 2, 2, 0.3333, 0.3333),
+])
+def test_static_configurations_against_dynamic_reference(config, both, static_only, dynamic_only, neither,
+                                                         confirmation, coverage):
+    result = versus_dynamic(ROWS, "any", config)
+    assert (result["both"], result["first_only"], result["second_only"], result["neither"]) == (
+        both, static_only, dynamic_only, neither)
+    assert result["undecided"] == 3 and result["unconfirmed_alerts"] == static_only
+    assert (result["confirmation_rate"], result["coverage_of_confirmed"]) == (confirmation, coverage)
 
 
-def test_f1_is_calculated_from_counts_not_rounded_ratios():
-    rows = [row("yes", "no", "no", "vulnerable") for _ in range(4)]
-    rows += [row("yes", "no", "no", "not_vulnerable") for _ in range(3)]
-    assert score(rows, "any", "B1")["f1"] == 0.7273  # 8 / 11
+def test_bandit_vs_ast_agreement():
+    result = agreement(ROWS, "any", "B0", "AST")
+    assert (result["both"], result["first_only"], result["second_only"], result["neither"],
+            result["undecided"]) == (1, 2, 1, 5, 1)
 
 
 @pytest.mark.parametrize("static,dynamic,union,confirmed", [
@@ -78,37 +83,24 @@ def test_f1_is_calculated_from_counts_not_rounded_ratios():
     ("no", "no_test", "inconclusive", "no"),
 ])
 def test_fusion_uses_inconclusive_only_when_it_changes_the_answer(static, dynamic, union, confirmed):
-    decisions = decide(row(static, static, dynamic, "vulnerable"), "any")
+    decisions = decide(row(static, static, dynamic), "any")
     assert (decisions["P_union"], decisions["P_confirmed"]) == (union, confirmed)
 
 
-def test_overlap_excludes_undecided_rows():
-    result = overlap(ROWS, "any", "B1", "D")
-    assert result["vulnerable"] == {"first_only": 1, "second_only": 1, "both": 1, "neither": 1}
-    assert result["not_vulnerable"] == {"first_only": 1, "second_only": 1, "both": 0, "neither": 1}
+def test_confirmed_share_and_undefined_rates():
+    assert compute_metrics(ROWS)["confirmed_share"] == 0.5  # D positive in 4 of 8 decided pairs
+    rows = [row("no", "no", "no")]
+    result = versus_dynamic(rows, "any", "B1")
+    assert result["confirmation_rate"] is None and result["coverage_of_confirmed"] is None
+    report = evaluation.format_report(compute_metrics(rows), [], [])
+    assert "n/a" in report and "no manual labels" in report
 
 
-def test_union_comparison_shows_the_false_positive_cost_on_paired_rows():
-    result = compare(ROWS, "any", "B1", "P_union")
-    assert result["paired_rows"] == 8
-    assert (result["tp_change"], result["fp_change"]) == (1, 1)
-    assert (result["recall_change"], result["precision_change"]) == (0.2, -0.0833)
-
-
-def test_confirmed_comparison_shows_the_recall_loss_on_paired_rows():
-    result = compare(ROWS, "any", "B1", "P_confirmed")
-    assert result["paired_rows"] == 8
-    assert (result["tp_change"], result["fp_change"]) == (-1, -1)
-    assert (result["recall_change"], result["precision_change"]) == (-0.25, 0.3333)
-
-
-def test_zero_denominators_are_undefined_not_zero():
-    rows = [row("no", "no", "no", "not_vulnerable")]
-    result = score(rows, "any", "B1")
-    assert result["precision"] is None and result["recall"] is None and result["f1"] is None
-    assert compare(rows, "any", "B1", "P_union")["recall_change"] is None
-    report = evaluation.format_report(compute_metrics(rows), [], [], None)
-    assert "recall and false negatives cannot be evaluated" in report and "n/a" in report
+def test_disagreements_list_static_only_and_dynamic_only_pairs():
+    kinds = [(e["candidate_id"], e["kind"]) for e in evaluation.disagreement_rows(ROWS, {})
+             if e["threshold"] == "any"]
+    assert kinds == [(ROWS[1]["candidate_id"], "static_only"), (ROWS[2]["candidate_id"], "dynamic_only"),
+                     (ROWS[4]["candidate_id"], "static_only"), (ROWS[5]["candidate_id"], "dynamic_only")]
 
 
 def analysis(tool, findings=(), tests=(), status="completed"):
@@ -172,6 +164,7 @@ def experiment(tmp_path):
 
 
 def dynamic_record(run_dir, out, failed):
+    out.parent.mkdir(parents=True, exist_ok=True)
     code = (run_dir / "code.py").read_bytes()
     write_json(out, {
         "schema_version": "1.0", "run_id": "synthetic", "sample_id": "sql_delete_user",
@@ -183,112 +176,61 @@ def dynamic_record(run_dir, out, failed):
         "evidence_files": ["report.json"], "error": None, "notes": "synthetic"})
 
 
-def write_labels(path, labels):
-    with path.open("w", newline="") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(["candidate_id", "label"])
-        writer.writerows(labels.items())
-
-
 def test_end_to_end_on_synthetic_experiment(tmp_path):
     root = experiment(tmp_path)
     static_dir = tmp_path / "static"
     run_static([root], static_dir)
     dynamic_dir = tmp_path / "dynamic"
-    dynamic_dir.mkdir()
-    dynamic_record(root / "unsafe-1", dynamic_dir / "unsafe.json", True)
-    (dynamic_dir / "unsafe.json").rename(dynamic_dir / "pytest-docker.json")
-    labels = tmp_path / "labels.csv"
-    write_labels(labels, {"unsafe-1": "vulnerable", "unsafe-2": "vulnerable", "safe-1": "not_vulnerable"})
-    metrics = evaluation.run_metrics([root], [static_dir, dynamic_dir], tmp_path / "out", labels)
+    dynamic_record(root / "unsafe-1", dynamic_dir / "unsafe/pytest-docker.json", True)
+    dynamic_record(root / "safe-1", dynamic_dir / "safe/pytest-docker.json", False)
+    metrics = evaluation.run_metrics([root], [static_dir, dynamic_dir], tmp_path / "out")
 
     assert metrics["pairs"] == 3 and metrics["distinct_code"] == 2
     assert [s["candidate_id"] for s in metrics["skipped"]] == ["failed-1"]
-    overall = metrics["thresholds"]["medium"]["overall"]
-    assert (overall["B1"]["tp"], overall["B1"]["tn"]) == (2, 1)
-    assert overall["AST"]["recall"] == 1.0
-    assert (overall["D"]["tp"], overall["D"]["inconclusive"]) == (2, 1)  # safe-1 has no dynamic record
-    assert metrics["dynamic_coverage"]["sql_delete_user"] == {"yes": 2, "no_test": 1}
+    assert metrics["confirmed_share"] == 0.6667  # unsafe-1 and unsafe-2 share code with a D positive
+    medium = metrics["thresholds"]["medium"]["overall"]
+    b1 = medium["vs_dynamic"]["B1"]
+    assert (b1["both"], b1["first_only"], b1["second_only"], b1["neither"]) == (2, 0, 0, 1)
+    assert (b1["confirmation_rate"], b1["coverage_of_confirmed"]) == (1.0, 1.0)
+    assert medium["reported"]["AST"] == {"yes": 2, "no": 1, "inconclusive": 0}
+    assert metrics["dynamic_coverage"]["sql_delete_user"] == {"yes": 2, "no": 1}
     with (tmp_path / "out/evaluation_table.csv").open(newline="") as handle:
         table = {r["candidate_id"]: r for r in csv.DictReader(handle)}
-    assert table["unsafe-2"]["security_failed_tests"] == "security" and table["safe-1"]["dynamic"] == "no_test"
+    assert "label" not in table["safe-1"]
+    assert table["unsafe-2"]["security_failed_tests"] == "security" and table["safe-1"]["dynamic"] == "no"
+    with (tmp_path / "out/disagreements.csv").open(newline="") as handle:
+        assert list(csv.DictReader(handle)) == []
     assert "P_confirmed" in (tmp_path / "out/report.md").read_text()
     assert json.loads((tmp_path / "out/metrics.json").read_text())["pairs"] == 3
     with pytest.raises(FileExistsError):
-        evaluation.run_metrics([root], [static_dir], tmp_path / "out", labels)
+        evaluation.run_metrics([root], [static_dir], tmp_path / "out")
 
 
-def test_error_analysis_lists_static_false_positives_and_negatives(tmp_path):
+def test_without_dynamic_results_static_is_reported_but_nothing_is_confirmed(tmp_path):
     root = experiment(tmp_path)
     run_static([root], tmp_path / "static")
-    labels = tmp_path / "labels.csv"
-    write_labels(labels, {"unsafe-1": "not_vulnerable", "safe-1": "vulnerable"})  # deliberately wrong
-    evaluation.run_metrics([root], [tmp_path / "static"], tmp_path / "out", labels)
-    with (tmp_path / "out/error_analysis.csv").open(newline="") as handle:
-        errors = list(csv.DictReader(handle))
-    kinds = {(e["candidate_id"], e["threshold"]): e for e in errors}
-    assert kinds["unsafe-1", "medium"]["kind"] == "false_positive"
-    assert "AST-SQL-001" in kinds["unsafe-1", "medium"]["rule_ids"]
-    assert kinds["safe-1", "any"]["kind"] == "false_negative" and kinds["safe-1", "any"]["rule_ids"] == ""
+    metrics = evaluation.run_metrics([root], [tmp_path / "static"], tmp_path / "out")
+    medium = metrics["thresholds"]["medium"]["overall"]
+    assert medium["reported"]["B1"] == {"yes": 2, "no": 1, "inconclusive": 0}
+    assert medium["vs_dynamic"]["B1"]["undecided"] == 3 and metrics["confirmed_share"] is None
+    assert metrics["dynamic_coverage"]["sql_delete_user"] == {"no_test": 3}
 
 
-def test_error_analysis_lists_bandit_rules_counted_through_equivalence():
+def test_disagreements_list_bandit_rules_counted_through_equivalence():
     # Bandit reports B307 (eval) as CWE-078; it counts for the CWE-095 target and must be listed.
     finding = {"rule_id": "B307", "cwe": "CWE-078", "severity": "medium", "evidence": "eval(expr)"}
     bandit = {**analysis("bandit", [finding]), "sample_id": "eval_expression", "code_sha256": "x"}
-    synthetic = {**row("no", "no", "no", "not_vulnerable"), "sample_id": "eval_expression",
-                 "code_sha256": "x", "cwe": "CWE-095"}
+    synthetic = {**row("no", "no", "no"), "sample_id": "eval_expression", "code_sha256": "x", "cwe": "CWE-095"}
     for threshold in evaluation.THRESHOLDS:
         synthetic[f"bandit_{threshold}"] = evaluation._static_decision(bandit, "CWE-095", threshold)
-    errors = evaluation.error_rows([synthetic], {("eval_expression", "x", "bandit"): bandit})
-    assert [(e["threshold"], e["kind"], e["rule_ids"]) for e in errors] == [
-        ("any", "false_positive", "B307"), ("medium", "false_positive", "B307")]
+    rows = evaluation.disagreement_rows([synthetic], {("eval_expression", "x", "bandit"): bandit})
+    assert [(e["threshold"], e["kind"], e["rule_ids"]) for e in rows] == [
+        ("any", "static_only", "B307"), ("medium", "static_only", "B307")]
 
 
-def test_candidate_tampering_and_unknown_labels_are_rejected(tmp_path):
+def test_candidate_tampering_is_rejected(tmp_path):
     root = experiment(tmp_path)
-    labels = tmp_path / "labels.csv"
-    write_labels(labels, {"not-a-candidate": "vulnerable"})
-    with pytest.raises(ValueError, match="unknown candidates"):
-        evaluation.run_metrics([root], [tmp_path], tmp_path / "out", labels)
-    assert not (tmp_path / "out").exists()
-    write_labels(labels, {"safe-1": "probably"})
-    with pytest.raises(ValueError, match="Unknown label"):
-        evaluation.read_labels(labels)
     with (root / "safe-1/code.py").open("a") as handle:
         handle.write("# changed\n")
     with pytest.raises(ValueError, match="hash mismatch"):
         evaluation.load_candidates([root])
-
-
-def test_label_sheet_is_blind_and_merge_reports_agreement(tmp_path):
-    root = experiment(tmp_path)
-    sheet = tmp_path / "sheet.csv"
-    assert evaluation.write_label_sheet([root], sheet) == 3
-    with sheet.open(newline="") as handle:
-        rows = list(csv.DictReader(handle))
-    assert set(rows[0]) == {"candidate_id", "sample_id", "target_cwe", "code_file", "label", "notes"}
-    assert all(r["label"] == "" for r in rows)
-    with pytest.raises(FileExistsError):
-        evaluation.write_label_sheet([root], sheet)
-
-    a, b = tmp_path / "a.csv", tmp_path / "b.csv"
-    write_labels(a, {"unsafe-1": "vulnerable", "unsafe-2": "vulnerable", "safe-1": "not_vulnerable"})
-    write_labels(b, {"unsafe-1": "vulnerable", "unsafe-2": "uncertain", "safe-1": "not_vulnerable"})
-    merged = tmp_path / "merged.csv"
-    assert evaluation.merge_labels(a, b, merged) == {
-        "pairs": 3, "agreed": 2, "agreement": 0.6667, "to_adjudicate": 1}
-    labels, agreement = evaluation.read_labels(merged)
-    assert labels["unsafe-2"] == "" and labels["unsafe-1"] == "vulnerable"
-    assert agreement == {"pairs": 3, "agreed": 2, "agreement": 0.6667}
-
-
-def test_merge_requires_complete_sheets_for_the_same_candidates(tmp_path):
-    a, b = tmp_path / "a.csv", tmp_path / "b.csv"
-    write_labels(a, {"x": "vulnerable"})
-    write_labels(b, {"x": ""})
-    with pytest.raises(ValueError, match="not labeled by both"):
-        evaluation.merge_labels(a, b, tmp_path / "m.csv")
-    write_labels(b, {"y": "vulnerable"})
-    with pytest.raises(ValueError, match="different candidates"):
-        evaluation.merge_labels(a, b, tmp_path / "m.csv")

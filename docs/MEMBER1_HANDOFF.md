@@ -4,9 +4,11 @@
 
 Member 1 owns sample selection, prompt adaptation, code generation, and generation
 records. The framework, three sample contracts, source verification, batch-generation
-command, and formal 60-candidate generation run are complete. The frozen dataset is in
-`experiments/member1-formal-60-002/`. Generation completion is not a security result;
-detector evaluation and manual review remain pending.
+command, and formal 60-candidate generation run are complete. That dataset is in
+`experiments/member1-formal-60-002/`. The primary experiment has since moved to
+`experiments/member1-formal-225-007/` (see `docs/EXPERIMENT_PLAN.md`); the configuration
+below describes the original 60-candidate run. Generation completion is not a security
+result, and there is no manual review: the dynamic test result is the reference.
 
 ## Fixed detection-experiment configuration
 

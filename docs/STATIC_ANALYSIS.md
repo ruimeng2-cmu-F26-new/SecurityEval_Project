@@ -153,25 +153,25 @@ patterns; they do not measure false-positive or false-negative rates on real cod
 The full comparison is defined in [Evaluation Protocol](EVALUATION_PROTOCOL.md).
 
 ```bash
-# 1. Label from code only, before looking at any detector output.
-security-eval label-sheet artifacts/experiment-001 --out reviewer_a.csv   # repeat for reviewer_b.csv
-security-eval merge-labels reviewer_a.csv reviewer_b.csv --out labels.csv # fill blank labels by adjudication
+# 1. Static analysis (Bandit and AST rules) on every generated candidate of the primary batch.
+security-eval static experiments/member1-formal-225-007 --out artifacts/225-007-static
 
-# 2. Run the detectors (Bandit, AST and Docker tests) on every generated candidate.
-for run in artifacts/experiment-001/*/; do
-  security-eval evaluate "$run" --out "artifacts/experiment-001-results/$(basename "$run")"
-done
+# 2. Docker tests (needs Docker and the test image; see docker/README.md).
+security-eval dynamic experiments/member1-formal-225-007 --out artifacts/225-007-dynamic
 
-# 3. Join everything and compute metrics.
-security-eval metrics --candidates artifacts/experiment-001 \
-  --results artifacts/experiment-001-results --labels labels.csv --out artifacts/experiment-001-metrics
+# 3. Join both and compute metrics.
+security-eval metrics --candidates experiments/member1-formal-225-007 \
+  --results artifacts/225-007-static artifacts/225-007-dynamic --out artifacts/225-007-metrics
 ```
 
-`evaluate` exits nonzero when a candidate cannot be evaluated, and the loop continues; failed
-generations are listed as skipped. `metrics` writes `evaluation_table.csv`, `metrics.json`,
-`report.md` and `error_analysis.csv` (B1 false positives and negatives with an empty
-`category` column for manual error analysis). Omit `--labels` only to check that results
-join correctly; do not read detector results before first-pass labeling is complete.
+There are no manual labels: D (an observed security impact) is the reference. `metrics`
+writes `evaluation_table.csv`, `metrics.json`, `report.md` and `disagreements.csv`. The report
+gives the pairs each configuration reports, static vs. D agreement, confirmation rate (share
+of static alerts that D confirms) and coverage of confirmed vulnerabilities (share of D
+positives that static analysis also reports). `disagreements.csv` lists static-only and
+dynamic-only pairs with the static evidence and failed security tests, plus empty `category`
+and `notes` columns for describing them. A static alert without a D positive is unconfirmed,
+not a proven false positive. Failed generations are listed as skipped.
 
 ## Assumptions to confirm
 
