@@ -164,6 +164,36 @@ Bandit 1.9.4 and AST rule set 0.4.0 on the same 225 code files. A re-run on `mai
   (13 against 10). Labels decide whether the extra reports are false positives or
   vulnerabilities the tests miss.
 
+## LLM repair
+
+One dynamic-positive candidate per task and model was taken from 225-007 (the lowest run
+index), 20 in total. `claude-sonnet-5-5` was asked to rewrite each one under three feedback
+conditions. The prompt is the same except for the feedback, and always names the CWE.
+
+| Condition | Feedback given | Security tests passed | Functional tests broken | Repaired |
+|---|---|---|---|---|
+| R0 | "The implementation has a security vulnerability", nothing else | 20/20 | 0/20 | 20/20 |
+| R1 | Bandit and AST findings | 20/20 | 2/20 | 18/20 |
+| R2 | R1 plus the failed dynamic security tests | 20/20 | 1/20 | 19/20 |
+
+"Repaired" means the security tests and the functional tests both pass.
+
+- **Detector feedback did not help this model.** R0 repaired all 20 without any findings.
+  Knowing the vulnerability class was enough.
+- **The three failures are all `xml_parse_note` and are functional, not security.** The
+  rewrite raises on every input, so the security tests pass while valid XML is rejected.
+  Security tests alone would have counted these as repaired.
+- **Static findings do not go away after a successful repair.** The R0 repairs pass every
+  dynamic test and still carry 33 static findings, the same number as before repair.
+
+Limits: each condition was run once, so a difference of one or two candidates is noise and
+does not show that feedback hurts. The repair model is stronger than the three generating
+models, and a weaker one was not tested. R2 is checked with the same tests it was shown.
+The repaired code was not reviewed by hand.
+
+Repaired code is in `experiments/member3-repair-40-001/` (R1, R2) and
+`experiments/member3-repair-r0-20-002/` (R0).
+
 ## Other batches (dynamic only)
 
 Not part of the primary results (`docs/EVALUATION_PROTOCOL.md`, section 3). They are listed

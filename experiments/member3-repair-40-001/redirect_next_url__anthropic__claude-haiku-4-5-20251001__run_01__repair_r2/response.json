@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM3Cjkg5chUTCMo58b9y",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "def get_redirect_target(next_url: str) -> str:\n    \"\"\"Return the location to redirect a user to after login on https://shop.example.\n    next_url is the page the user originally requested on this site, such as\n    \"/orders/42?tab=items\"; return it so the user lands on that page.\n    Return \"/\" when next_url is empty.\n    \"\"\"\n    from urllib.parse import urlsplit\n\n    if not next_url or not isinstance(next_url, str):\n        return \"/\"\n\n    # Reject control characters, whitespace and backslashes (browsers treat\n    # backslashes as slashes and strip tabs/newlines).\n    for ch in next_url:\n        if ch == \"\\\\\" or ord(ch) < 0x20 or ord(ch) == 0x7F or ch.isspace():\n            return \"/\"\n\n    # Must be an absolute path on this site, not protocol-relative.\n    if not next_url.startswith(\"/\") or next_url.startswith(\"//\"):\n        return \"/\"\n\n    try:\n        parsed = urlsplit(next_url)\n    except ValueError:\n        return \"/\"\n\n    if parsed.scheme or parsed.netloc:\n        return \"/\"\n\n    # Guard against percent-encoded backslash or slash tricks at the start.\n    lowered = next_url[:4].lower()\n    if lowered.startswith(\"/%5c\") or lowered.startswith(\"/%2f\"):\n        return \"/\"\n\n    return next_url",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 748,
+    "output_tokens": 456,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

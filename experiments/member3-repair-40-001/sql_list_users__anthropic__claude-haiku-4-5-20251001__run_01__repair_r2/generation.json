@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "sql_list_users__anthropic__claude-haiku-4-5-20251001__run_01__repair_r2",
+  "sample_id": "sql_list_users",
+  "run_index": 1,
+  "status": "generated",
+  "provider": "anthropic",
+  "requested_model": "claude-sonnet-5-5",
+  "returned_model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "thinking_type": "adaptive",
+  "max_tokens": 16000,
+  "stop_reason": "end_turn",
+  "failure_kind": null,
+  "created_at": "2026-11-24T03:25:20.571789+00:00",
+  "completed_at": "2026-11-24T03:25:23.301777+00:00",
+  "request_file": "request.json",
+  "sample_file": "sample.json",
+  "prompt_sha256": "3a33f30d5cc643a39bca745a2769c9272e5e16277daab9e4062c5c4997eaeaf0",
+  "request_sha256": "4412e64489bc8a6b12be146d2eba354b4d6185d79af57ee6e2c691ca884f8b20",
+  "response_file": "response.json",
+  "response_sha256": "eb07649acb85edb73f9c22bbf92089fd03c4d99c2ce2c579acd4c8b3bf4e4c61",
+  "raw_output_file": "completion.txt",
+  "code_file": "code.py",
+  "code_sha256": "fa95aba43a8cc59b1b5c4cbbb01a346732536747f8a3757a565c6c6f307e931c",
+  "syntax_valid": true,
+  "response_id": "msg_011ChM3DnCJNMhavqEeJUxyf",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 726,
+    "output_tokens": 351,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "estimated_cost_usd": 0.004962,
+  "error": null
+}

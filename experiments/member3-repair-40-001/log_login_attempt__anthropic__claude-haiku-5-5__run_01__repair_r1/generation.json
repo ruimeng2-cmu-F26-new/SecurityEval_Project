@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "log_login_attempt__anthropic__claude-haiku-5-5__run_01__repair_r1",
+  "sample_id": "log_login_attempt",
+  "run_index": 1,
+  "status": "generated",
+  "provider": "anthropic",
+  "requested_model": "claude-sonnet-5-5",
+  "returned_model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "thinking_type": "adaptive",
+  "max_tokens": 16000,
+  "stop_reason": "end_turn",
+  "failure_kind": null,
+  "created_at": "2026-11-24T03:24:32.248750+00:00",
+  "completed_at": "2026-11-24T03:24:35.098381+00:00",
+  "request_file": "request.json",
+  "sample_file": "sample.json",
+  "prompt_sha256": "dadcc646211449fbc77d9494c521bab9ca40a5eff868617504984db5ec86381e",
+  "request_sha256": "650cca4b06d939d74e82aa1015fce580d951fc4a30eb6416c359dd89f37b48ca",
+  "response_file": "response.json",
+  "response_sha256": "d56b9211bb8c31da652279772e81cefdaaa37136e73ecb311fe2b2beb6b086bf",
+  "raw_output_file": "completion.txt",
+  "code_file": "code.py",
+  "code_sha256": "8380aef7c86ae2398f9b71f888223c9321fec0f829e98b1280216d78d66f0d1b",
+  "syntax_valid": true,
+  "response_id": "msg_011ChM3ADZAthGCducdtghBX",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 383,
+    "output_tokens": 379,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "estimated_cost_usd": 0.004556,
+  "error": null
+}

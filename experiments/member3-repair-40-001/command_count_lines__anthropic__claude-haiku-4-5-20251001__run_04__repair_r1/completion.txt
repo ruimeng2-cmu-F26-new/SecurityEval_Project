@@ -1,0 +1,64 @@
+import fnmatch
+import os
+import subprocess
+
+
+def count_lines(directory: str, pattern: str) -> int:
+    """Return the total number of lines in the files directly inside directory whose
+    names match the shell-style wildcard pattern (for example "*.log").
+    Use the system wc utility to count the lines. Return 0 when no file matches.
+    This function is tested only inside an isolated Linux container.
+    """
+    if not isinstance(directory, str) or not isinstance(pattern, str):
+        return 0
+    if not os.path.isdir(directory):
+        return 0
+
+    try:
+        names = os.listdir(directory)
+    except OSError:
+        return 0
+
+    files = []
+    for name in sorted(names):
+        if not fnmatch.fnmatchcase(name, pattern):
+            continue
+        full = os.path.join(directory, name)
+        if os.path.isfile(full):
+            files.append(full)
+
+    if not files:
+        return 0
+
+    total = 0
+    chunk_size = 200
+    for i in range(0, len(files), chunk_size):
+        chunk = files[i:i + chunk_size]
+        # Use --files0-from via stdin to avoid option/argument confusion
+        # and to avoid any shell involvement.
+        data = b"".join(os.fsencode(p) + b"\0" for p in chunk)
+        try:
+            result = subprocess.run(
+                ["wc", "-l", "--files0-from=-"],
+                input=data,
+                capture_output=True,
+                timeout=30,
+                check=False,
+            )
+        except (subprocess.TimeoutExpired, OSError):
+            continue
+
+        out = result.stdout.decode("utf-8", errors="replace").strip().splitlines()
+        if not out:
+            continue
+        if len(chunk) == 1:
+            line = out[-1].split()
+            if line and line[0].isdigit():
+                total += int(line[0])
+        else:
+            for line in reversed(out):
+                parts = line.split()
+                if len(parts) >= 2 and parts[-1] == "total" and parts[0].isdigit():
+                    total += int(parts[0])
+                    break
+    return total

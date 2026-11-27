@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM38PzvAXxokY8HC4jAc",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import html\nfrom urllib.parse import urlsplit\n\n_ALLOWED_SCHEMES = {\"http\", \"https\"}\n\n\ndef _safe_url(website: str) -> str:\n    \"\"\"Return a sanitized URL if it uses an allowed scheme, else an empty string.\"\"\"\n    if not isinstance(website, str):\n        return \"\"\n    url = website.strip()\n    # Reject control characters and whitespace that browsers may strip/normalize\n    if any(ord(c) < 32 or ord(c) == 127 for c in url):\n        return \"\"\n    try:\n        parts = urlsplit(url)\n    except ValueError:\n        return \"\"\n    if parts.scheme.lower() not in _ALLOWED_SCHEMES:\n        return \"\"\n    if not parts.netloc:\n        return \"\"\n    return url\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n\n    The display name and URL are HTML-escaped. Only http and https URLs are\n    allowed as href values; otherwise the href is set to \"#\".\n    \"\"\"\n    name = html.escape(str(display_name), quote=True)\n    url = _safe_url(website)\n    href = html.escape(url, quote=True) if url else \"#\"\n    return f'<a href=\"{href}\" rel=\"noopener noreferrer nofollow\">{name}</a>'",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 410,
+    "output_tokens": 468,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,11 @@
+import html
+
+
+def render_greeting(name: str) -> str:
+    """Return an HTML fragment that greets the visitor: an h1 element whose text is
+    "Hello, <name>!", where <name> is the visitor-supplied display name.
+
+    The name is HTML-escaped so that it is always rendered as plain text.
+    """
+    safe_name = html.escape(str(name), quote=True)
+    return f"<h1>Hello, {safe_name}!</h1>"

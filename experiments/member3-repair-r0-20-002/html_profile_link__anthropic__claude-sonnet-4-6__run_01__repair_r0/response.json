@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChSw7tHq1g89BdgEBjv93",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "from html import escape\nfrom urllib.parse import urlsplit\n\n\n_ALLOWED_SCHEMES = {\"http\", \"https\"}\n\n\ndef _sanitize_url(url: str) -> str:\n    \"\"\"Return a safe URL or '#' if the URL uses a disallowed scheme.\"\"\"\n    if not isinstance(url, str):\n        return \"#\"\n    cleaned = url.strip()\n    # Remove control characters and whitespace that browsers may ignore\n    # inside scheme names (e.g. \"java\\tscript:\").\n    probe = \"\".join(ch for ch in cleaned if ch.isprintable() and not ch.isspace())\n    if not probe:\n        return \"#\"\n    try:\n        parts = urlsplit(probe)\n    except ValueError:\n        return \"#\"\n    scheme = parts.scheme.lower()\n    if scheme:\n        if scheme not in _ALLOWED_SCHEMES:\n            return \"#\"\n        if not parts.netloc:\n            return \"#\"\n        return probe\n    # No scheme: reject protocol-relative or backslash tricks; allow only\n    # plain relative references.\n    if probe.startswith((\"//\", \"\\\\\")) or \":\" in probe.split(\"/\", 1)[0]:\n        return \"#\"\n    return probe\n\n\ndef render_profile_link(display_name: str, website: str) -> str:\n    \"\"\"Return an HTML anchor element for a user's profile page: its href attribute is\n    the user's website URL and its text is the user's display name.\n    \"\"\"\n    safe_href = escape(_sanitize_url(website), quote=True)\n    safe_text = escape(str(display_name), quote=True)\n    return f'<a href=\"{safe_href}\">{safe_text}</a>'",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 333,
+    "output_tokens": 551,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

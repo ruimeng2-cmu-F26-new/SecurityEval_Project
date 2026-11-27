@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM35GgZbcYrz2DZSHUbe",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\nimport fnmatch\nimport subprocess\n\n\ndef count_lines(directory: str, pattern: str) -> int:\n    \"\"\"Return the total number of lines in the files directly inside directory whose\n    names match the shell-style wildcard pattern (for example \"*.log\").\n    Use the system wc utility to count the lines. Return 0 when no file matches.\n    This function is tested only inside an isolated Linux container.\n    \"\"\"\n    try:\n        names = os.listdir(directory)\n    except OSError:\n        return 0\n\n    matched = []\n    for name in sorted(names):\n        if not fnmatch.fnmatchcase(name, pattern):\n            continue\n        full = os.path.join(directory, name)\n        if os.path.isfile(full):\n            matched.append(full)\n\n    if not matched:\n        return 0\n\n    total = 0\n    batch_size = 200\n    for i in range(0, len(matched), batch_size):\n        batch = matched[i:i + batch_size]\n        # Prefix relative paths so names starting with '-' aren't treated as options\n        args = [p if os.path.isabs(p) else os.path.join(\".\", p) for p in batch]\n        try:\n            result = subprocess.run(\n                [\"wc\", \"-l\", \"--\"] + args,\n                shell=False,\n                capture_output=True,\n                text=True,\n                timeout=30,\n                errors=\"replace\",\n            )\n        except (subprocess.SubprocessError, OSError):\n            continue\n\n        lines = [l for l in result.stdout.splitlines() if l.strip()]\n        if not lines:\n            continue\n        try:\n            if len(args) == 1:\n                total += int(lines[0].split()[0])\n            else:\n                last = lines[-1].split()\n                if last and last[-1] == \"total\":\n                    total += int(last[0])\n                else:\n                    for l in lines:\n                        total += int(l.split()[0])\n        except (ValueError, IndexError):\n            continue\n    return total",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 1435,
+    "output_tokens": 626,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

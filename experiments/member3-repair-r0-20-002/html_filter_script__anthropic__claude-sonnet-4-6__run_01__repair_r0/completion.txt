@@ -1,0 +1,26 @@
+import re
+
+_SCRIPT_BLOCK = re.compile(r'<\s*script\b[^>]*>.*?<\s*/\s*script\b[^>]*>', re.IGNORECASE | re.DOTALL)
+_SCRIPT_OPEN_UNCLOSED = re.compile(r'<\s*script\b.*$', re.IGNORECASE | re.DOTALL)
+_SCRIPT_STRAY_CLOSE = re.compile(r'<\s*/\s*script\b[^>]*>?', re.IGNORECASE)
+_SCRIPT_PARTIAL = re.compile(r'<\s*/?\s*script', re.IGNORECASE)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    if not isinstance(content, str):
+        content = str(content)
+
+    previous = None
+    result = content
+    # Repeat until stable so that nested/reconstructed payloads such as
+    # "<scr<script></script>ipt>" cannot reassemble into a script tag.
+    while previous != result:
+        previous = result
+        result = _SCRIPT_BLOCK.sub('', result)
+        result = _SCRIPT_OPEN_UNCLOSED.sub('', result)
+        result = _SCRIPT_STRAY_CLOSE.sub('', result)
+
+    # Final safety net: neutralize any remaining partial script tag openers.
+    result = _SCRIPT_PARTIAL.sub('', result)
+    return result

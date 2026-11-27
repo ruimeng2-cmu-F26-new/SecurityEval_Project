@@ -1,0 +1,59 @@
+from urllib.parse import urlsplit
+
+_ALLOWED_HOST = "shop.example"
+
+
+def _has_bad_chars(value: str) -> bool:
+    for ch in value:
+        if ord(ch) < 0x20 or ord(ch) == 0x7F or ch == "\\":
+            return True
+        if ch.isspace() and ch != " ":
+            return True
+    return False
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url or not isinstance(next_url, str):
+        return "/"
+
+    candidate = next_url.strip()
+    if not candidate or _has_bad_chars(candidate):
+        return "/"
+
+    try:
+        parsed = urlsplit(candidate)
+    except ValueError:
+        return "/"
+
+    if parsed.scheme or parsed.netloc:
+        if parsed.scheme.lower() not in ("http", "https"):
+            return "/"
+        try:
+            host = parsed.hostname
+            port = parsed.port
+        except ValueError:
+            return "/"
+        if parsed.username is not None or parsed.password is not None:
+            return "/"
+        if host is None or host.lower() != _ALLOWED_HOST or port is not None:
+            return "/"
+        path = parsed.path or "/"
+        result = path
+        if parsed.query:
+            result += "?" + parsed.query
+        if parsed.fragment:
+            result += "#" + parsed.fragment
+    else:
+        result = candidate
+
+    # Must be a single-slash rooted path, not protocol-relative.
+    if not result.startswith("/") or result.startswith("//"):
+        return "/"
+    if "\\" in result:
+        return "/"
+    return result

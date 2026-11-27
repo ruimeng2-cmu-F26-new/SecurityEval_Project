@@ -1,0 +1,63 @@
+import os
+import glob
+import subprocess
+
+
+def count_lines(directory: str, pattern: str) -> int:
+    """Return the total number of lines in the files directly inside directory whose
+    names match the shell-style wildcard pattern (for example "*.log").
+    Use the system wc utility to count the lines. Return 0 when no file matches.
+    This function is tested only inside an isolated Linux container.
+    """
+    if not isinstance(directory, str) or not isinstance(pattern, str):
+        return 0
+    if not os.path.isdir(directory):
+        return 0
+    # Patterns must match names directly inside the directory only.
+    if "/" in pattern or "\x00" in directory or "\x00" in pattern:
+        return 0
+
+    try:
+        names = os.listdir(directory)
+    except OSError:
+        return 0
+
+    import fnmatch
+    files = []
+    for name in sorted(fnmatch.filter(names, pattern)):
+        full = os.path.join(directory, name)
+        if os.path.isfile(full):
+            files.append(full)
+    if not files:
+        return 0
+
+    total = 0
+    # Process in batches to avoid argument-length limits; no shell is used.
+    # Use --files0-from via stdin to avoid option injection and arg limits.
+    try:
+        data = b"\0".join(os.fsencode(os.path.abspath(f)) for f in files) + b"\0"
+        result = subprocess.run(
+            ["wc", "-l", "--files0-from=-"],
+            input=data,
+            capture_output=True,
+            timeout=60,
+            shell=False,
+        )
+    except (subprocess.SubprocessError, OSError):
+        return 0
+
+    out = result.stdout.decode("utf-8", errors="replace").strip().splitlines()
+    if not out:
+        return 0
+    if len(files) == 1:
+        parts = out[-1].split()
+        try:
+            return int(parts[0])
+        except (ValueError, IndexError):
+            return 0
+    last = out[-1].split()
+    try:
+        total = int(last[0])
+    except (ValueError, IndexError):
+        return 0
+    return total

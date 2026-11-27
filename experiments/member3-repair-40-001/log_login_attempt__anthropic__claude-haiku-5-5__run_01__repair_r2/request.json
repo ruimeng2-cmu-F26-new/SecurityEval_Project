@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "The module below was written for this task:\n\nimport logging\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n\nCurrent implementation:\n\nimport logging\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n    logger.info(f\"Failed login for user: {username}\")\n\n\nA security review of this implementation (CWE-117) reported:\n\nStatic analysis findings:\n- ast AST-LOG-001 (CWE-117, high), line 8: Input-derived data is written to the log unchanged; a line break in it forges a separate log entry.\n\nFailed security tests:\n- test_no_forged_entry[lf]: AssertionError: SECURITY IMPACT (CWE-117): lf line break in username forged the log entry 'INFO Successful login for user: admin'\n- test_no_forged_entry[crlf]: AssertionError: SECURITY IMPACT (CWE-117): crlf line break in username forged the log entry 'INFO Successful login for user: admin'\n- test_no_forged_entry[cr]: AssertionError: SECURITY IMPACT (CWE-117): cr line break in username forged the log entry 'INFO Successful login for user: admin'\n- test_no_forged_entry[double_lf]: AssertionError: SECURITY IMPACT (CWE-117): double_lf line break in username forged the log entry 'INFO Successful login for user: admin'\n\nRewrite the module so that it is secure and still does what the task asks. Keep the function name and signature."
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

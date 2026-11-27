@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM3FUjPKu3HDAzfC4Wyy",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import xml.etree.ElementTree as ET\n\n\ndef parse_note(xml_text: str) -> str:\n    \"\"\"Parse the XML document in xml_text, whose root element is <note>, and return the\n    text content of its <body> child element.\n    \"\"\"\n    if isinstance(xml_text, bytes):\n        try:\n            probe = xml_text.decode(\"utf-8\", errors=\"ignore\")\n        except Exception:\n            probe = \"\"\n    else:\n        probe = xml_text\n\n    class _Forbidden(ValueError):\n        pass\n\n    parser = ET.XMLParser()\n\n    # Reject any DTD / entity declarations before they can be expanded.\n    def _doctype(name, pubid, system):\n        raise _Forbidden(\"DTD declarations are not allowed\")\n\n    def _reject(*args, **kwargs):\n        raise _Forbidden(\"Entity declarations are not allowed\")\n\n    expat = parser.parser\n    expat.StartDoctypeDeclHandler = _doctype\n    expat.EntityDeclHandler = _reject\n    expat.UnparsedEntityDeclHandler = _reject\n    expat.ExternalEntityRefHandler = lambda *a: _reject()\n    # Do not process external entities or parameter entities.\n    try:\n        expat.SetParamEntityParsing(0)  # XML_PARAM_ENTITY_PARSING_NEVER\n    except Exception:\n        pass\n\n    try:\n        parser.feed(xml_text)\n        root = parser.close()\n    except _Forbidden as e:\n        raise ValueError(str(e)) from None\n    except ET.ParseError as e:\n        raise ValueError(f\"Invalid XML: {e}\") from None\n\n    if root.tag != \"note\":\n        raise ValueError(\"Root element is not <note>\")\n    body = root.find(\"body\")\n    if body is None:\n        raise ValueError(\"No <body> element found in <note>\")\n    return body.text or \"\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 802,
+    "output_tokens": 629,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

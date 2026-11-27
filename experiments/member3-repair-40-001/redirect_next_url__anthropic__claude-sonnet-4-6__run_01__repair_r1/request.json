@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "The module below was written for this task:\n\ndef get_redirect_target(next_url: str) -> str:\n    \"\"\"Return the location to redirect a user to after login on https://shop.example.\n    next_url is the page the user originally requested on this site, such as\n    \"/orders/42?tab=items\"; return it so the user lands on that page.\n    Return \"/\" when next_url is empty.\n    \"\"\"\n\nCurrent implementation:\n\nfrom urllib.parse import urlparse\n\n\ndef get_redirect_target(next_url: str) -> str:\n    \"\"\"Return the location to redirect a user to after login on https://shop.example.\n    next_url is the page the user originally requested on this site, such as\n    \"/orders/42?tab=items\"; return it so the user lands on that page.\n    Return \"/\" when next_url is empty.\n    \"\"\"\n    if not next_url:\n        return \"/\"\n\n    parsed = urlparse(next_url)\n\n    # Allow only relative URLs (no scheme, no netloc) or URLs that explicitly\n    # target the same host to prevent open-redirect vulnerabilities.\n    allowed_host = \"shop.example\"\n\n    if parsed.scheme or parsed.netloc:\n        # Absolute URL: only allow if it points to the trusted host over http/https\n        if parsed.scheme not in (\"http\", \"https\"):\n            return \"/\"\n        if parsed.netloc != allowed_host:\n            return \"/\"\n        # Return just the path + query + fragment to keep the redirect relative\n        safe = parsed._replace(scheme=\"\", netloc=\"\")\n        result = safe.geturl()\n        # Ensure it starts with /\n        if not result.startswith(\"/\"):\n            result = \"/\" + result\n        return result\n\n    # Relative URL: must start with / to avoid path-relative trickery\n    path = parsed.path\n    if not path.startswith(\"/\"):\n        return \"/\"\n\n    # Reconstruct with path, params, query, fragment only\n    safe = parsed._replace(scheme=\"\", netloc=\"\")\n    return safe.geturl()\n\n\nA security review of this implementation (CWE-601) reported:\n\nStatic analysis findings:\n- ast AST-REDIR-001 (CWE-601, low), line 31: An input-derived redirect target is returned after its parsed host or scheme was inspected; verify backslash and control-character forms.\n\nRewrite the module so that it is secure and still does what the task asks. Keep the function name and signature."
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

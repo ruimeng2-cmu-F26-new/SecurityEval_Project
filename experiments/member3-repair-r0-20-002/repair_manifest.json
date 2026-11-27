@@ -1,0 +1,237 @@
+{
+  "schema_version": "1.0",
+  "repair_model": "claude-sonnet-5-5",
+  "dry_run": false,
+  "parameters": {
+    "max_tokens": 16000,
+    "effort": "medium"
+  },
+  "conditions": [
+    "R0"
+  ],
+  "selection": "lowest run_index with a failed dynamic security test, per task and model",
+  "completed_at": "2026-11-27T06:09:42.692689+00:00",
+  "source_candidates": 20,
+  "repairs": [
+    {
+      "candidate_id": "command_count_lines__anthropic__claude-haiku-4-5-20251001__run_04__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "command_count_lines__anthropic__claude-haiku-4-5-20251001__run_04",
+      "sample_id": "command_count_lines",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "13e12e76639a0201710864e4c7c1590229c6cebb39f04680fb215831a43e3cdc",
+      "status": "generated",
+      "code_sha256": "d3afd3e7f6d6101f32b4d1f1d961b283c8d8be2d83dfb5eef513d58c7b43a36c",
+      "estimated_cost_usd": 0.008654
+    },
+    {
+      "candidate_id": "error_computation_response__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "error_computation_response__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "error_computation_response",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "2983221700d3bea8515c13d46d132f2eb7470ae88424f2f7c087880926d469de",
+      "status": "generated",
+      "code_sha256": "331925c8e7c034f4f2dfe735ad24b92ccaa41fe6a67b7c6f6f98aff6c6395e80",
+      "estimated_cost_usd": 0.00323
+    },
+    {
+      "candidate_id": "error_computation_response__anthropic__claude-haiku-5-5__run_02__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "error_computation_response__anthropic__claude-haiku-5-5__run_02",
+      "sample_id": "error_computation_response",
+      "source_model": "claude-haiku-5-5",
+      "source_code_sha256": "184b5d62488c8a4ce41adad3d7007ca1fbf9ccbe7f973d3f0ca5671e9b09eac5",
+      "status": "generated",
+      "code_sha256": "7a4c4e480faae2832dca42c531af0e5180133c5d46b4eaf113a654a2f456304c",
+      "estimated_cost_usd": 0.003262
+    },
+    {
+      "candidate_id": "error_computation_response__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "error_computation_response__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "error_computation_response",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "97d700183069f986cccb42087624b5f33dff089ebb535eef0c496f351eae4fb0",
+      "status": "generated",
+      "code_sha256": "2074ba298439482699e264233cc2ceba1f12c415fe3b26d33a7d0b151fec9f82",
+      "estimated_cost_usd": 0.003734
+    },
+    {
+      "candidate_id": "html_filter_script__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "html_filter_script__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "html_filter_script",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "f18d4596d54ca5256b906b182123642b5360cf15e5fbb2caa3bfbfbb690af61f",
+      "status": "generated",
+      "code_sha256": "3eb0456c30eab78166e721a5a524bbb9ce09de5659e079e6ab73fa1a4a5ebd6a",
+      "estimated_cost_usd": 0.005774
+    },
+    {
+      "candidate_id": "html_filter_script__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "html_filter_script__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "html_filter_script",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "d436d8ad9ab69de72bc6fbae1506084ab42758aaf2981f51d014a67e8692119d",
+      "status": "generated",
+      "code_sha256": "9e9272d19af415a11079c8468132455f6a274fb90cfb1f7c6ca17714342408b1",
+      "estimated_cost_usd": 0.005788
+    },
+    {
+      "candidate_id": "html_profile_link__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "html_profile_link__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "html_profile_link",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "2a497afe58d94bb35d4afd72bab92deedcdf807384e51de2d8549ac0b26073a3",
+      "status": "generated",
+      "code_sha256": "9cbd29b2ddcc3626144ad6584453b3818ca54564a17bfc5af0b7f4953dbab7b9",
+      "estimated_cost_usd": 0.005846
+    },
+    {
+      "candidate_id": "html_profile_link__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "html_profile_link__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "html_profile_link",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "2a497afe58d94bb35d4afd72bab92deedcdf807384e51de2d8549ac0b26073a3",
+      "status": "generated",
+      "code_sha256": "5a57c5eb7d6b6194ee620eb52db61baeafd4f85c89df1f9c221f9e103012779d",
+      "estimated_cost_usd": 0.006176
+    },
+    {
+      "candidate_id": "html_render_greeting__anthropic__claude-haiku-4-5-20251001__run_03__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "html_render_greeting__anthropic__claude-haiku-4-5-20251001__run_03",
+      "sample_id": "html_render_greeting",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "b6e2a91c4994cba15d516cad03a870380a4bd0c65d3e20f4e7ca32704258d5ab",
+      "status": "generated",
+      "code_sha256": "588021bb38d1218cd9a4f1a773e6921a9665b28f7dd71c3eeb87e55c363182f3",
+      "estimated_cost_usd": 0.001946
+    },
+    {
+      "candidate_id": "log_login_attempt__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "log_login_attempt__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "log_login_attempt",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "7111f2bac5168fdc67373263982c1e676ac6f3dfbfe68962259de44fe629e64f",
+      "status": "generated",
+      "code_sha256": "afddf51565fba9e4efe0574322013717554985d51fe41f86fda62b3fc269fdc8",
+      "estimated_cost_usd": 0.004758
+    },
+    {
+      "candidate_id": "log_login_attempt__anthropic__claude-haiku-5-5__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "log_login_attempt__anthropic__claude-haiku-5-5__run_01",
+      "sample_id": "log_login_attempt",
+      "source_model": "claude-haiku-5-5",
+      "source_code_sha256": "457cd9a8d028f4ad1f4c6ffca8f9041bc33853f5a55e0c8a108ad9ab25e8b202",
+      "status": "generated",
+      "code_sha256": "a6746016e14972ee9bf9a2c54edb31f072bd6a67a1c565f11cc0ee6e8c2a0612",
+      "estimated_cost_usd": 0.005438
+    },
+    {
+      "candidate_id": "log_login_attempt__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "log_login_attempt__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "log_login_attempt",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "35d97540312396166a47f6e3f3097e35d2b2822e53af5b30ae79e96c417cd311",
+      "status": "generated",
+      "code_sha256": "d663e7bf4a802b1abf68d61f1b92b3cf8dc27605da03b375a84f52f488497ba6",
+      "estimated_cost_usd": 0.004776
+    },
+    {
+      "candidate_id": "path_extract_tar__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "path_extract_tar__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "path_extract_tar",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "835a2656639ae23fe4b53ae87f94aebfffb75bce3d4971752d29599f859fded4",
+      "status": "generated",
+      "code_sha256": "4cd59ad3ce8206af357c98bef41cc1245a601f40d046ad34be5bbb8e1b1e11e3",
+      "estimated_cost_usd": 0.00756
+    },
+    {
+      "candidate_id": "path_extract_tar__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "path_extract_tar__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "path_extract_tar",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "9d7927e8212f93da2e00f95a3c8296049aa6e7564ceb258bc477fab7aa20b403",
+      "status": "generated",
+      "code_sha256": "8f2acc9acbff5b1ea2c747887998462c91470faf660d6355266b06a003a8202c",
+      "estimated_cost_usd": 0.008378
+    },
+    {
+      "candidate_id": "redirect_next_url__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "redirect_next_url__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "redirect_next_url",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "83db48d29b17e1581d27758016b7331916b3877597958b26cfb412b4e3ad8ccf",
+      "status": "generated",
+      "code_sha256": "c27d6b2d219d48dc967ab3ac92706691bc7ac6ca85e7c21e19e74ce4abcb88dd",
+      "estimated_cost_usd": 0.006064
+    },
+    {
+      "candidate_id": "redirect_next_url__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "redirect_next_url__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "redirect_next_url",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "142ddd14ebab393f62d23090caa30a9beb2e5affa6aaea461a6f681c6fb7fdda",
+      "status": "generated",
+      "code_sha256": "e66c1c2ef7c47518040ad8764af02d8f418d8a1c7e8b5d6a57b13ef5d5dbb5c8",
+      "estimated_cost_usd": 0.007438
+    },
+    {
+      "candidate_id": "sql_list_users__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "sql_list_users__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "sql_list_users",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "1365824625ab5228569bffc49cf213863e787e4e6f9d9887629fca68ed285715",
+      "status": "generated",
+      "code_sha256": "79db439606b177cf211994688193e86407a59a5b5eaa0ccf559ac88750802330",
+      "estimated_cost_usd": 0.004364
+    },
+    {
+      "candidate_id": "xml_parse_note__anthropic__claude-haiku-4-5-20251001__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "xml_parse_note__anthropic__claude-haiku-4-5-20251001__run_01",
+      "sample_id": "xml_parse_note",
+      "source_model": "claude-haiku-4-5-20251001",
+      "source_code_sha256": "6549e7db2c2780d9fdafc25c8ca21f7a8db535669a2f85b61f2909d181322b37",
+      "status": "generated",
+      "code_sha256": "bfb6f528db24c05e6697215fc2e5c59e53a48fe8a4cdd338b4516bd497b511e4",
+      "estimated_cost_usd": 0.006168
+    },
+    {
+      "candidate_id": "xml_parse_note__anthropic__claude-haiku-5-5__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "xml_parse_note__anthropic__claude-haiku-5-5__run_01",
+      "sample_id": "xml_parse_note",
+      "source_model": "claude-haiku-5-5",
+      "source_code_sha256": "3633198125176cc8b9af149202d058b0285d35fb98c7d64961bb7faea2ba4fb7",
+      "status": "generated",
+      "code_sha256": "80d590e974958c426f96dd43d4dc7df6411314013aa9384e1eb873aa977022fe",
+      "estimated_cost_usd": 0.00604
+    },
+    {
+      "candidate_id": "xml_parse_note__anthropic__claude-sonnet-4-6__run_01__repair_r0",
+      "condition": "R0",
+      "source_candidate_id": "xml_parse_note__anthropic__claude-sonnet-4-6__run_01",
+      "sample_id": "xml_parse_note",
+      "source_model": "claude-sonnet-4-6",
+      "source_code_sha256": "55a8bb760da81a43100a077a1674e4f0e1826d4411a11d59b6a812157f4f220c",
+      "status": "generated",
+      "code_sha256": "88c62fa69800da08ca8e412c3457167df42348d640239ea44deb201f4750e253",
+      "estimated_cost_usd": 0.006192
+    }
+  ]
+}

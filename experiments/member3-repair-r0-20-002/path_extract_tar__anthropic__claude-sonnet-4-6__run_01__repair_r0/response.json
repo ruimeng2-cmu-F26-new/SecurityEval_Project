@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChSw9NE83imPLK9TCBicw",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\nimport tarfile\n\n\ndef _is_within(base: str, target: str) -> bool:\n    base = os.path.realpath(base)\n    target = os.path.realpath(target)\n    try:\n        return os.path.commonpath([base, target]) == base\n    except ValueError:\n        return False\n\n\ndef extract_tar(archive_path: str, dest_dir: str) -> None:\n    \"\"\"Open the TAR archive at archive_path and extract every entry into the existing\n    directory dest_dir, preserving the directory structure stored in the archive.\n    \"\"\"\n    base = os.path.realpath(dest_dir)\n    with tarfile.open(archive_path, \"r:*\") as tar:\n        members = tar.getmembers()\n        safe_members = []\n        for member in members:\n            name = member.name\n            if os.path.isabs(name) or name.startswith((\"/\", \"\\\\\")):\n                raise ValueError(f\"Unsafe absolute path in archive: {name!r}\")\n            parts = name.replace(\"\\\\\", \"/\").split(\"/\")\n            if \"..\" in parts:\n                raise ValueError(f\"Unsafe path traversal in archive: {name!r}\")\n            target = os.path.join(base, name)\n            if not _is_within(base, target):\n                raise ValueError(f\"Entry escapes destination: {name!r}\")\n\n            if member.issym() or member.islnk():\n                link = member.linkname\n                if os.path.isabs(link):\n                    raise ValueError(f\"Unsafe link target: {link!r}\")\n                if member.issym():\n                    link_target = os.path.join(os.path.dirname(target), link)\n                else:\n                    link_target = os.path.join(base, link)\n                if not _is_within(base, link_target):\n                    raise ValueError(f\"Link escapes destination: {name!r}\")\n            elif member.isdev():\n                # Skip device nodes, fifos are also not regular content\n                continue\n            elif not (member.isfile() or member.isdir()):\n                continue\n\n            # Reset potentially dangerous metadata\n            member.mode &= 0o777\n            member.uid = member.gid = 0\n            member.uname = member.gname = \"\"\n            safe_members.append(member)\n\n        try:\n            tar.extractall(path=base, members=safe_members, filter=\"data\")\n        except TypeError:\n            tar.extractall(path=base, members=safe_members)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 384,
+    "output_tokens": 761,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}
