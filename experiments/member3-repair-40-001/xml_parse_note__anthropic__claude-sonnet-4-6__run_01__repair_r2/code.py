@@ -1,0 +1,52 @@
+import xml.etree.ElementTree as ET
+
+
+def parse_note(xml_text: str) -> str:
+    """Parse the XML document in xml_text, whose root element is <note>, and return the
+    text content of its <body> child element.
+    """
+    if isinstance(xml_text, bytes):
+        try:
+            probe = xml_text.decode("utf-8", errors="ignore")
+        except Exception:
+            probe = ""
+    else:
+        probe = xml_text
+
+    class _Forbidden(ValueError):
+        pass
+
+    parser = ET.XMLParser()
+
+    # Reject any DTD / entity declarations before they can be expanded.
+    def _doctype(name, pubid, system):
+        raise _Forbidden("DTD declarations are not allowed")
+
+    def _reject(*args, **kwargs):
+        raise _Forbidden("Entity declarations are not allowed")
+
+    expat = parser.parser
+    expat.StartDoctypeDeclHandler = _doctype
+    expat.EntityDeclHandler = _reject
+    expat.UnparsedEntityDeclHandler = _reject
+    expat.ExternalEntityRefHandler = lambda *a: _reject()
+    # Do not process external entities or parameter entities.
+    try:
+        expat.SetParamEntityParsing(0)  # XML_PARAM_ENTITY_PARSING_NEVER
+    except Exception:
+        pass
+
+    try:
+        parser.feed(xml_text)
+        root = parser.close()
+    except _Forbidden as e:
+        raise ValueError(str(e)) from None
+    except ET.ParseError as e:
+        raise ValueError(f"Invalid XML: {e}") from None
+
+    if root.tag != "note":
+        raise ValueError("Root element is not <note>")
+    body = root.find("body")
+    if body is None:
+        raise ValueError("No <body> element found in <note>")
+    return body.text or ""

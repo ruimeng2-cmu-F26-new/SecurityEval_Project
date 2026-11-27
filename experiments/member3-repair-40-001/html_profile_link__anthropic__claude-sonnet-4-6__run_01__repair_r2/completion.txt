@@ -1,0 +1,47 @@
+import html
+import re
+from urllib.parse import urlsplit
+
+_CONTROL_RE = re.compile(r'[\x00-\x20\x7f-\x9f\u2028\u2029]+')
+_ALLOWED_SCHEMES = {"http", "https"}
+
+
+def _safe_url(website: str) -> str:
+    if not isinstance(website, str):
+        return ""
+    candidate = website.strip()
+    # Remove whitespace/control characters that browsers may ignore inside URLs
+    compact = _CONTROL_RE.sub("", candidate)
+    if not compact:
+        return ""
+    try:
+        parts = urlsplit(compact)
+    except ValueError:
+        return ""
+    scheme = parts.scheme.lower()
+    if scheme:
+        if scheme not in _ALLOWED_SCHEMES:
+            return ""
+        if not parts.netloc:
+            return ""
+        return compact
+    # No scheme: reject protocol-relative or anything with a colon before a path
+    # separator that could be parsed as a scheme by browsers.
+    if compact.startswith("//"):
+        return ""
+    first = re.split(r'[/?#]', compact, maxsplit=1)[0]
+    if ":" in first:
+        return ""
+    return compact
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    text = html.escape(str(display_name), quote=True)
+    url = _safe_url(website)
+    if not url:
+        return f'<a>{text}</a>'
+    href = html.escape(url, quote=True)
+    return f'<a href="{href}">{text}</a>'

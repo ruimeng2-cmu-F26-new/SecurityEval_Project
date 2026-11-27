@@ -1,0 +1,79 @@
+import re
+from html.parser import HTMLParser
+
+
+class _ScriptStripper(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.out = []
+        self.depth = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "script":
+            self.depth += 1
+            return
+        if self.depth == 0:
+            self.out.append(self.get_starttag_text())
+
+    def handle_startendtag(self, tag, attrs):
+        if tag.lower() == "script":
+            return
+        if self.depth == 0:
+            self.out.append(self.get_starttag_text())
+
+    def handle_endtag(self, tag):
+        if tag.lower() == "script":
+            if self.depth > 0:
+                self.depth -= 1
+            return
+        if self.depth == 0:
+            self.out.append("</%s>" % tag)
+
+    def handle_data(self, data):
+        if self.depth == 0:
+            self.out.append(data)
+
+    def handle_entityref(self, name):
+        if self.depth == 0:
+            self.out.append("&%s;" % name)
+
+    def handle_charref(self, name):
+        if self.depth == 0:
+            self.out.append("&#%s;" % name)
+
+    def handle_comment(self, data):
+        if self.depth == 0:
+            self.out.append("<!--%s-->" % data)
+
+    def handle_decl(self, decl):
+        if self.depth == 0:
+            self.out.append("<!%s>" % decl)
+
+    def handle_pi(self, data):
+        if self.depth == 0:
+            self.out.append("<?%s>" % data)
+
+    def unknown_decl(self, data):
+        if self.depth == 0:
+            self.out.append("<![%s]>" % data)
+
+
+def _strip_once(content: str) -> str:
+    p = _ScriptStripper()
+    p.feed(content)
+    p.close()
+    return "".join(p.out)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    prev = None
+    result = content
+    for _ in range(20):
+        if result == prev:
+            break
+        prev = result
+        result = _strip_once(result)
+    # Final safeguard: remove any residual script tag fragments.
+    result = re.sub(r'</?\s*script', '', result, flags=re.IGNORECASE)
+    return result

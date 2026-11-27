@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "The module below was written for this task:\n\nimport re\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n\nCurrent implementation:\n\nimport re\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n    return re.sub(r'<script\\b[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)\n\n\nA security review of this implementation (CWE-116) reported:\n\nThe implementation has a security vulnerability. No further detail is available.\n\nRewrite the module so that it is secure and still does what the task asks. Keep the function name and signature."
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

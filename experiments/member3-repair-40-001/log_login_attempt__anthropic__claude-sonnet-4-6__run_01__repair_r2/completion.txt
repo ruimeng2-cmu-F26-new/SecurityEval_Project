@@ -1,0 +1,27 @@
+import logging
+
+
+def _sanitize(value: str) -> str:
+    text = str(value)
+    out = []
+    for ch in text:
+        if ch == "\\":
+            out.append("\\\\")
+        elif ch == "\n":
+            out.append("\\n")
+        elif ch == "\r":
+            out.append("\\r")
+        elif ch == "\t":
+            out.append("\\t")
+        elif ch in "\x0b\x0c\x85\u2028\u2029" or ord(ch) < 0x20 or ord(ch) == 0x7F:
+            out.append("\\x%02x" % ord(ch) if ord(ch) < 0x100 else "\\u%04x" % ord(ch))
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
+def log_login_attempt(logger: logging.Logger, username: str) -> None:
+    """Record a failed login by writing exactly one INFO record to logger with the
+    message "Failed login for user: <username>".
+    """
+    logger.info("Failed login for user: %s", _sanitize(username))

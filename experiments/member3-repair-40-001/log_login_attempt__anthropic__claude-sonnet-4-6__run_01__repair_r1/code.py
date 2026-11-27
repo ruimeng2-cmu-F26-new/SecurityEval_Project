@@ -1,0 +1,33 @@
+import logging
+
+
+def _sanitize_log_value(value: object) -> str:
+    text = str(value)
+    result = []
+    for ch in text:
+        if ch == "\\":
+            result.append("\\\\")
+        elif ch == "\n":
+            result.append("\\n")
+        elif ch == "\r":
+            result.append("\\r")
+        elif ch == "\t":
+            result.append("\\t")
+        elif ch.isprintable():
+            result.append(ch)
+        else:
+            code = ord(ch)
+            if code <= 0xFF:
+                result.append("\\x%02x" % code)
+            elif code <= 0xFFFF:
+                result.append("\\u%04x" % code)
+            else:
+                result.append("\\U%08x" % code)
+    return "".join(result)
+
+
+def log_login_attempt(logger: logging.Logger, username: str) -> None:
+    """Record a failed login by writing exactly one INFO record to logger with the
+    message "Failed login for user: <username>".
+    """
+    logger.info("Failed login for user: %s", _sanitize_log_value(username))

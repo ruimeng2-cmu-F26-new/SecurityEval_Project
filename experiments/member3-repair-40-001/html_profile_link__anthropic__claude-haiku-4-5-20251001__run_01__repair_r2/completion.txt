@@ -1,0 +1,44 @@
+import html
+import re
+from urllib.parse import urlsplit
+
+_SAFE_SCHEMES = {"http", "https"}
+_CONTROL_AND_SPACE = re.compile(r"[\x00-\x20\x7f-\x9f\u2028\u2029]")
+
+
+def _sanitize_url(website: str) -> str:
+    if not isinstance(website, str):
+        website = str(website)
+    # Remove whitespace/control characters that browsers ignore inside URLs.
+    cleaned = _CONTROL_AND_SPACE.sub("", website)
+    if not cleaned:
+        return ""
+    try:
+        parts = urlsplit(cleaned)
+    except ValueError:
+        return ""
+    scheme = parts.scheme.lower()
+    if scheme:
+        if scheme not in _SAFE_SCHEMES:
+            return ""
+        return cleaned
+    # No scheme: reject protocol-relative or anything with a colon before a path
+    # delimiter (could be parsed as a scheme by browsers).
+    if cleaned.startswith("//") or cleaned.startswith("\\"):
+        return ""
+    first = re.split(r"[/?#]", cleaned, maxsplit=1)[0]
+    if ":" in first:
+        return ""
+    return cleaned
+
+
+def render_profile_link(display_name: str, website: str) -> str:
+    """Return an HTML anchor element for a user's profile page: its href attribute is
+    the user's website URL and its text is the user's display name.
+    """
+    href = _sanitize_url(website)
+    if not href:
+        href = "#"
+    safe_href = html.escape(href, quote=True)
+    safe_name = html.escape(str(display_name), quote=True)
+    return f'<a href="{safe_href}">{safe_name}</a>'

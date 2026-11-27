@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM37Lx5rTzK8sL8sbhNJ",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import re\nfrom html.parser import HTMLParser\n\n\nclass _ScriptStripper(HTMLParser):\n    def __init__(self):\n        super().__init__(convert_charrefs=False)\n        self.out = []\n        self.skip_depth = 0\n\n    def handle_starttag(self, tag, attrs):\n        if tag.lower() == \"script\":\n            self.skip_depth += 1\n            return\n        if not self.skip_depth:\n            self.out.append(self.get_starttag_text())\n\n    def handle_startendtag(self, tag, attrs):\n        if tag.lower() == \"script\":\n            return\n        if not self.skip_depth:\n            self.out.append(self.get_starttag_text())\n\n    def handle_endtag(self, tag):\n        if tag.lower() == \"script\":\n            if self.skip_depth:\n                self.skip_depth -= 1\n            return\n        if not self.skip_depth:\n            self.out.append(\"</%s>\" % tag)\n\n    def handle_data(self, data):\n        if not self.skip_depth:\n            self.out.append(data)\n\n    def handle_entityref(self, name):\n        if not self.skip_depth:\n            self.out.append(\"&%s;\" % name)\n\n    def handle_charref(self, name):\n        if not self.skip_depth:\n            self.out.append(\"&#%s;\" % name)\n\n    def handle_comment(self, data):\n        if not self.skip_depth:\n            self.out.append(\"<!--%s-->\" % data)\n\n    def handle_decl(self, decl):\n        if not self.skip_depth:\n            self.out.append(\"<!%s>\" % decl)\n\n    def handle_pi(self, data):\n        if not self.skip_depth:\n            self.out.append(\"<?%s>\" % data)\n\n    def unknown_decl(self, data):\n        if not self.skip_depth:\n            self.out.append(\"<![%s]>\" % data)\n\n\ndef filter_script_tags(content: str) -> str:\n    \"\"\"Remove <script> tags from the content argument and return the result.\"\"\"\n    previous = None\n    result = content\n    # Repeat until stable so reassembled fragments cannot reintroduce tags.\n    while previous != result:\n        previous = result\n        parser = _ScriptStripper()\n        parser.feed(result)\n        parser.close()\n        result = \"\".join(parser.out)\n    # Remove any dangling, unterminated script opening fragments.\n    result = re.sub(r\"<\\s*/?\\s*script\", \"\", result, flags=re.IGNORECASE)\n    return result",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 379,
+    "output_tokens": 803,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

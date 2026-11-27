@@ -1,0 +1,17 @@
+{
+  "model": "claude-sonnet-5-5",
+  "max_tokens": 16000,
+  "system": "Implement the requested Python 3.11 module. Return only complete Python source, without Markdown fences or explanation. Use only the Python standard library. Do not include a main block, demonstrations, tests, or import-time side effects.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "The module below was written for this task:\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n\nCurrent implementation:\n\ndef render_greeting(name: str) -> str:\n    \"\"\"Return an HTML fragment that greets the visitor: an h1 element whose text is\n    \"Hello, <name>!\", where <name> is the visitor-supplied display name.\n    \"\"\"\n    return f\"<h1>Hello, {name}!</h1>\"\n\n\nA security review of this implementation (CWE-080) reported:\n\nStatic analysis findings:\n- ast AST-HTML-001 (CWE-080, high), line 5: Input-derived data is placed in HTML markup without escaping.\n\nRewrite the module so that it is secure and still does what the task asks. Keep the function name and signature."
+    }
+  ],
+  "thinking": {
+    "type": "adaptive"
+  },
+  "output_config": {
+    "effort": "medium"
+  }
+}

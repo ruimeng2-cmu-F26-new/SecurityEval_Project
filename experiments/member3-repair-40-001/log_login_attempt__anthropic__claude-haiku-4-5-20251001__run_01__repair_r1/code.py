@@ -1,0 +1,26 @@
+import logging
+
+def log_login_attempt(logger: logging.Logger, username: str) -> None:
+    """Record a failed login by writing exactly one INFO record to logger with the
+    message "Failed login for user: <username>".
+
+    Line breaks and other control characters in the username are escaped so
+    that they cannot forge additional log entries.
+    """
+    text = str(username)
+    sanitized = []
+    for ch in text:
+        code = ord(ch)
+        if ch == "\\":
+            sanitized.append("\\\\")
+        elif ch == "\n":
+            sanitized.append("\\n")
+        elif ch == "\r":
+            sanitized.append("\\r")
+        elif ch == "\t":
+            sanitized.append("\\t")
+        elif code < 32 or code == 127 or 0x80 <= code <= 0x9F or ch in "\u2028\u2029":
+            sanitized.append("\\x%02x" % code if code < 256 else "\\u%04x" % code)
+        else:
+            sanitized.append(ch)
+    logger.info("Failed login for user: %s", "".join(sanitized))

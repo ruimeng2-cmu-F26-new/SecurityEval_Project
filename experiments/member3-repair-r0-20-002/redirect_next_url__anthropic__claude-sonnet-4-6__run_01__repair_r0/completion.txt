@@ -1,0 +1,51 @@
+from urllib.parse import urlsplit
+
+_ALLOWED_HOST = "shop.example"
+
+
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    if not next_url or not isinstance(next_url, str):
+        return "/"
+
+    # Reject control characters, whitespace and backslashes, which browsers
+    # may normalize in ways that turn a path into a different host.
+    for ch in next_url:
+        if ord(ch) < 0x21 or ord(ch) == 0x7F or ch == "\\":
+            return "/"
+
+    try:
+        parsed = urlsplit(next_url)
+    except ValueError:
+        return "/"
+
+    if parsed.scheme or parsed.netloc:
+        if parsed.scheme.lower() not in ("http", "https"):
+            return "/"
+        try:
+            host = parsed.hostname
+            port = parsed.port
+        except ValueError:
+            return "/"
+        if parsed.username is not None or parsed.password is not None:
+            return "/"
+        if host is None or host.lower() != _ALLOWED_HOST or port is not None:
+            return "/"
+        path = parsed.path or "/"
+    else:
+        path = parsed.path
+
+    # Must be a single-slash rooted path (not protocol-relative "//host").
+    if not path.startswith("/") or path.startswith("//"):
+        return "/"
+
+    result = path
+    if parsed.query:
+        result += "?" + parsed.query
+    if parsed.fragment:
+        result += "#" + parsed.fragment
+    return result

@@ -1,0 +1,44 @@
+import re
+import xml.etree.ElementTree as ET
+
+
+class _SafeParser(ET.XMLParser):
+    """XMLParser that rejects any DTD / entity declarations."""
+
+    def __init__(self):
+        super().__init__()
+        parser = self.parser
+
+        def _reject_doctype(*args, **kwargs):
+            raise ValueError("DTD declarations are not allowed")
+
+        def _reject_entity(*args, **kwargs):
+            raise ValueError("Entity declarations are not allowed")
+
+        parser.StartDoctypeDeclHandler = _reject_doctype
+        parser.EntityDeclHandler = _reject_entity
+        parser.UnparsedEntityDeclHandler = _reject_entity
+        parser.ExternalEntityRefHandler = lambda *a, **k: _reject_entity()
+
+
+_DOCTYPE_RE = re.compile(r"<!\s*(DOCTYPE|ENTITY)", re.IGNORECASE)
+
+
+def parse_note(xml_text: str) -> str:
+    """Parse the XML document in xml_text, whose root element is <note>, and return the
+    text content of its <body> child element.
+    """
+    if isinstance(xml_text, str):
+        if _DOCTYPE_RE.search(xml_text):
+            raise ValueError("DTD declarations are not allowed")
+    elif isinstance(xml_text, (bytes, bytearray)):
+        if _DOCTYPE_RE.search(bytes(xml_text).decode("latin-1")):
+            raise ValueError("DTD declarations are not allowed")
+
+    parser = _SafeParser()
+    parser.feed(xml_text)
+    root = parser.close()
+    body = root.find("body")
+    if body is None:
+        return ""
+    return body.text if body.text is not None else ""

@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM3C89ne5HDx3qNZA8UZ",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\nimport tarfile\n\n\ndef _is_within(base: str, target: str) -> bool:\n    try:\n        return os.path.commonpath([base, target]) == base\n    except ValueError:\n        return False\n\n\ndef extract_tar(archive_path: str, dest_dir: str) -> None:\n    \"\"\"Open the TAR archive at archive_path and extract every entry into the existing\n    directory dest_dir, preserving the directory structure stored in the archive.\n    \"\"\"\n    base = os.path.realpath(dest_dir)\n    with tarfile.open(archive_path, \"r:*\") as tar:\n        safe_members = []\n        for member in tar.getmembers():\n            name = member.name\n            if os.path.isabs(name) or name.startswith((\"/\", \"\\\\\")):\n                raise ValueError(f\"Unsafe absolute path in archive: {name}\")\n            parts = name.replace(\"\\\\\", \"/\").split(\"/\")\n            if \"..\" in parts:\n                raise ValueError(f\"Unsafe path in archive: {name}\")\n\n            target = os.path.realpath(os.path.join(base, name))\n            if not _is_within(base, target):\n                raise ValueError(f\"Unsafe path in archive: {name}\")\n\n            if member.issym() or member.islnk():\n                link = member.linkname\n                if member.issym():\n                    link_target = os.path.join(\n                        os.path.dirname(os.path.join(base, name)), link\n                    )\n                else:\n                    link_target = os.path.join(base, link)\n                if os.path.isabs(link) or not _is_within(\n                    base, os.path.realpath(link_target)\n                ):\n                    raise ValueError(f\"Unsafe link in archive: {name}\")\n            elif member.isdev():\n                continue\n\n            safe_members.append(member)\n\n        # Extract one by one, re-checking real paths to defend against\n        # symlinks created earlier in the same archive.\n        for member in safe_members:\n            target = os.path.realpath(os.path.join(base, member.name))\n            if not _is_within(base, target):\n                raise ValueError(f\"Unsafe path in archive: {member.name}\")\n            if hasattr(tarfile, \"data_filter\"):\n                tar.extract(member, path=base, filter=\"data\")\n            else:\n                tar.extract(member, path=base)",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 830,
+    "output_tokens": 741,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

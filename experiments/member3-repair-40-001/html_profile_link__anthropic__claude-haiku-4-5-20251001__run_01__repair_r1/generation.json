@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "candidate_id": "html_profile_link__anthropic__claude-haiku-4-5-20251001__run_01__repair_r1",
+  "sample_id": "html_profile_link",
+  "run_index": 1,
+  "status": "generated",
+  "provider": "anthropic",
+  "requested_model": "claude-sonnet-5-5",
+  "returned_model": "claude-sonnet-5-5",
+  "effort": "medium",
+  "thinking_type": "adaptive",
+  "max_tokens": 16000,
+  "stop_reason": "end_turn",
+  "failure_kind": null,
+  "created_at": "2026-11-24T03:24:07.542927+00:00",
+  "completed_at": "2026-11-24T03:24:10.835664+00:00",
+  "request_file": "request.json",
+  "sample_file": "sample.json",
+  "prompt_sha256": "bd84d61113f888dbfb99154d3eede05cbc79aa934fb9c0b294ff7612e15dccef",
+  "request_sha256": "4b2b079004d1e221d647dfc67c89bf86b909c973afefcdd7b82f31b5aa248f54",
+  "response_file": "response.json",
+  "response_sha256": "8005141041a0a39368ed5eeae44529aba5455810a926661bd35c3b6fac735a9d",
+  "raw_output_file": "completion.txt",
+  "code_file": "code.py",
+  "code_sha256": "d27360f4cf530ee4b712e0dde61170052dee5f4899304a669261eac612017f3d",
+  "syntax_valid": true,
+  "response_id": "msg_011ChM38PzvAXxokY8HC4jAc",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 410,
+    "output_tokens": 468,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  },
+  "estimated_cost_usd": 0.0055,
+  "error": null
+}

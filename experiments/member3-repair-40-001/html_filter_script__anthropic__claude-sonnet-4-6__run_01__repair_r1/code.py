@@ -1,0 +1,74 @@
+import re
+from html.parser import HTMLParser
+
+
+class _ScriptStripper(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.out = []
+        self.skip_depth = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "script":
+            self.skip_depth += 1
+            return
+        if not self.skip_depth:
+            self.out.append(self.get_starttag_text())
+
+    def handle_startendtag(self, tag, attrs):
+        if tag.lower() == "script":
+            return
+        if not self.skip_depth:
+            self.out.append(self.get_starttag_text())
+
+    def handle_endtag(self, tag):
+        if tag.lower() == "script":
+            if self.skip_depth:
+                self.skip_depth -= 1
+            return
+        if not self.skip_depth:
+            self.out.append("</%s>" % tag)
+
+    def handle_data(self, data):
+        if not self.skip_depth:
+            self.out.append(data)
+
+    def handle_entityref(self, name):
+        if not self.skip_depth:
+            self.out.append("&%s;" % name)
+
+    def handle_charref(self, name):
+        if not self.skip_depth:
+            self.out.append("&#%s;" % name)
+
+    def handle_comment(self, data):
+        if not self.skip_depth:
+            self.out.append("<!--%s-->" % data)
+
+    def handle_decl(self, decl):
+        if not self.skip_depth:
+            self.out.append("<!%s>" % decl)
+
+    def handle_pi(self, data):
+        if not self.skip_depth:
+            self.out.append("<?%s>" % data)
+
+    def unknown_decl(self, data):
+        if not self.skip_depth:
+            self.out.append("<![%s]>" % data)
+
+
+def filter_script_tags(content: str) -> str:
+    """Remove <script> tags from the content argument and return the result."""
+    previous = None
+    result = content
+    # Repeat until stable so reassembled fragments cannot reintroduce tags.
+    while previous != result:
+        previous = result
+        parser = _ScriptStripper()
+        parser.feed(result)
+        parser.close()
+        result = "".join(parser.out)
+    # Remove any dangling, unterminated script opening fragments.
+    result = re.sub(r"<\s*/?\s*script", "", result, flags=re.IGNORECASE)
+    return result

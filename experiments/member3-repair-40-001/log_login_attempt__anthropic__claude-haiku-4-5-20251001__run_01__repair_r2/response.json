@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM3A3u12dq9BrzxDZk7A",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import logging\n\n\ndef _sanitize_for_log(value: object) -> str:\n    text = str(value)\n    result = []\n    for ch in text:\n        if ch == \"\\\\\":\n            result.append(\"\\\\\\\\\")\n        elif ch == \"\\n\":\n            result.append(\"\\\\n\")\n        elif ch == \"\\r\":\n            result.append(\"\\\\r\")\n        elif ch == \"\\t\":\n            result.append(\"\\\\t\")\n        elif ch in \"\\x0b\\x0c\\x85\\u2028\\u2029\" or ord(ch) < 0x20 or ord(ch) == 0x7F or 0x80 <= ord(ch) <= 0x9F:\n            code = ord(ch)\n            if code <= 0xFF:\n                result.append(\"\\\\x%02x\" % code)\n            else:\n                result.append(\"\\\\u%04x\" % code)\n        else:\n            result.append(ch)\n    return \"\".join(result)\n\n\ndef log_login_attempt(logger: logging.Logger, username: str) -> None:\n    \"\"\"Record a failed login by writing exactly one INFO record to logger with the\n    message \"Failed login for user: <username>\".\n    \"\"\"\n    logger.info(\"Failed login for user: %s\", _sanitize_for_log(username))",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 661,
+    "output_tokens": 386,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

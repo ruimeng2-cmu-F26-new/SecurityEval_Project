@@ -1,0 +1,42 @@
+import re
+import xml.etree.ElementTree as ET
+
+
+def parse_note(xml_text: str) -> str:
+    """Parse the XML document in xml_text, whose root element is <note>, and return the
+    text content of its <body> child element.
+    """
+    if isinstance(xml_text, bytes):
+        head = xml_text[:4096].decode("latin-1", errors="ignore")
+        scan = xml_text.decode("latin-1", errors="ignore")
+    else:
+        scan = xml_text
+
+    # Reject any DTD / entity declarations outright to prevent entity expansion
+    # attacks (billion laughs, quadratic blowup, external entities).
+    if re.search(r"<!\s*(DOCTYPE|ENTITY)", scan, re.IGNORECASE):
+        raise ValueError("DTD and entity declarations are not allowed")
+    # UTF-16/32 encoded input would evade the textual check above; reject
+    # inputs containing NUL bytes/characters.
+    if "\x00" in scan:
+        raise ValueError("Unsupported encoding or invalid content")
+
+    class _SafeParser(ET.XMLParser):
+        def __init__(self):
+            super().__init__()
+            # Fail on any doctype or entity declaration the parser sees.
+            def _reject(*args, **kwargs):
+                raise ValueError("DTD and entity declarations are not allowed")
+            try:
+                self.parser.StartDoctypeDeclHandler = _reject
+                self.parser.EntityDeclHandler = _reject
+            except AttributeError:
+                pass
+
+    root = ET.fromstring(xml_text, parser=_SafeParser())
+    if root.tag != "note":
+        raise ValueError("Root element is not <note>")
+    body = root.find("body")
+    if body is None:
+        raise ValueError("No <body> element found in <note>")
+    return body.text or ""

@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChM3ELgQamimVhJDxRyRT",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import xml.etree.ElementTree as ET\n\n\ndef parse_note(xml_text: str) -> str:\n    \"\"\"Parse the XML document in xml_text, whose root element is <note>, and return the\n    text content of its <body> child element.\n\n    Documents containing a DTD or entity declarations are rejected, which\n    prevents entity expansion attacks (billion laughs, etc.).\n    \"\"\"\n    if isinstance(xml_text, bytes):\n        try:\n            probe = xml_text.decode(\"utf-8\", errors=\"ignore\")\n        except Exception:\n            probe = \"\"\n    else:\n        probe = xml_text\n\n    upper = probe.upper()\n    if \"<!DOCTYPE\" in upper or \"<!ENTITY\" in upper:\n        raise ValueError(\"DTDs and entity declarations are not allowed\")\n\n    class _Target(ET.TreeBuilder):\n        pass\n\n    parser = ET.XMLParser(target=_Target())\n\n    # Reject any doctype / entity declaration at parse time as well.\n    def _forbid(*args, **kwargs):\n        raise ValueError(\"DTDs and entity declarations are not allowed\")\n\n    try:\n        parser.parser.StartDoctypeDeclHandler = _forbid\n        parser.parser.EntityDeclHandler = _forbid\n        parser.parser.UseForeignDTD(False)\n    except AttributeError:\n        pass\n\n    parser.feed(xml_text)\n    root = parser.close()\n\n    body = root.find(\"body\")\n    if body is not None:\n        return body.text if body.text is not None else \"\"\n    return \"\"",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 795,
+    "output_tokens": 517,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "msg_011ChSw65vm4ifYJ5881HseK",
+  "container": null,
+  "content": [
+    {
+      "citations": null,
+      "text": "import os\nimport glob\nimport subprocess\n\n\ndef count_lines(directory: str, pattern: str) -> int:\n    \"\"\"Return the total number of lines in the files directly inside directory whose\n    names match the shell-style wildcard pattern (for example \"*.log\").\n    Use the system wc utility to count the lines. Return 0 when no file matches.\n    This function is tested only inside an isolated Linux container.\n    \"\"\"\n    if not isinstance(directory, str) or not isinstance(pattern, str):\n        return 0\n    if not os.path.isdir(directory):\n        return 0\n    # Patterns must match names directly inside the directory only.\n    if \"/\" in pattern or \"\\x00\" in directory or \"\\x00\" in pattern:\n        return 0\n\n    try:\n        names = os.listdir(directory)\n    except OSError:\n        return 0\n\n    import fnmatch\n    files = []\n    for name in sorted(fnmatch.filter(names, pattern)):\n        full = os.path.join(directory, name)\n        if os.path.isfile(full):\n            files.append(full)\n    if not files:\n        return 0\n\n    total = 0\n    # Process in batches to avoid argument-length limits; no shell is used.\n    # Use --files0-from via stdin to avoid option injection and arg limits.\n    try:\n        data = b\"\\0\".join(os.fsencode(os.path.abspath(f)) for f in files) + b\"\\0\"\n        result = subprocess.run(\n            [\"wc\", \"-l\", \"--files0-from=-\"],\n            input=data,\n            capture_output=True,\n            timeout=60,\n            shell=False,\n        )\n    except (subprocess.SubprocessError, OSError):\n        return 0\n\n    out = result.stdout.decode(\"utf-8\", errors=\"replace\").strip().splitlines()\n    if not out:\n        return 0\n    if len(files) == 1:\n        parts = out[-1].split()\n        try:\n            return int(parts[0])\n        except (ValueError, IndexError):\n            return 0\n    last = out[-1].split()\n    try:\n        total = int(last[0])\n    except (ValueError, IndexError):\n        return 0\n    return total",
+      "type": "text"
+    }
+  ],
+  "diagnostics": null,
+  "model": "claude-sonnet-5-5",
+  "role": "assistant",
+  "stop_details": null,
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "inference_geo": "global",
+    "input_tokens": 877,
+    "output_tokens": 690,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": null,
+    "service_tier": "standard",
+    "speed": "standard"
+  }
+}

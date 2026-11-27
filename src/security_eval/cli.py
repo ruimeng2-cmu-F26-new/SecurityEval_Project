@@ -10,6 +10,7 @@ from .contracts import load_samples, validate
 from .evaluation import merge_labels, run_metrics, write_label_sheet
 from .generation import generate, prepare, run_batch, run_experiment
 from .pipeline import evaluate
+from .repair import report as repair_report, run_repair
 from . import dynamic_runner
 from .static_runner import all_completed, format_summary, run_static
 
@@ -79,6 +80,23 @@ def main(argv=None) -> int:
     experiment.add_argument("--max-tokens", type=int, default=16000)
     experiment.add_argument("--effort", choices=["none", "low", "medium", "high", "xhigh", "max"],
                             default="medium")
+    repair = commands.add_parser("repair", help="Ask a model to repair dynamic-positive candidates (R1/R2 feedback)")
+    repair.add_argument("--candidates", nargs="+", type=Path, required=True,
+                        help="Experiment or generation run directories")
+    repair.add_argument("--results", nargs="+", type=Path, required=True,
+                        help="Directories with the static and dynamic results of those candidates")
+    repair.add_argument("--model", required=True, help="Repair model ID")
+    repair.add_argument("--out", type=Path, required=True, help="New directory; existing results are never overwritten")
+    repair.add_argument("--conditions", nargs="+", choices=["R0", "R1", "R2"], default=["R0", "R1", "R2"],
+                        help="Feedback conditions to run")
+    repair.add_argument("--dry-run", action="store_true")
+    repair.add_argument("--max-tokens", type=int, default=16000)
+    repair.add_argument("--effort", choices=["none", "low", "medium", "high", "xhigh", "max"], default="medium")
+    repair_summary = commands.add_parser("repair-report", help="Summarise static and dynamic results of repairs")
+    repair_summary.add_argument("repair_dirs", nargs="+", type=Path)
+    repair_summary.add_argument("--results", nargs="+", type=Path, required=True,
+                                help="Static and dynamic results of the original and repaired candidates")
+    repair_summary.add_argument("--out", type=Path, required=True, help="New directory")
     args = parser.parse_args(argv)
     try:
         if args.command == "dynamic":
@@ -105,6 +123,17 @@ def main(argv=None) -> int:
             result = run_metrics(args.candidates, args.results, args.out, args.labels)
             print(json.dumps({"pairs": result["pairs"], "labels": result["labels"],
                               "skipped": len(result["skipped"]), "report": str(args.out / "report.md")}))
+        elif args.command == "repair":
+            manifest = run_repair(args.candidates, args.results, args.out, args.model, dry_run=args.dry_run,
+                                  conditions=tuple(args.conditions),
+                                  max_tokens=args.max_tokens, effort=args.effort)
+            statuses = [entry["status"] for entry in manifest["repairs"]]
+            print(json.dumps({"source_candidates": manifest["source_candidates"],
+                              "status_counts": {s: statuses.count(s) for s in sorted(set(statuses))},
+                              "manifest": str(args.out / "repair_manifest.json")}))
+            return 0 if "error" not in statuses else 1
+        elif args.command == "repair-report":
+            print(json.dumps(repair_report(args.repair_dirs, args.results, args.out)))
         elif args.command == "static":
             summary = run_static(args.paths, args.out, args.sample_id)
             print(format_summary(summary))

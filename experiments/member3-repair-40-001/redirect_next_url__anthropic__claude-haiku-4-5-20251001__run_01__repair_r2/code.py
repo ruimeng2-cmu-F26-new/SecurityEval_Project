@@ -1,0 +1,35 @@
+def get_redirect_target(next_url: str) -> str:
+    """Return the location to redirect a user to after login on https://shop.example.
+    next_url is the page the user originally requested on this site, such as
+    "/orders/42?tab=items"; return it so the user lands on that page.
+    Return "/" when next_url is empty.
+    """
+    from urllib.parse import urlsplit
+
+    if not next_url or not isinstance(next_url, str):
+        return "/"
+
+    # Reject control characters, whitespace and backslashes (browsers treat
+    # backslashes as slashes and strip tabs/newlines).
+    for ch in next_url:
+        if ch == "\\" or ord(ch) < 0x20 or ord(ch) == 0x7F or ch.isspace():
+            return "/"
+
+    # Must be an absolute path on this site, not protocol-relative.
+    if not next_url.startswith("/") or next_url.startswith("//"):
+        return "/"
+
+    try:
+        parsed = urlsplit(next_url)
+    except ValueError:
+        return "/"
+
+    if parsed.scheme or parsed.netloc:
+        return "/"
+
+    # Guard against percent-encoded backslash or slash tricks at the start.
+    lowered = next_url[:4].lower()
+    if lowered.startswith("/%5c") or lowered.startswith("/%2f"):
+        return "/"
+
+    return next_url
